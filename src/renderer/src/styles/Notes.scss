@@ -1,0 +1,114 @@
+$note-bg: #fdfdfd;
+$note-border: #e0e0e0;
+$note-shadow: rgba(0, 0, 0, 0.1);
+$note-header-bg: #f7f7f7;
+$note-header-color: #333;
+$note-body-color: #555;
+$note-footer-bg: #fafafa;
+$primary-btn-bg: #4caf50;
+$primary-btn-bg-hover: #3e8e41;
+$danger-btn-bg: #f44336;
+$danger-btn-bg-hover: #d32f2f;
+$btn-text-color: #fff;
+$border-radius: 10px;
+$transition-speed: 0.3s;
+$note-padding: 15px;
+$note-margin: 20px;
+
+
+.notes-page{
+
+    .notes{
+        margin-top: 15px;
+
+        .note-card {
+            background: $note-bg;
+            border: 1px solid $note-border;
+            border-radius: $border-radius;
+            box-shadow: 0 4px 8px $note-shadow;
+            padding: $note-padding;
+            margin: $note-margin;
+            width: 100%;
+            max-width: 400px;
+          
+            &:hover {
+              box-shadow: 0 6px 12px $note-shadow;
+            }
+          
+            .note-header {
+              background: $note-header-bg;
+              padding: $note-padding;
+              border-bottom: 1px solid $note-border;
+              border-radius: $border-radius $border-radius 0 0;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+          
+              h3 {
+                margin: 0;
+                font-size: 1.2rem;
+                color: $note-header-color;
+              }
+          
+              .note-date {
+                font-size: 0.85rem;
+                color: #888;
+              }
+            }
+          
+            .note-body {
+              color: $note-body-color;
+              padding: $note-padding;
+              line-height: 1.6;
+          
+              p {
+                margin: 0;
+              }
+            }
+          
+            .note-footer {
+              background: $note-footer-bg;
+              padding: $note-padding;
+              border-top: 1px solid $note-border;
+              border-radius: 0 0 $border-radius $border-radius;
+              display: flex;
+              justify-content: space-between;
+              gap: 10px;
+          
+              .edit-btn,
+              .delete-btn {
+                padding: 5px 10px;
+                border: none;
+                border-radius: 5px;
+                font-size: 0.9rem;
+                cursor: pointer;
+                color: $btn-text-color;
+                transition: background $transition-speed;
+          
+                &:hover {
+                  filter: brightness(1.1);
+                }
+              }
+          
+              .edit-btn {
+                background: $primary-btn-bg;
+          
+                &:hover {
+                  background: $primary-btn-bg-hover;
+                }
+              }
+          
+              .delete-btn {
+                background: $danger-btn-bg;
+          
+                &:hover {
+                  background: $danger-btn-bg-hover;
+                }
+              }
+            }
+          }
+
+    }
+    
+    
+}
