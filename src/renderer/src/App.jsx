@@ -13,14 +13,16 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
-import InfoIcon from "@mui/icons-material/Info";
-import BuildIcon from "@mui/icons-material/Build";
-import ContactMailIcon from "@mui/icons-material/ContactMail";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import SettingsIcon from '@mui/icons-material/Settings';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import {  Routes, Route, Link } from 'react-router-dom';
 import Notes from "./components/Notes";
 import Setting from "./components/Setting";
 import NoteEditor from "./components/NoteEditor";
+import Register from "./components/Register";
+import Login from "./components/Login";
 
 
 
@@ -40,10 +42,11 @@ const App = () => {
   };
 
   const drawerContent = [
-    { text: "Home", icon: <HomeIcon />,path: "/" },
-    { text: "About", icon: <InfoIcon />, path: "/setting" },
-    { text: "Create", icon: <BuildIcon />, path: "/createNote" },
-    { text: "Contact", icon: <ContactMailIcon/>, path: "/setting" },
+    { text: "Profile", icon: <AccountCircleIcon/>,path: "/register" }, 
+    { text: "Home", icon: <HomeIcon />, path: "/" },
+    { text: "Create", icon: <NoteAddIcon />, path: "/createNote" },
+    { text: "Setting", icon: <SettingsIcon/>, path: "/setting" },
+    { text: "Login", icon: <SettingsIcon/>, path: "/login" }
   ];
 
   
@@ -112,6 +115,8 @@ const App = () => {
           <Route path="/" element={<Notes />} />
           <Route path="/setting" element={<Setting />} />
           <Route path="/createNote" element={<NoteEditor />} />
+          <Route path="/register" element={<Register/>}></Route>
+          <Route path="/login" element={<Login/>}></Route>
         </Routes>
     
         </div>

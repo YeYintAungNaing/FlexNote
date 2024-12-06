@@ -2,6 +2,8 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import db from './database'
+
 
 function createWindow() {
   // Create the browser window.
@@ -73,6 +75,86 @@ app.on('window-all-closed', () => {
 })
 
 
+// Save a new note
+ipcMain.handle('save-note', async (_, { noteName, content }) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      'INSERT INTO notes (name, content) VALUES (?, ?)',
+      [noteName, content],
+      function (err) {
+        if (err) {
+          console.error('Failed to save note:', err);
+          reject(err);
+        } else {
+          resolve({ id: this.lastID }); // Return the ID of the inserted note
+        }
+      }
+    );
+  });
+});
 
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
+
+// Fetch all notes
+ipcMain.handle('fetch-notes', async () => {
+  return new Promise((resolve, reject) => {
+    db.all('SELECT * FROM notes', (err, rows) => {
+      if (err) {
+        console.error('Failed to fetch notes:', err);
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+});
+
+
+// create user account
+ipcMain.handle('create-user', async (_, { userName, password}) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      'INSERT INTO users (userName, password) VALUES (?, ?)' ,
+      [userName, password],
+      function (err) {
+        if (err) {
+          console.error('faled to create user account', err)
+          reject(err)
+        }
+        else{
+          resolve({message : `${userName} has be registerd`})
+        }
+      }
+    )
+  })
+})
+
+// log in
+ipcMain.handle('log-in', async (_, { userName, password}) => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      'SELECT * FROM users WHERE userName = ?',
+      [userName],
+      (err, row) => {
+        // when there is something wrong with request
+        if (err) {
+          console.error(err)
+          reject({ message: 'Database error'})
+        }
+        // when there is no res data after retrieving from dv
+        else if(!row) {
+          resolve({ message: 'User not found'})
+        }
+        // found the user data 
+        else{
+          console.log(row)
+          if (row.password === password) {
+            resolve({ message: `Welcome ${row.userName}`});
+          }
+          else{
+            resolve({ message: 'Incorrect password' });
+          }
+        }
+      }
+    )
+  })
+})

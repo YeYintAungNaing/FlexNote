@@ -2,7 +2,30 @@
 const electron = require("electron");
 const path = require("path");
 const utils = require("@electron-toolkit/utils");
+const sqlite3 = require("sqlite3");
 const icon = path.join(__dirname, "../../resources/icon.png");
+const dbPath = path.join(electron.app.getPath("userData"), "notes.db");
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error("Failed to connect to the database", err);
+  } else {
+    console.log("Connected to the database at", dbPath);
+  }
+});
+db.run(
+  `CREATE TABLE IF NOT EXISTS notes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    content TEXT NOT NULL
+  )`
+);
+db.run(
+  `CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userName TEXT NOT NULL,
+    password TEXT NOT NULL
+  )`
+);
 function createWindow() {
   const mainWindow = new electron.BrowserWindow({
     width: 900,
@@ -45,4 +68,71 @@ electron.app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     electron.app.quit();
   }
+});
+electron.ipcMain.handle("save-note", async (_, { noteName, content }) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      "INSERT INTO notes (name, content) VALUES (?, ?)",
+      [noteName, content],
+      function(err) {
+        if (err) {
+          console.error("Failed to save note:", err);
+          reject(err);
+        } else {
+          resolve({ id: this.lastID });
+        }
+      }
+    );
+  });
+});
+electron.ipcMain.handle("fetch-notes", async () => {
+  return new Promise((resolve, reject) => {
+    db.all("SELECT * FROM notes", (err, rows) => {
+      if (err) {
+        console.error("Failed to fetch notes:", err);
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+});
+electron.ipcMain.handle("create-user", async (_, { userName, password }) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      "INSERT INTO users (userName, password) VALUES (?, ?)",
+      [userName, password],
+      function(err) {
+        if (err) {
+          console.error("faled to create user account", err);
+          reject(err);
+        } else {
+          resolve({ message: `${userName} has be registerd` });
+        }
+      }
+    );
+  });
+});
+electron.ipcMain.handle("log-in", async (_, { userName, password }) => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT * FROM users WHERE userName = ?",
+      [userName],
+      (err, row) => {
+        if (err) {
+          console.error(err);
+          reject({ message: "Database error" });
+        } else if (!row) {
+          resolve({ message: "User not found" });
+        } else {
+          console.log(row);
+          if (row.password === password) {
+            resolve({ message: `Welcome ${row.userName}` });
+          } else {
+            resolve({ message: "Incorrect password" });
+          }
+        }
+      }
+    );
+  });
 });
