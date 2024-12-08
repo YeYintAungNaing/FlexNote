@@ -3,7 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import db from './database'
-
+import crypto from 'crypto';
 
 function createWindow() {
   // Create the browser window.
@@ -146,9 +146,27 @@ ipcMain.handle('log-in', async (_, { userName, password}) => {
         }
         // found the user data 
         else{
-          console.log(row)
+          //console.log(row)
           if (row.password === password) {
-            resolve({ message: `Welcome ${row.userName}`});
+            //resolve({ message: `Welcome ${row.userName}`});
+
+            const sessionToken = crypto.randomBytes(32).toString('hex')
+
+            db.run(
+              'UPDATE users SET sessionToken = ? WHERE id = ?',
+              [sessionToken, row.id],
+              (err) => {
+                if (err) {
+                  reject({message : 'failed to save session'})
+                }
+                else {
+                  resolve({
+                    message : `Welcome ${row.userName} and your token is ${sessionToken}`,
+                    token : sessionToken,
+                  })
+                }
+              }
+            )
           }
           else{
             resolve({ message: 'Incorrect password' });
@@ -158,3 +176,21 @@ ipcMain.handle('log-in', async (_, { userName, password}) => {
     )
   })
 })
+
+
+ipcMain.handle('verify-session', async (_, token) => {
+  return new Promise((resolve, reject) => {
+    db.get("select * from users where sessionToken =?", [token], (err, row) => {
+      if (err) {
+        reject ({ message : 'database errr'})
+      }
+      else if(!row) {
+        resolve({ message : 'Not session'})
+      }
+      else{
+        resolve({ message : "session exists", currentUser : row})
+      }
+    })
+  })
+})
+

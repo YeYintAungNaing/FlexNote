@@ -13,6 +13,10 @@ export default function Login() {
             password
            })
           console.log( response.message)
+          if(response.token) {
+            console.log('this happen')
+            window.localStorage.setItem('sessionToken', response.token)
+          }
         }catch(e) {
           console.log(e)
         }    

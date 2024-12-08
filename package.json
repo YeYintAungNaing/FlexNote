@@ -33,6 +33,7 @@
     "@tiptap/pm": "^2.10.3",
     "@tiptap/react": "^2.10.3",
     "@tiptap/starter-kit": "^2.10.3",
+    "crypto": "^1.0.1",
     "electron-updater": "^6.1.7",
     "highlight.js": "^11.10.0",
     "lowlight": "^3.2.0",
