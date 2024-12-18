@@ -20,14 +20,9 @@ contextBridge.exposeInMainWorld('electron', {
   saveNote: (note) => ipcRenderer.invoke('save-note', note),
   createUser: (user) => ipcRenderer.invoke('create-user', user),
   loginUser: (user) => ipcRenderer.invoke('log-in', user),
-  fetchNotes: () => ipcRenderer.invoke('fetch-notes'),
-
-  //session related fucntions
-  saveToken : (token) => localStorage.setItem('sessionToken', token),
-  getToken: () => localStorage.getItem('sessionToken'),
-  clearToken: () => localStorage.removeItem('sessionToken'),
-
-   verifySession: (token) => ipcRenderer.invoke('verify-session', token)
+  fetchNotes: (userId) => ipcRenderer.invoke('fetch-notes', userId),
+  verifyToken: (token) => ipcRenderer.invoke('verify-token', token),
+  logoutUser: (userId) => ipcRenderer.invoke('logout-user', userId), 
  });
 
 console.log('Preload script loaded');

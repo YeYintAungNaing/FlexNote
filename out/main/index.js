@@ -70,11 +70,11 @@ electron.app.on("window-all-closed", () => {
     electron.app.quit();
   }
 });
-electron.ipcMain.handle("save-note", async (_, { noteName, content }) => {
+electron.ipcMain.handle("save-note", async (_, { noteName, content, userId }) => {
   return new Promise((resolve, reject) => {
     db.run(
-      "INSERT INTO notes (name, content) VALUES (?, ?)",
-      [noteName, content],
+      "INSERT INTO notes (name, content, userId) VALUES (?, ?, ?)",
+      [noteName, content, userId],
       function(err) {
         if (err) {
           console.error("Failed to save note:", err);
@@ -86,9 +86,9 @@ electron.ipcMain.handle("save-note", async (_, { noteName, content }) => {
     );
   });
 });
-electron.ipcMain.handle("fetch-notes", async () => {
+electron.ipcMain.handle("fetch-notes", async (_, userId) => {
   return new Promise((resolve, reject) => {
-    db.all("SELECT * FROM notes", (err, rows) => {
+    db.all("SELECT * FROM notes where userId = ?", [userId], (err, rows) => {
       if (err) {
         console.error("Failed to fetch notes:", err);
         reject(err);
@@ -137,6 +137,7 @@ electron.ipcMain.handle("log-in", async (_, { userName, password }) => {
                 } else {
                   resolve({
                     message: `Welcome ${row.userName} and your token is ${sessionToken}`,
+                    user: row,
                     token: sessionToken
                   });
                 }
@@ -150,7 +151,7 @@ electron.ipcMain.handle("log-in", async (_, { userName, password }) => {
     );
   });
 });
-electron.ipcMain.handle("verify-session", async (_, token) => {
+electron.ipcMain.handle("verify-token", async (_, token) => {
   return new Promise((resolve, reject) => {
     db.get("select * from users where sessionToken =?", [token], (err, row) => {
       if (err) {
@@ -159,6 +160,17 @@ electron.ipcMain.handle("verify-session", async (_, token) => {
         resolve({ message: "Not session" });
       } else {
         resolve({ message: "session exists", currentUser: row });
+      }
+    });
+  });
+});
+electron.ipcMain.handle("logout-user", async (_, userId) => {
+  return new Promise((resolve, reject) => {
+    db.run("UPDATE users set sessionToken = null where id = ?", [userId], (err) => {
+      if (err) {
+        reject({ message: "database errr" });
+      } else {
+        resolve({ message: `logout success` });
       }
     });
   });

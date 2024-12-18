@@ -20,6 +20,7 @@ export default function Register() {
 
     return (
         <div>
+          <div>register</div>
             <input 
                 placeholder="Name" 
                 value={userName}

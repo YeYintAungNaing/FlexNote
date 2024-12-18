@@ -1,9 +1,12 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
+import { GlobalContext } from "../context/GlobalState"
+import { Link } from "react-router-dom";
 
 export default function Login() {
 
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
+    const { setCurrentUser} = useContext(GlobalContext);
 
     async function login() {
 
@@ -12,10 +15,14 @@ export default function Login() {
             userName,
             password
            })
-          console.log( response.message)
           if(response.token) {
-            console.log('this happen')
             window.localStorage.setItem('sessionToken', response.token)
+            console.log('login success')
+            setCurrentUser(response.user)
+            
+          }
+          else{
+            console.log( response.message)
           }
         }catch(e) {
           console.log(e)
@@ -24,6 +31,7 @@ export default function Login() {
 
     return (
         <div>
+          <div>Login</div>
             <input 
                 placeholder="Name" 
                 value={userName}
@@ -37,6 +45,10 @@ export default function Login() {
                 >
             </input>
             <button onClick={login}>Submit</button>
+            <Link to='/register'>
+              <button>register</button>
+            </Link>
+            
         </div>
     )
 }

@@ -76,11 +76,11 @@ app.on('window-all-closed', () => {
 
 
 // Save a new note
-ipcMain.handle('save-note', async (_, { noteName, content }) => {
+ipcMain.handle('save-note', async (_, { noteName, content, userId }) => {
   return new Promise((resolve, reject) => {
     db.run(
-      'INSERT INTO notes (name, content) VALUES (?, ?)',
-      [noteName, content],
+      'INSERT INTO notes (name, content, userId) VALUES (?, ?, ?)',
+      [noteName, content, userId],
       function (err) {
         if (err) {
           console.error('Failed to save note:', err);
@@ -95,9 +95,9 @@ ipcMain.handle('save-note', async (_, { noteName, content }) => {
 
 
 // Fetch all notes
-ipcMain.handle('fetch-notes', async () => {
+ipcMain.handle('fetch-notes', async (_, userId) => {
   return new Promise((resolve, reject) => {
-    db.all('SELECT * FROM notes', (err, rows) => {
+    db.all('SELECT * FROM notes where userId = ?', [userId], (err, rows) => {
       if (err) {
         console.error('Failed to fetch notes:', err);
         reject(err);
@@ -162,6 +162,7 @@ ipcMain.handle('log-in', async (_, { userName, password}) => {
                 else {
                   resolve({
                     message : `Welcome ${row.userName} and your token is ${sessionToken}`,
+                    user : row,
                     token : sessionToken,
                   })
                 }
@@ -177,8 +178,8 @@ ipcMain.handle('log-in', async (_, { userName, password}) => {
   })
 })
 
-
-ipcMain.handle('verify-session', async (_, token) => {
+// this try to find the user with the token(from db) that matches the one from frontend
+ipcMain.handle('verify-token', async (_, token) => {
   return new Promise((resolve, reject) => {
     db.get("select * from users where sessionToken =?", [token], (err, row) => {
       if (err) {
@@ -189,6 +190,19 @@ ipcMain.handle('verify-session', async (_, token) => {
       }
       else{
         resolve({ message : "session exists", currentUser : row})
+      }
+    })
+  })
+})
+
+ipcMain.handle('logout-user', async (_, userId) => {
+  return new Promise ((resolve, reject) => {
+    db.run("UPDATE users set sessionToken = null where id = ?", [userId], (err) => {
+      if (err) {
+        reject({ message : 'database errr'});
+      }
+      else{
+        resolve({message : `logout success`})
       }
     })
   })

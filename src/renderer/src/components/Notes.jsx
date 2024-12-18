@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "./../styles/Notes.scss"
 import {
     Button,
@@ -9,14 +9,17 @@ import {
     TextField,
   } from '@mui/material';
 import { useNavigate } from "react-router-dom";
+import { GlobalContext } from "../context/GlobalState";
 
 
 
 export default function Notes() {
-    const navigate = useNavigate()
 
+    const {currentUser} = useContext(GlobalContext);
+    const navigate = useNavigate()
     const [open, setOpen] = useState(false); // State to control modal visibility
     const [noteName, setNoteName] = useState(''); // State to store the note name
+    const [notes, setNotes] = useState(null)
   
     const handleOpen = () => setOpen(true); // Open modal
     const handleClose = () => {
@@ -29,6 +32,32 @@ export default function Notes() {
     }
     //console.log(noteName)
 
+    async function getNotes(userId) {
+
+      try{
+        const response = await window.electron.fetchNotes(userId);
+        if (response.length >  0) {
+          //console.log(response)
+          setNotes(response)
+        }
+        else{
+          setNotes(null)
+        }
+      }
+      catch(e) {
+        console.log(e)
+      }
+    }
+
+
+    useEffect(()=>{
+      if(currentUser) {
+        getNotes(currentUser.id)
+      }
+      console.log('notes effect')
+
+    },[currentUser])
+
     return (
         <div className="notes-page">
             <div>
@@ -38,19 +67,27 @@ export default function Notes() {
                     Add Note
             </Button>
             <div className="notes">
-                <div className="note-card">
-                    <div className="note-header">
-                        <h3>Note Title</h3>
-                        <span className="note-date">Nov 30, 2024</span>
-                    </div>
-                    <div className="note-body">
-                        <p>This is a sample content for the note card. Add your note details here.</p>
-                    </div>
-                    <div className="note-footer">
-                        <button className="edit-btn">Edit</button>
-                        <button className="delete-btn">Delete</button>
-                    </div>
-                </div>
+              {
+                notes? (
+                  notes.map((note, index) => (
+                    <div className="note-card" key={index}>
+                      <div className="note-header">
+                          <h3>{note.name}</h3>
+                          <span className="note-date">Nov 30, 2024</span>
+                      </div>
+                      <div className="note-body">
+                          <p>{note.content}</p>
+                      </div>
+                      <div className="note-footer">
+                          <button className="edit-btn">Edit</button>
+                          <button className="delete-btn">Delete</button>
+                      </div>
+                  </div>
+                  ))
+                ) 
+                : (<div>lol</div>)
+              }
+                
             </div> 
             <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Enter Note Name</DialogTitle>
