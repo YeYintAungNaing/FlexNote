@@ -58,6 +58,20 @@ export default function Notes() {
 
     },[currentUser])
 
+
+    async function deleteNote (noteId) {
+      console.log()
+      try{
+        const response = await window.electron.deleteNote(noteId, currentUser.id);
+        // console.log('noteId:', noteId, 'Type:', typeof noteId);
+        // console.log('userId:', currentUser.id, 'Type:', typeof currentUser.id);
+        console.log(response.message)
+      }
+      catch(e) {
+        console.log(e)
+      }
+    }
+
     return (
         <div className="notes-page">
             <div>
@@ -76,11 +90,11 @@ export default function Notes() {
                           <span className="note-date">Nov 30, 2024</span>
                       </div>
                       <div className="note-body">
-                          <p>{note.content}</p>
+                        <div dangerouslySetInnerHTML={{ __html: note.content }} />
                       </div>
                       <div className="note-footer">
                           <button className="edit-btn">Edit</button>
-                          <button className="delete-btn">Delete</button>
+                          <button className="delete-btn" onClick={()=> deleteNote(note.id)}>Delete</button>
                       </div>
                   </div>
                   ))

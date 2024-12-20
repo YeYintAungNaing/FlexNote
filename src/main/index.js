@@ -80,13 +80,29 @@ ipcMain.handle('save-note', async (_, { noteName, content, userId }) => {
   return new Promise((resolve, reject) => {
     db.run(
       'INSERT INTO notes (name, content, userId) VALUES (?, ?, ?)',
-      [noteName, content, userId],
-      function (err) {
+      [noteName, content, userId], (err) => {
         if (err) {
           console.error('Failed to save note:', err);
           reject(err);
         } else {
           resolve({ id: this.lastID }); // Return the ID of the inserted note
+        }
+      }
+    );
+  });
+});
+
+ipcMain.handle('delete-note', async (_,  noteId, userId ) => {
+  console.log('Received NoteId:', noteId, 'UserId:', userId);
+  return new Promise((resolve, reject) => {
+    db.run(
+      'DELETE FROM notes WHERE id = ? AND userId = ?',
+      [noteId, userId],  (err) => {
+        if (err) {
+          console.error('Failed to delete note:', err);
+          reject(err);
+        } else {
+          resolve({ message : 'note has been deleted' }); 
         }
       }
     );
@@ -114,8 +130,7 @@ ipcMain.handle('create-user', async (_, { userName, password}) => {
   return new Promise((resolve, reject) => {
     db.run(
       'INSERT INTO users (userName, password) VALUES (?, ?)' ,
-      [userName, password],
-      function (err) {
+      [userName, password], (err) => {
         if (err) {
           console.error('faled to create user account', err)
           reject(err)

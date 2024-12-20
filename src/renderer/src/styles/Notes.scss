@@ -57,12 +57,15 @@ $note-margin: 20px;
             }
           
             .note-body {
-              color: $note-body-color;
-              padding: $note-padding;
-              line-height: 1.6;
+              
           
-              p {
+              div {
                 margin: 0;
+
+                p {
+                  white-space: pre-wrap; /* Preserve white spaces and line breaks */
+                  word-wrap: break-word; /* Ensure long words break correctly */
+                }
               }
             }
           
