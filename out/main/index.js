@@ -4,6 +4,7 @@ const path = require("path");
 const utils = require("@electron-toolkit/utils");
 const sqlite3 = require("sqlite3");
 const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 const icon = path.join(__dirname, "../../resources/icon.png");
 const dbPath = path.join(electron.app.getPath("userData"), "notes.db");
 const db = new sqlite3.Database(dbPath, (err) => {
@@ -80,7 +81,7 @@ electron.ipcMain.handle("save-note", async (_, { noteName, content, userId }) =>
           console.error("Failed to save note:", err);
           reject(err);
         } else {
-          resolve({ id: (void 0).lastID });
+          resolve({ message: "note has been saved" });
         }
       }
     );
@@ -117,9 +118,11 @@ electron.ipcMain.handle("fetch-notes", async (_, userId) => {
 });
 electron.ipcMain.handle("create-user", async (_, { userName, password }) => {
   return new Promise((resolve, reject) => {
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(password, salt);
     db.run(
       "INSERT INTO users (userName, password) VALUES (?, ?)",
-      [userName, password],
+      [userName, hashedPassword],
       (err) => {
         if (err) {
           console.error("faled to create user account", err);
@@ -143,7 +146,8 @@ electron.ipcMain.handle("log-in", async (_, { userName, password }) => {
         } else if (!row) {
           resolve({ message: "User not found" });
         } else {
-          if (row.password === password) {
+          const matchedPassword = bcrypt.compareSync(password, row.password);
+          if (matchedPassword) {
             const sessionToken = crypto.randomBytes(32).toString("hex");
             db.run(
               "UPDATE users SET sessionToken = ? WHERE id = ?",

@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import db from './database'
 import crypto from 'crypto';
+import bcrypt from 'bcrypt';
 
 function createWindow() {
   // Create the browser window.
@@ -85,7 +86,8 @@ ipcMain.handle('save-note', async (_, { noteName, content, userId }) => {
           console.error('Failed to save note:', err);
           reject(err);
         } else {
-          resolve({ id: this.lastID }); // Return the ID of the inserted note
+          //resolve({ id: this.lastID }); // Return the ID of the inserted note
+          resolve({ message: 'note has been saved' })
         }
       }
     );
@@ -128,9 +130,13 @@ ipcMain.handle('fetch-notes', async (_, userId) => {
 // create user account
 ipcMain.handle('create-user', async (_, { userName, password}) => {
   return new Promise((resolve, reject) => {
+
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(password, salt);
+
     db.run(
       'INSERT INTO users (userName, password) VALUES (?, ?)' ,
-      [userName, password], (err) => {
+      [userName, hashedPassword], (err) => {
         if (err) {
           console.error('faled to create user account', err)
           reject(err)
@@ -162,7 +168,9 @@ ipcMain.handle('log-in', async (_, { userName, password}) => {
         // found the user data 
         else{
           //console.log(row)
-          if (row.password === password) {
+          
+          const matchedPassword = bcrypt.compareSync(password, row.password);
+          if (matchedPassword) {
             //resolve({ message: `Welcome ${row.userName}`});
 
             const sessionToken = crypto.randomBytes(32).toString('hex')
