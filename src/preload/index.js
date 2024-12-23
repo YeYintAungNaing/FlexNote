@@ -18,6 +18,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 contextBridge.exposeInMainWorld('electron', {
   // when the frontend call the function "saveNote" with note as an arguemnt, that will invoke the function "save-note" with that note argument in the backeed
   saveNote: (note) => ipcRenderer.invoke('save-note', note),
+  editNote: (content, noteId, userId) => ipcRenderer.invoke('edit-note', content, noteId, userId),
   deleteNote: (noteId, userId) => ipcRenderer.invoke('delete-note', noteId, userId),
   createUser: (user) => ipcRenderer.invoke('create-user', user),
   loginUser: (user) => ipcRenderer.invoke('log-in', user),

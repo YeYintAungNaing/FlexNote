@@ -8,7 +8,7 @@ import {
     DialogTitle,
     TextField,
   } from '@mui/material';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GlobalContext } from "../context/GlobalState";
 
 
@@ -93,7 +93,7 @@ export default function Notes() {
                         <div dangerouslySetInnerHTML={{ __html: note.content }} />
                       </div>
                       <div className="note-footer">
-                          <button className="edit-btn">Edit</button>
+                        <Link to='/editNote' state={note}> <button className="edit-btn">Edit</button></Link>
                           <button className="delete-btn" onClick={()=> deleteNote(note.id)}>Delete</button>
                       </div>
                   </div>

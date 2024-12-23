@@ -87,6 +87,22 @@ electron.ipcMain.handle("save-note", async (_, { noteName, content, userId }) =>
     );
   });
 });
+electron.ipcMain.handle("edit-note", async (_, { content, noteId, userId }) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      "UPDATE notes SET content = ? WHERE id = ? AND userId = ?",
+      [content, noteId, userId],
+      (err) => {
+        if (err) {
+          console.error("Failed to edit note:", err);
+          reject(err);
+        } else {
+          resolve({ message: "note has been edited" });
+        }
+      }
+    );
+  });
+});
 electron.ipcMain.handle("delete-note", async (_, noteId, userId) => {
   console.log("Received NoteId:", noteId, "UserId:", userId);
   return new Promise((resolve, reject) => {

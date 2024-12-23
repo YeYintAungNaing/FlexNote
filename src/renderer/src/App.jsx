@@ -25,6 +25,7 @@ import NoteEditor from "./components/NoteEditor";
 import Register from "./components/Register";
 import Login from "./components/Login";
 import Profile from "./components/Profile";
+import EditNote from "./components/EditNote";
 
 
 
@@ -116,6 +117,7 @@ const App = () => {
           <Route path="/notes" element={<Notes />} />
           <Route path="/setting" element={<Setting />} />
           <Route path="/createNote" element={<NoteEditor />} />
+          <Route path="/editNote" element={<EditNote />} />
           <Route path="/register" element={<Register/>}></Route>
           <Route path="/login" element={<Login/>}></Route>
           <Route path="/" element={<Profile/>}></Route>
