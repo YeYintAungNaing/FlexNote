@@ -1,13 +1,13 @@
 import { useContext } from "react";
 import { GlobalContext } from "../context/GlobalState";
-import { Link, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import Login from "./Login";
 
 export default function Profile() {
 
     const navigate = useNavigate()
 
-    const {currentUser, setCurrentUser} = useContext(GlobalContext);
+    const {currentUser, clearToken} = useContext(GlobalContext);
     function current() {
       try{
         const token = window.localStorage.getItem('sessionToken');
@@ -23,8 +23,7 @@ export default function Profile() {
       try{
         const response = await window.electron.logoutUser(currentUser.id)
         console.log( response.message)
-        setCurrentUser(null)
-        localStorage.removeItem('sessionToken')
+        clearToken()
         navigate('/')
   
       }catch(e) {

@@ -12,13 +12,14 @@ export default function EditNote() {
 
   const [noteName, setNoteName] = useState(location.state.name ? location.state.name : null )
   const [content, setContent] = useState(location.state.content ? location.state.content : null )
-  const {currentUser} = useContext(GlobalContext);
+  const {currentUser, token} = useContext(GlobalContext);
 
 
   async function editNote() {
 
     try{
       const response = await window.electron.editNote({
+        token : token,
         content : content,
         noteId : location.state.id,
         userId : currentUser.id 

@@ -11,7 +11,7 @@ import { GlobalContext } from '../context/GlobalState'
 export default function NoteEditor() {
   
   const location = useLocation();
-  const {currentUser} = useContext(GlobalContext);
+  const {currentUser, token} = useContext(GlobalContext);
   const { noteName } = location.state || {noteName : 'Default'};
   const [content, setContent] = useState('')
   //let content = 'Enter your note here'
@@ -20,6 +20,7 @@ export default function NoteEditor() {
 
     try{
       const response = await window.electron.saveNote({
+        token : token,
         noteName : noteName,
         content : content,
         userId : currentUser.id 
@@ -34,14 +35,21 @@ export default function NoteEditor() {
 
   return (
     <>
-      <h2>{noteName}</h2>
-      <button onClick={saveNote}>save</button>
-      <EditorProvider  
-        slotBefore={<MenuBar />} 
-        extensions={extensions} 
-        content={content}
-        onUpdate={({ editor }) => setContent(editor.getHTML())}>
-      </EditorProvider>
+    {
+    currentUser? (
+      <div>
+        <h2>{noteName}</h2>
+        <button onClick={saveNote}>save</button>
+        <EditorProvider  
+          slotBefore={<MenuBar />} 
+          extensions={extensions} 
+          content={content}
+          onUpdate={({ editor }) => setContent(editor.getHTML())}>
+        </EditorProvider>
+      </div>
+    ) 
+    : (<div>You must sign in first</div>)}
+      
     </>
   )
 }

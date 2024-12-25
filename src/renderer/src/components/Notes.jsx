@@ -15,7 +15,7 @@ import { GlobalContext } from "../context/GlobalState";
 
 export default function Notes() {
 
-    const {currentUser} = useContext(GlobalContext);
+    const {currentUser, token} = useContext(GlobalContext);
     const navigate = useNavigate()
     const [open, setOpen] = useState(false); // State to control modal visibility
     const [noteName, setNoteName] = useState(''); // State to store the note name
@@ -62,7 +62,7 @@ export default function Notes() {
     async function deleteNote (noteId) {
       console.log()
       try{
-        const response = await window.electron.deleteNote(noteId, currentUser.id);
+        const response = await window.electron.deleteNote(token, noteId, currentUser.id);
         // console.log('noteId:', noteId, 'Type:', typeof noteId);
         // console.log('userId:', currentUser.id, 'Type:', typeof currentUser.id);
         console.log(response.message)

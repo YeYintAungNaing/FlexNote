@@ -77,55 +77,96 @@ app.on('window-all-closed', () => {
 
 
 // Save a new note
-ipcMain.handle('save-note', async (_, { noteName, content, userId }) => {
+ipcMain.handle('save-note', async (_, { token, noteName, content, userId }) => {
   return new Promise((resolve, reject) => {
-    db.run(
-      'INSERT INTO notes (name, content, userId) VALUES (?, ?, ?)',
-      [noteName, content, userId], (err) => {
+
+    db.get('SELECT * FROM users WHERE id = ? and sessionToken = ?',
+      [userId, token ], (err, rows) => {
         if (err) {
-          console.error('Failed to save note:', err);
-          reject(err);
-        } else {
-          //resolve({ id: this.lastID }); // Return the ID of the inserted note
-          resolve({ message: 'note has been saved' })
+          console.error('db error', err);
+          return reject(err);  // have to explictly return to terminate
+        } 
+        if(!rows) {
+          
+          return resolve({ message: 'Invalid user' })
         }
+
+        // this only happens after the previous query is completed
+        // queries are asyns so we cant just terminate them in order with return
+        db.run(
+          'INSERT INTO notes (name, content, userId) VALUES (?, ?, ?)',
+          [noteName, content, userId], (err) => {
+            if (err) {
+              console.error('Failed to save note:', err);
+              return reject(err);
+            } else {
+              //resolve({ id: this.lastID }); // Return the ID of the inserted note
+              return resolve({ message: 'note has been saved' })
+            }
+          }
+        )
       }
-    );
-  });
+    )
+  })
 });
 
-ipcMain.handle('edit-note', async (_, {  content, noteId,  userId }) => {
+ipcMain.handle('edit-note', async (_, {  token, content, noteId,  userId }) => {
   return new Promise((resolve, reject) => {
-    db.run(
-      'UPDATE notes SET content = ? WHERE id = ? AND userId = ?',
-      [content, noteId, userId], (err) => {
+    
+    db.get('SELECT * FROM users WHERE id = ? and sessionToken = ?',
+      [userId, token ], (err, rows) => {
         if (err) {
-          console.error('Failed to edit note:', err);
-          reject(err);
-        } else {
-
-          resolve({ message: 'note has been edited' })
+          console.error('db error', err);
+          return reject(err);  // have to explictly return to terminate
+        } 
+        if(!rows) {
+          return resolve({ message: 'Invalid user' })
         }
+
+        db.run(
+          'UPDATE notes SET content = ? WHERE id = ? AND userId = ?',
+          [content, noteId, userId], (err) => {
+            if (err) {
+              console.error('Failed to edit note:', err);
+              return reject(err);
+            } else {
+              return resolve({ message: 'note has been edited' })
+            }
+          }
+        )
       }
-    );
-  });
+    ) 
+  })
 });
 
-ipcMain.handle('delete-note', async (_,  noteId, userId ) => {
+ipcMain.handle('delete-note', async (_,  token, noteId, userId ) => {
   console.log('Received NoteId:', noteId, 'UserId:', userId);
   return new Promise((resolve, reject) => {
-    db.run(
-      'DELETE FROM notes WHERE id = ? AND userId = ?',
-      [noteId, userId],  (err) => {
+
+    db.get('SELECT * FROM users WHERE id = ? and sessionToken = ?',
+      [userId, token ], (err, rows) => {
         if (err) {
-          console.error('Failed to delete note:', err);
-          reject(err);
-        } else {
-          resolve({ message : 'note has been deleted' }); 
+          console.error('db error', err);
+          return reject(err);  // have to explictly return to terminate
+        } 
+        if(!rows) {
+          return resolve({ message: 'Invalid user' })
         }
+
+        db.run(
+          'DELETE FROM notes WHERE id = ? AND userId = ?',
+          [noteId, userId],  (err) => {
+            if (err) {
+              console.error('Failed to delete note:', err);
+              return reject(err);
+            } else {
+              return resolve({ message : 'note has been deleted' }); 
+            }
+          }
+        )
       }
-    );
-  });
+    )
+  })
 });
 
 
@@ -135,12 +176,12 @@ ipcMain.handle('fetch-notes', async (_, userId) => {
     db.all('SELECT * FROM notes where userId = ?', [userId], (err, rows) => {
       if (err) {
         console.error('Failed to fetch notes:', err);
-        reject(err);
+        return reject(err);
       } else {
-        resolve(rows);
+        return resolve(rows);
       }
-    });
-  });
+    })
+  })
 });
 
 
@@ -156,10 +197,10 @@ ipcMain.handle('create-user', async (_, { userName, password}) => {
       [userName, hashedPassword], (err) => {
         if (err) {
           console.error('faled to create user account', err)
-          reject(err)
+          return reject(err)
         }
         else{
-          resolve({message : `${userName} has be registerd`})
+          return resolve({message : `${userName} has be registerd`})
         }
       }
     )
@@ -176,16 +217,15 @@ ipcMain.handle('log-in', async (_, { userName, password}) => {
         // when there is something wrong with request
         if (err) {
           console.error(err)
-          reject({ message: 'Database error'})
+          return reject({ message: 'Database error'})
         }
+      
         // when there is no res data after retrieving from dv
         else if(!row) {
-          resolve({ message: 'User not found'})
+           return resolve({ message: 'User not found'})
         }
         // found the user data 
         else{
-          //console.log(row)
-          
           const matchedPassword = bcrypt.compareSync(password, row.password);
           if (matchedPassword) {
             //resolve({ message: `Welcome ${row.userName}`});
@@ -197,10 +237,10 @@ ipcMain.handle('log-in', async (_, { userName, password}) => {
               [sessionToken, row.id],
               (err) => {
                 if (err) {
-                  reject({message : 'failed to save session'})
+                  return reject({message : 'failed to save session'})
                 }
                 else {
-                  resolve({
+                  return resolve({
                     message : `Welcome ${row.userName} and your token is ${sessionToken}`,
                     user : row,
                     token : sessionToken,
@@ -210,7 +250,7 @@ ipcMain.handle('log-in', async (_, { userName, password}) => {
             )
           }
           else{
-            resolve({ message: 'Incorrect password' });
+            return resolve({ message: 'Incorrect password' });
           }
         }
       }
@@ -223,13 +263,14 @@ ipcMain.handle('verify-token', async (_, token) => {
   return new Promise((resolve, reject) => {
     db.get("select * from users where sessionToken =?", [token], (err, row) => {
       if (err) {
-        reject ({ message : 'database errr'})
+        return reject ({ message : 'database errr'})
       }
+      // what if there is left over token in the db for some reaosn
       else if(!row) {
-        resolve({ message : 'Not session'})
+        return resolve({ message : 'Not session'})
       }
       else{
-        resolve({ message : "session exists", currentUser : row})
+        return resolve({ message : "session exists", currentUser : row})
       }
     })
   })
@@ -239,10 +280,10 @@ ipcMain.handle('logout-user', async (_, userId) => {
   return new Promise ((resolve, reject) => {
     db.run("UPDATE users set sessionToken = null where id = ?", [userId], (err) => {
       if (err) {
-        reject({ message : 'database errr'});
+        return reject({ message : 'database errr'});
       }
       else{
-        resolve({message : `logout success`})
+        return resolve({message : `logout success`})
       }
     })
   })
