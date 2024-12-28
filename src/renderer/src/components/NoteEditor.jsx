@@ -25,8 +25,14 @@ export default function NoteEditor() {
         content : content,
         userId : currentUser.id 
        })
-      //console.log('saved with ID', response.id)
-      console.log(response.message)
+
+      if (response.error) {
+        console.log(response.error)
+      }
+      else{
+        console.log(response.message)
+      }
+      
     }catch(e) {
       console.log(e)
     }    

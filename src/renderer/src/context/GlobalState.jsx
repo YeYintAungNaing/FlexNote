@@ -24,7 +24,7 @@ export default function GlobalState({children}) {
             }
             else{
               console.log('invalid token')
-              localStorage.removeItem('sessionToken')
+              localStorage.removeItem('sessionToken') // remove the existing token if the verificaiton process failed
             }
           }
 

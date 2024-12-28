@@ -84,18 +84,26 @@ electron.ipcMain.handle("save-note", async (_, { token, noteName, content, userI
         if (!rows) {
           return resolve({ message: "Invalid user" });
         }
-        db.run(
-          "INSERT INTO notes (name, content, userId) VALUES (?, ?, ?)",
-          [noteName, content, userId],
-          (err2) => {
-            if (err2) {
-              console.error("Failed to save note:", err2);
-              return reject(err2);
-            } else {
-              return resolve({ message: "note has been saved" });
-            }
+        db.get("SELECT * FROM notes where name = ?", [noteName], (err2, rows2) => {
+          if (err2) {
+            console.error("faled to create new note", err2);
+            return reject(err2);
+          } else if (rows2) {
+            return resolve({ error: "note name is already taken" });
           }
-        );
+          db.run(
+            "INSERT INTO notes (name, content, userId) VALUES (?, ?, ?)",
+            [noteName, content, userId],
+            (err3) => {
+              if (err3) {
+                console.error("Failed to save note:", err3);
+                return reject(err3);
+              } else {
+                return resolve({ message: "note has been saved" });
+              }
+            }
+          );
+        });
       }
     );
   });
@@ -122,6 +130,35 @@ electron.ipcMain.handle("edit-note", async (_, { token, content, noteId, userId 
               return reject(err2);
             } else {
               return resolve({ message: "note has been edited" });
+            }
+          }
+        );
+      }
+    );
+  });
+});
+electron.ipcMain.handle("edit-noteName", async (_, { token, noteName, noteId, userId }) => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT * FROM users WHERE id = ? and sessionToken = ?",
+      [userId, token],
+      (err, rows) => {
+        if (err) {
+          console.error("db error", err);
+          return reject(err);
+        }
+        if (!rows) {
+          return resolve({ message: "Invalid user" });
+        }
+        db.run(
+          "UPDATE notes SET name = ? WHERE id = ? AND userId = ?",
+          [noteName, noteId, userId],
+          (err2) => {
+            if (err2) {
+              console.error("Failed to edit note name:", err2);
+              return reject(err2);
+            } else {
+              return resolve({ message: "note name has been edited" });
             }
           }
         );
@@ -173,20 +210,28 @@ electron.ipcMain.handle("fetch-notes", async (_, userId) => {
 });
 electron.ipcMain.handle("create-user", async (_, { userName, password }) => {
   return new Promise((resolve, reject) => {
-    const salt = bcrypt.genSaltSync(10);
-    const hashedPassword = bcrypt.hashSync(password, salt);
-    db.run(
-      "INSERT INTO users (userName, password) VALUES (?, ?)",
-      [userName, hashedPassword],
-      (err) => {
-        if (err) {
-          console.error("faled to create user account", err);
-          return reject(err);
-        } else {
-          return resolve({ message: `${userName} has be registerd` });
-        }
+    db.get("SELECT * FROM users where userName = ?", [userName], (err, rows) => {
+      if (err) {
+        console.error("faled to create user account", err);
+        return reject(err);
+      } else if (rows) {
+        return resolve({ error: "user name is already taken" });
       }
-    );
+      const salt = bcrypt.genSaltSync(10);
+      const hashedPassword = bcrypt.hashSync(password, salt);
+      db.run(
+        "INSERT INTO users (userName, password) VALUES (?, ?)",
+        [userName, hashedPassword],
+        (err2) => {
+          if (err2) {
+            console.error("faled to create user account_", err2);
+            return reject(err2);
+          } else {
+            return resolve({ message: `${userName} has be registerd` });
+          }
+        }
+      );
+    });
   });
 });
 electron.ipcMain.handle("log-in", async (_, { userName, password }) => {

@@ -12,7 +12,6 @@ import {
   Divider,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import HomeIcon from "@mui/icons-material/Home";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
@@ -117,7 +116,7 @@ const App = () => {
           <Route path="/notes" element={<Notes />} />
           <Route path="/setting" element={<Setting />} />
           <Route path="/createNote" element={<NoteEditor />} />
-          <Route path="/editNote" element={<EditNote />} />
+          <Route path="/editNote/:id" element={<EditNote />} />
           <Route path="/register" element={<Register/>}></Route>
           <Route path="/login" element={<Login/>}></Route>
           <Route path="/" element={<Profile/>}></Route>

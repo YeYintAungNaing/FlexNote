@@ -12,7 +12,14 @@ export default function Register() {
             userName,
             password
            })
-          console.log( response.message)
+         
+          if (response.error) {
+            console.log(response.error)
+          }
+          else{
+            console.log(response.message)
+          }
+
         }catch(e) {
           console.log(e)
         }    

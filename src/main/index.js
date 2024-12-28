@@ -91,20 +91,30 @@ ipcMain.handle('save-note', async (_, { token, noteName, content, userId }) => {
           return resolve({ message: 'Invalid user' })
         }
 
-        // this only happens after the previous query is completed
-        // queries are asyns so we cant just terminate them in order with return
-        db.run(
-          'INSERT INTO notes (name, content, userId) VALUES (?, ?, ?)',
-          [noteName, content, userId], (err) => {
-            if (err) {
-              console.error('Failed to save note:', err);
-              return reject(err);
-            } else {
-              //resolve({ id: this.lastID }); // Return the ID of the inserted note
-              return resolve({ message: 'note has been saved' })
-            }
+        db.get("SELECT * FROM notes where name = ?", [noteName], (err, rows) => {
+          if (err) {
+            console.error('faled to create new note', err)
+            return reject(err)
           }
-        )
+          else if(rows){
+            return resolve({error : "note name is already taken"})
+          }
+
+          // this only happens after the previous query is completed
+          // queries are asyns so we cant just terminate them in order with return
+          db.run(
+            'INSERT INTO notes (name, content, userId) VALUES (?, ?, ?)',
+            [noteName, content, userId], (err) => {
+              if (err) {
+               console.error('Failed to save note:', err);
+                return reject(err);
+              } else {
+               //resolve({ id: this.lastID }); // Return the ID of the inserted note
+                return resolve({ message: 'note has been saved' })
+              }
+            }
+          )
+        })
       }
     )
   })
@@ -138,6 +148,36 @@ ipcMain.handle('edit-note', async (_, {  token, content, noteId,  userId }) => {
     ) 
   })
 });
+
+
+ipcMain.handle('edit-noteName', async  (_, {token, noteName, noteId, userId }) => {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT * FROM users WHERE id = ? and sessionToken = ?',
+      [userId, token ], (err, rows) => {
+        if (err) {
+          console.error('db error', err);
+          return reject(err);  // have to explictly return to terminate
+        } 
+        if(!rows) {
+          return resolve({ message: 'Invalid user' })
+        }
+
+        db.run(
+          'UPDATE notes SET name = ? WHERE id = ? AND userId = ?',
+          [noteName, noteId, userId], (err) => {
+            if (err) {
+              console.error('Failed to edit note name:', err);
+              return reject(err);
+            } else {
+              return resolve({ message: 'note name has been edited' })
+            }
+          }
+        )
+      }
+    )
+  })
+})
+
 
 ipcMain.handle('delete-note', async (_,  token, noteId, userId ) => {
   console.log('Received NoteId:', noteId, 'UserId:', userId);
@@ -189,21 +229,32 @@ ipcMain.handle('fetch-notes', async (_, userId) => {
 ipcMain.handle('create-user', async (_, { userName, password}) => {
   return new Promise((resolve, reject) => {
 
-    const salt = bcrypt.genSaltSync(10);
-    const hashedPassword = bcrypt.hashSync(password, salt);
 
-    db.run(
-      'INSERT INTO users (userName, password) VALUES (?, ?)' ,
-      [userName, hashedPassword], (err) => {
-        if (err) {
-          console.error('faled to create user account', err)
-          return reject(err)
-        }
-        else{
-          return resolve({message : `${userName} has be registerd`})
-        }
+    db.get("SELECT * FROM users where userName = ?", [userName], (err, rows) => {
+      if (err) {
+        console.error('faled to create user account', err)
+        return reject(err)
       }
-    )
+      else if(rows){
+        return resolve({error : "user name is already taken"})
+      }
+
+      const salt = bcrypt.genSaltSync(10);
+      const hashedPassword = bcrypt.hashSync(password, salt);
+
+      db.run(
+        'INSERT INTO users (userName, password) VALUES (?, ?)' ,
+        [userName, hashedPassword], (err) => {
+          if (err) {
+            console.error('faled to create user account_', err)
+            return reject(err)
+          }
+          else{
+            return resolve({message : `${userName} has be registerd`})
+          }
+        }
+      )
+    })
   })
 })
 

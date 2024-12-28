@@ -66,6 +66,7 @@ export default function Notes() {
         // console.log('noteId:', noteId, 'Type:', typeof noteId);
         // console.log('userId:', currentUser.id, 'Type:', typeof currentUser.id);
         console.log(response.message)
+        getNotes(currentUser.id)
       }
       catch(e) {
         console.log(e)
@@ -93,7 +94,7 @@ export default function Notes() {
                         <div dangerouslySetInnerHTML={{ __html: note.content }} />
                       </div>
                       <div className="note-footer">
-                        <Link to='/editNote' state={note}> <button className="edit-btn">Edit</button></Link>
+                        <Link to={`/editNote/${note.id}`} state={note}> <button className="edit-btn">Edit</button></Link>
                           <button className="delete-btn" onClick={()=> deleteNote(note.id)}>Delete</button>
                       </div>
                   </div>
@@ -104,27 +105,27 @@ export default function Notes() {
                 
             </div> 
             <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Enter Note Name</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Note Name"
-            type="text"
-            fullWidth
-            value={noteName}
-            onChange={(e) => setNoteName(e.target.value)} // Update state
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleSave} color="primary">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog> 
+            <DialogTitle>Enter Note Name</DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Note Name"
+                type="text"
+                fullWidth
+                value={noteName}
+                onChange={(e) => setNoteName(e.target.value)} // Update state
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose} color="secondary">
+                Cancel
+              </Button>
+              <Button onClick={handleSave} color="primary">
+                Save
+              </Button>
+            </DialogActions>
+            </Dialog> 
         </div>
     )
 }
