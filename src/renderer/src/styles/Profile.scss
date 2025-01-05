@@ -1,0 +1,77 @@
+.profile{
+
+
+    .profile-photo{
+        border: 1px solid;
+        margin-bottom: 5px;
+        
+    }
+
+    .profile-info{
+
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+        align-items: center;
+        
+
+        .info-1{
+            width: 100%;
+        }
+        .info-2{
+            width: 100%;
+        }
+
+        table{
+            border-collapse: collapse;
+            border: 1px solid rgb(121, 121, 121);
+            font-family: sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 1px; 
+            width: 100%;
+
+
+            tbody{
+
+                .table-caption{
+                    font-size: 18px;
+                    background-color: rgb(76, 138, 204);
+                    text-align: center;
+                }
+
+                tr{
+                    &:nth-child(odd) {
+                        background-color: aliceblue;   
+                    }
+                }
+
+                
+                
+                th{
+                    display: flex;
+                    padding: 5px;
+                    font-size: 16px;
+                    justify-content: left; 
+                    font-weight: normal;
+                }
+    
+                td{
+                    padding: 5px;
+                    font-size: 16px;
+                    font-weight:500; 
+                }
+            }  
+        }
+    }
+
+    .logout{
+        margin-top: 4px;
+        text-align: center;
+
+        button{
+            width: 100px;
+            font-size: 15px;
+            border: 1px solid
+        }
+    }
+}

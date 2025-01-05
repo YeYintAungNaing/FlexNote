@@ -2,18 +2,34 @@ import './../styles/NoteEditor.scss'
 import { EditorProvider} from '@tiptap/react'
 import { useContext, useState } from 'react'
 //import { useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { isRouteErrorResponse, useLocation } from 'react-router-dom'
 import MenuBar from './TiptapConfig'
 import {extensions} from './TiptapConfig'
 import { GlobalContext } from '../context/GlobalState'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+} from '@mui/material';
 
 
 export default function NoteEditor() {
   
   const location = useLocation();
   const {currentUser, token} = useContext(GlobalContext);
-  const { noteName } = location.state || {noteName : 'Default'};
+  const [noteName, setNoteName] = useState(location.state || "Default")
   const [content, setContent] = useState('')
+  const [open, setOpen] = useState(false)
+
+  const handleOpen = () => setOpen(true); // Open modal
+  const handleClose = () => {
+        setNoteName('Default')
+        setOpen(false); // Close modal
+  }
+
   //let content = 'Enter your note here'
 
   async function saveNote() {
@@ -38,13 +54,41 @@ export default function NoteEditor() {
     }    
   }
 
-
+  // function test() {
+  //   console.log('test')
+  // }
+  function editNoteName() {
+    setOpen(false)
+  }
+ 
   return (
     <>
     {
     currentUser? (
       <div>
-        <h2>{noteName}</h2>
+        <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>Enter Note Name</DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Note Name"
+                type="text"
+                fullWidth
+                value={noteName}
+                onChange={(e) => setNoteName(e.target.value)} // Update state
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose} color="secondary">
+                Cancel
+              </Button>
+              <Button onClick={editNoteName} color="primary">
+                Save
+              </Button>
+            </DialogActions>
+            </Dialog>
+        <h2 onClick={handleOpen} className='note-title-btn'>{noteName}</h2>
         <button onClick={saveNote}>save</button>
         <EditorProvider  
           slotBefore={<MenuBar />} 
@@ -59,3 +103,4 @@ export default function NoteEditor() {
     </>
   )
 }
+

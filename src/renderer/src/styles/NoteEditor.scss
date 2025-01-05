@@ -2,8 +2,8 @@
 .tiptap {
   outline: none;
   height: 100vh;
-  background-color: rgb(199, 202, 202);
-
+  background-color: rgb(230, 233, 236);
+  margin-top: 10px;
   :first-child {
     margin-top: 0;
   }
@@ -79,5 +79,12 @@
       padding: 0;
     }
   }
+}
+
+.note-title-btn{
+  &:hover{
+     color: rgb(50, 110, 213);
+     cursor: pointer;
+    }
 }
 

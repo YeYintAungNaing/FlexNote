@@ -28,7 +28,7 @@ export default function Notes() {
     }
     const handleSave = () => {
       setOpen(false);
-      navigate('/createNote', { state: { noteName } })
+      navigate('/createNote', { state: noteName })
     }
     //console.log(noteName)
 
