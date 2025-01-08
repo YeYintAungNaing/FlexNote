@@ -139,6 +139,7 @@ electron.ipcMain.handle("edit-note", async (_, { token, content, noteId, userId 
 });
 electron.ipcMain.handle("edit-noteName", async (_, { token, noteName, noteId, userId }) => {
   return new Promise((resolve, reject) => {
+    console.log(token, userId);
     db.get(
       "SELECT * FROM users WHERE id = ? and sessionToken = ?",
       [userId, token],
@@ -268,6 +269,35 @@ electron.ipcMain.handle("log-in", async (_, { userName, password }) => {
             return resolve({ message: "Incorrect password" });
           }
         }
+      }
+    );
+  });
+});
+electron.ipcMain.handle("edit-profile", async (_, { token, userName, email, location, gender, displyName, userId }) => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT * FROM users WHERE id = ? and sessionToken = ?",
+      [userId, token],
+      (err, rows) => {
+        if (err) {
+          console.error("db error", err);
+          return reject(err);
+        }
+        if (!rows) {
+          return resolve({ message: "Invalid user" });
+        }
+        db.run(
+          "UPDATE users SET userName = ?, email = ?, location = ?, gender = ?, dName = ? WHERE id = ?",
+          [userName, email, location, gender, displyName, userId],
+          (err2) => {
+            if (err2) {
+              console.error("Failed to edit note name:", err2);
+              return reject(err2);
+            } else {
+              return resolve({ message: "note name has been edited" });
+            }
+          }
+        );
       }
     );
   });

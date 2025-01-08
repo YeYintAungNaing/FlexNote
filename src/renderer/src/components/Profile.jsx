@@ -45,7 +45,7 @@ export default function Profile() {
                   <table>
                     <tbody>
                       <tr>
-                        <td colSpan="2" className="table-caption">Account Details</td>
+                        <td colSpan="2" className="table-caption">Personal Details</td>
                       </tr>
                       <tr>
                         <th >Name</th>
@@ -56,9 +56,8 @@ export default function Profile() {
                         <td>{currentUser.email || 'None'}</td>
                       </tr>
                       <tr>
-                        <th >Display Name</th>
-                        <td>{currentUser.dName || 'None'} </td>
-                        
+                        <th >Location</th>
+                        <td>{currentUser.locaiton || 'None'} </td> 
                       </tr>
                       <tr>
                         <th >Gender</th>
@@ -74,21 +73,20 @@ export default function Profile() {
                         <td colSpan="2" className="table-caption">Account Details</td>
                       </tr>
                       <tr>
-                        <th >Name</th>
-                        <td>YeYint</td>
-                      </tr>
-                      <tr>
-                        <th >Gmail</th>
-                        <td>random@gmail.com</td>
-                      </tr>
-                      <tr>
                         <th >Display Name</th>
-                        <td>YeYe </td>
-                        
+                        <td>YeYe</td>
                       </tr>
                       <tr>
-                        <th >Gender</th>
-                        <td>Male</td>
+                        <th >Mode</th>
+                        <td>Offline</td>
+                      </tr>
+                      <tr>
+                        <th >Account Created</th>
+                        <td>YeYe </td>  
+                      </tr>
+                      <tr>
+                        <th >Premium</th>
+                        <td>No</td>
                       </tr>
                     </tbody>
                   </table>

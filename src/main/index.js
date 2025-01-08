@@ -150,8 +150,9 @@ ipcMain.handle('edit-note', async (_, {  token, content, noteId,  userId }) => {
 });
 
 
-ipcMain.handle('edit-noteName', async  (_, {token, noteName, noteId, userId }) => {
+ipcMain.handle('edit-noteName', async  (_, {token, noteName, noteId, userId}) => {
   return new Promise((resolve, reject) => {
+    console.log(token, userId)
     db.get('SELECT * FROM users WHERE id = ? and sessionToken = ?',
       [userId, token ], (err, rows) => {
         if (err) {
@@ -258,6 +259,8 @@ ipcMain.handle('create-user', async (_, { userName, password}) => {
   })
 })
 
+
+
 // log in
 ipcMain.handle('log-in', async (_, { userName, password}) => {
   return new Promise((resolve, reject) => {
@@ -304,6 +307,35 @@ ipcMain.handle('log-in', async (_, { userName, password}) => {
             return resolve({ message: 'Incorrect password' });
           }
         }
+      }
+    )
+  })
+})
+
+
+ipcMain.handle('edit-profile', async  (_, {token, userName, email, location, gender, displyName, userId }) => {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT * FROM users WHERE id = ? and sessionToken = ?',
+      [userId, token ], (err, rows) => {
+        if (err) {
+          console.error('db error', err);
+          return reject(err);  // have to explictly return to terminate
+        } 
+        if(!rows) {
+          return resolve({ message: 'Invalid user' })
+        }
+
+        db.run(
+          'UPDATE users SET userName = ?, email = ?, location = ?, gender = ?, dName = ? WHERE id = ?',
+          [userName, email, location, gender, displyName, userId], (err) => {
+            if (err) {
+              console.error('Failed to edit profile :', err);
+              return reject(err);
+            } else {
+              return resolve({ message: 'note name has been edited' })
+            }
+          }
+        )
       }
     )
   })
