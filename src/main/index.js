@@ -313,7 +313,7 @@ ipcMain.handle('log-in', async (_, { userName, password}) => {
 })
 
 
-ipcMain.handle('edit-profile', async  (_, {token, userName, email, location, gender, displyName, userId }) => {
+ipcMain.handle('edit-profile', async  (_, {token, userName, email, location, gender, dName, userId }) => {
   return new Promise((resolve, reject) => {
     db.get('SELECT * FROM users WHERE id = ? and sessionToken = ?',
       [userId, token ], (err, rows) => {
@@ -327,12 +327,12 @@ ipcMain.handle('edit-profile', async  (_, {token, userName, email, location, gen
 
         db.run(
           'UPDATE users SET userName = ?, email = ?, location = ?, gender = ?, dName = ? WHERE id = ?',
-          [userName, email, location, gender, displyName, userId], (err) => {
+          [userName, email, location, gender, dName, userId], (err) => {
             if (err) {
               console.error('Failed to edit profile :', err);
               return reject(err);
             } else {
-              return resolve({ message: 'note name has been edited' })
+              return resolve({ message: 'profile has been edited' })
             }
           }
         )

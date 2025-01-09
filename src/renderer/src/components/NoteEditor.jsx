@@ -2,7 +2,6 @@ import './../styles/NoteEditor.scss'
 import { EditorProvider} from '@tiptap/react'
 import { useContext, useState } from 'react'
 //import { useState } from 'react'
-import { isRouteErrorResponse, useLocation } from 'react-router-dom'
 import MenuBar from './TiptapConfig'
 import {extensions} from './TiptapConfig'
 import { GlobalContext } from '../context/GlobalState'
@@ -14,6 +13,7 @@ import {
   DialogTitle,
   TextField,
 } from '@mui/material';
+import { useLocation } from 'react-router-dom'
 
 
 export default function NoteEditor() {

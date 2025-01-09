@@ -25,6 +25,7 @@ import Register from "./components/Register";
 import Login from "./components/Login";
 import Profile from "./components/Profile";
 import EditNote from "./components/EditNote";
+import EditProfile from "./components/EditProfile";
 
 
 
@@ -120,8 +121,8 @@ const App = () => {
           <Route path="/register" element={<Register/>}></Route>
           <Route path="/login" element={<Login/>}></Route>
           <Route path="/" element={<Profile/>}></Route>
+          <Route path="/editProfile" element={<EditProfile/>}></Route>
         </Routes>
-    
         </div>
       </main>
     </>

@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { GlobalContext } from "../context/GlobalState";
-import {  useNavigate } from "react-router-dom";
+import {  Link, useNavigate } from "react-router-dom";
 import Login from "./Login";
 import "./../styles/Profile.scss"
 
@@ -93,9 +93,8 @@ export default function Profile() {
                   </div>
               </div> 
               <div className="logout">
-                <button>Edit</button>   
+                <Link to='/editProfile'><button>Edit</button> </Link> 
                 <button onClick={logoutUser}>Logout</button>
-
               </div> 
               
             </div>

@@ -273,7 +273,7 @@ electron.ipcMain.handle("log-in", async (_, { userName, password }) => {
     );
   });
 });
-electron.ipcMain.handle("edit-profile", async (_, { token, userName, email, location, gender, displyName, userId }) => {
+electron.ipcMain.handle("edit-profile", async (_, { token, userName, email, location, gender, dName, userId }) => {
   return new Promise((resolve, reject) => {
     db.get(
       "SELECT * FROM users WHERE id = ? and sessionToken = ?",
@@ -288,13 +288,13 @@ electron.ipcMain.handle("edit-profile", async (_, { token, userName, email, loca
         }
         db.run(
           "UPDATE users SET userName = ?, email = ?, location = ?, gender = ?, dName = ? WHERE id = ?",
-          [userName, email, location, gender, displyName, userId],
+          [userName, email, location, gender, dName, userId],
           (err2) => {
             if (err2) {
-              console.error("Failed to edit note name:", err2);
+              console.error("Failed to edit profile :", err2);
               return reject(err2);
             } else {
-              return resolve({ message: "note name has been edited" });
+              return resolve({ message: "profile has been edited" });
             }
           }
         );
