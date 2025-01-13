@@ -57,7 +57,7 @@ export default function Profile() {
                       </tr>
                       <tr>
                         <th >Location</th>
-                        <td>{currentUser.locaiton || 'None'} </td> 
+                        <td>{currentUser.location || 'None'} </td> 
                       </tr>
                       <tr>
                         <th >Gender</th>
@@ -93,7 +93,7 @@ export default function Profile() {
                   </div>
               </div> 
               <div className="logout">
-                <Link to='/editProfile'><button>Edit</button> </Link> 
+                <Link to='/editProfile'><button>Edit</button></Link> 
                 <button onClick={logoutUser}>Logout</button>
               </div> 
               

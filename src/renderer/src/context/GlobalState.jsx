@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createContext } from "react";
-
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 
 
 export const GlobalContext = createContext(null);
@@ -21,6 +22,7 @@ export default function GlobalState({children}) {
             
             if (response.currentUser) {
               setCurrentUser(response.currentUser)
+              //console.log('verify token')
             }
             else{
               console.log('invalid token')
@@ -46,6 +48,22 @@ export default function GlobalState({children}) {
       //navigate('/')
     }
 
+    const [alert, setAlert] = useState({
+      open: false,
+      severity: 'success', // 'success' | 'info' | 'warning' | 'error'
+      message: '',
+  });
+
+
+
+  function showAlert(message, severity) {
+      setAlert({ open: true, severity, message });
+    };
+  
+  const handleClose = () => {
+      setAlert({ ...alert, open: false });
+  };
+
 
     return (
         <GlobalContext.Provider
@@ -53,9 +71,22 @@ export default function GlobalState({children}) {
             currentUser,
             setCurrentUser,
             token,
-            clearToken  
+            clearToken,
+            verifyToken,
+            showAlert
         }}>
             {children}
+            <Snackbar
+              open={alert.open}
+              autoHideDuration={3000} 
+              onClose={handleClose}
+              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+              style={{ top: '70px' }}
+            >
+            <Alert severity={alert.severity} onClose={handleClose} variant="outlined">
+                {alert.message}
+            </Alert>
+            </Snackbar>
         </GlobalContext.Provider>
     )
 }

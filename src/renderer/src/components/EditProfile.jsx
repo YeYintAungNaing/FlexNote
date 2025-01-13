@@ -1,16 +1,17 @@
 import { useContext, useState } from "react";
 import { GlobalContext } from "../context/GlobalState";
-import { Dns } from "@mui/icons-material";
-import { useRadioGroup } from "@mui/material";
+//import { GlobalAlertContext } from "../context/AlertContext";
+
 
 export default function EditProfile() {
 
-    const {currentUser, token} = useContext(GlobalContext);
+    const {currentUser, token, verifyToken, showAlert} = useContext(GlobalContext);
+    //const {showAlert} = useContext(GlobalAlertContext);
     const [userName, setUserName] =useState(currentUser?.userName || '') 
     const [dName, setdName] =useState(currentUser?.dName || '') 
     const [email, setEmail] =useState(currentUser?.email || '') 
     const [gender, setGender] =useState(currentUser?.gender || '')
-    const [location, setLocation] =useState(currentUser?.gender || '')
+    const [location, setLocation] =useState(currentUser.location || '')
 
     //console.log(userName, dName, email, gender, location)
 
@@ -31,6 +32,9 @@ export default function EditProfile() {
         }catch(e) {
             console.log(e)
         }
+        await verifyToken()
+        showAlert('successfully edited', 'success')
+        
     }
 
 
@@ -59,6 +63,7 @@ export default function EditProfile() {
             <div>
                 <button onClick={changeProfileDetails}>submit</button>
             </div> 
+            
         </div>
     )
 

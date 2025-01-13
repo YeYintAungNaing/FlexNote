@@ -26,6 +26,8 @@ import Login from "./components/Login";
 import Profile from "./components/Profile";
 import EditNote from "./components/EditNote";
 import EditProfile from "./components/EditProfile";
+//import AlertContext from "./context/AlertContext";
+
 
 
 
@@ -38,10 +40,12 @@ const App = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
 
+
   const drawerStyle = {
     width: isDrawerOpen ? drawerWidth : 60, // Adjust width for mini variant
     transition: "width 0.3s",
     overflowX: "hidden",
+    background: 'aliceblue'
   };
 
   const drawerContent = [
@@ -112,17 +116,18 @@ const App = () => {
       >
         <Toolbar />
         <div className="currentPage">
-        
-        <Routes>
-          <Route path="/notes" element={<Notes />} />
-          <Route path="/setting" element={<Setting />} />
-          <Route path="/createNote" element={<NoteEditor />} />
-          <Route path="/editNote/:id" element={<EditNote />} />
-          <Route path="/register" element={<Register/>}></Route>
-          <Route path="/login" element={<Login/>}></Route>
-          <Route path="/" element={<Profile/>}></Route>
-          <Route path="/editProfile" element={<EditProfile/>}></Route>
-        </Routes>
+          
+          <Routes>
+            <Route path="/notes" element={<Notes />} />
+            <Route path="/setting" element={<Setting />} />
+            <Route path="/createNote" element={<NoteEditor />} />
+            <Route path="/editNote/:id" element={<EditNote />} />
+            <Route path="/register" element={<Register/>}></Route>
+            <Route path="/login" element={<Login/>}></Route>
+            <Route path="/" element={<Profile/>}></Route>
+            <Route path="/editProfile" element={<EditProfile/>}></Route>
+          </Routes>
+           
         </div>
       </main>
     </>
