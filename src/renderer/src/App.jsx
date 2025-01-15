@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -26,6 +26,7 @@ import Login from "./components/Login";
 import Profile from "./components/Profile";
 import EditNote from "./components/EditNote";
 import EditProfile from "./components/EditProfile";
+import { GlobalContext } from "./context/GlobalState";
 //import AlertContext from "./context/AlertContext";
 
 
@@ -35,7 +36,7 @@ const drawerWidth = 240;
 
 const App = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
+  const {currentUser} = useContext(GlobalContext);
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
@@ -49,7 +50,7 @@ const App = () => {
   };
 
   const drawerContent = [
-    { text: "Profile", icon: <AccountCircleIcon/>,path: "/" }, 
+    { text: currentUser?.dName || 'Profile', icon: <AccountCircleIcon/>,path: "/" }, 
     { text: "Notes", icon: <StickyNote2Icon/>, path: "/notes" },
     { text: "Create", icon: <NoteAddIcon />, path: "/createNote" },
     { text: "Setting", icon: <SettingsIcon/>, path: "/setting" },

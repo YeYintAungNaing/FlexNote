@@ -1,9 +1,11 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
+import { GlobalContext } from "../context/GlobalState";
 
 export default function Register() {
 
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
+    const { showAlert} = useContext(GlobalContext);
 
     async function register() {
 
@@ -14,10 +16,12 @@ export default function Register() {
            })
          
           if (response.error) {
-            console.log(response.error)
+            //console.log(response.error)
+            showAlert(response.error, 'error')
           }
           else{
             console.log(response.message)
+            showAlert(response.message, 'success')
           }
 
         }catch(e) {

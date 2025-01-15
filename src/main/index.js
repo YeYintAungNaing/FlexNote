@@ -163,17 +163,27 @@ ipcMain.handle('edit-noteName', async  (_, {token, noteName, noteId, userId}) =>
           return resolve({ message: 'Invalid user' })
         }
 
-        db.run(
-          'UPDATE notes SET name = ? WHERE id = ? AND userId = ?',
-          [noteName, noteId, userId], (err) => {
-            if (err) {
-              console.error('Failed to edit note name:', err);
-              return reject(err);
-            } else {
-              return resolve({ message: 'note name has been edited' })
-            }
+        db.get("SELECT * FROM notes where name = ?", [noteName], (err, rows) => {
+          if (err) {
+            console.error('faled to edit name', err)
+            return reject(err)
           }
-        )
+          else if(rows){
+            return resolve({error : "note name is already taken"})
+          }
+
+          db.run(
+            'UPDATE notes SET name = ? WHERE id = ? AND userId = ?',
+            [noteName, noteId, userId], (err) => {
+              if (err) {
+                console.error('Failed to edit note name:', err);
+                return reject(err);
+              } else {
+                return resolve({ message: 'note name has been edited' })
+              }
+            }
+          )
+        })
       }
     )
   })

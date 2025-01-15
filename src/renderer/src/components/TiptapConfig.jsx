@@ -3,6 +3,7 @@ import ListItem from '@tiptap/extension-list-item'
 import TextStyle from '@tiptap/extension-text-style'
 import { useCurrentEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import '../styles/TiptapConfig.scss'
 
 
 export default function MenuBar() {

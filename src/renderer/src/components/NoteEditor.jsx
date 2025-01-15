@@ -19,7 +19,7 @@ import { useLocation } from 'react-router-dom'
 export default function NoteEditor() {
   
   const location = useLocation();
-  const {currentUser, token} = useContext(GlobalContext);
+  const {currentUser, token, showAlert} = useContext(GlobalContext);
   const [noteName, setNoteName] = useState(location.state || "Default")
   const [content, setContent] = useState('')
   const [open, setOpen] = useState(false)
@@ -43,10 +43,12 @@ export default function NoteEditor() {
        })
 
       if (response.error) {
-        console.log(response.error)
+        //console.log(response.error)
+        showAlert(response.error, 'error')
       }
       else{
-        console.log(response.message)
+        //console.log(response.message)
+        showAlert(response.message, 'success')
       }
       
     }catch(e) {

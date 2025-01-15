@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { GlobalContext } from "../context/GlobalState";
 //import { GlobalAlertContext } from "../context/AlertContext";
+import { CountryDropdown } from 'react-country-region-selector';
 
 
 export default function EditProfile() {
@@ -12,7 +13,6 @@ export default function EditProfile() {
     const [email, setEmail] =useState(currentUser?.email || '') 
     const [gender, setGender] =useState(currentUser?.gender || '')
     const [location, setLocation] =useState(currentUser.location || '')
-
     //console.log(userName, dName, email, gender, location)
 
     async function changeProfileDetails() {
@@ -33,11 +33,10 @@ export default function EditProfile() {
             console.log(e)
         }
         await verifyToken()
-        showAlert('successfully edited', 'success')
-        
+        showAlert('successfully edited profile', 'success')   
     }
 
-
+    
     return (
         <div className="edit-profile"> 
             <div>
@@ -58,7 +57,7 @@ export default function EditProfile() {
             </div>
             <div>
                 <p>Location</p>
-                <input value={location} onChange={(e) => setLocation(e.target.value) } ></input>
+                <CountryDropdown value={location} onChange={(val) => setLocation(val) } />
             </div> 
             <div>
                 <button onClick={changeProfileDetails}>submit</button>
@@ -66,5 +65,4 @@ export default function EditProfile() {
             
         </div>
     )
-
 }

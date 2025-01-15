@@ -151,18 +151,26 @@ electron.ipcMain.handle("edit-noteName", async (_, { token, noteName, noteId, us
         if (!rows) {
           return resolve({ message: "Invalid user" });
         }
-        db.run(
-          "UPDATE notes SET name = ? WHERE id = ? AND userId = ?",
-          [noteName, noteId, userId],
-          (err2) => {
-            if (err2) {
-              console.error("Failed to edit note name:", err2);
-              return reject(err2);
-            } else {
-              return resolve({ message: "note name has been edited" });
-            }
+        db.get("SELECT * FROM notes where name = ?", [noteName], (err2, rows2) => {
+          if (err2) {
+            console.error("faled to edit name", err2);
+            return reject(err2);
+          } else if (rows2) {
+            return resolve({ error: "note name is already taken" });
           }
-        );
+          db.run(
+            "UPDATE notes SET name = ? WHERE id = ? AND userId = ?",
+            [noteName, noteId, userId],
+            (err3) => {
+              if (err3) {
+                console.error("Failed to edit note name:", err3);
+                return reject(err3);
+              } else {
+                return resolve({ message: "note name has been edited" });
+              }
+            }
+          );
+        });
       }
     );
   });

@@ -1,18 +1,3 @@
-// import { contextBridge } from 'electron'
-
-// if (!process.contextIsolated) {
-//   throw new Error('CentextIsolated must be enabled in teh BrowserWindow')
-// }
-
-// try {
-//   contextBridge.exposeInMainWorld('context', {
-//     //todo
-//   })
-// } catch (e) {
-//   console.error(e)
-// }
-
-
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electron', {

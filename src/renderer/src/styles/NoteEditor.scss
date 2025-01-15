@@ -2,8 +2,10 @@
 .tiptap {
   outline: none;
   height: 100vh;
-  background-color: rgb(230, 233, 236);
+  background-color: aliceblue;
+  border-radius: 10px;
   margin-top: 10px;
+  padding: 10px;
   :first-child {
     margin-top: 0;
   }
