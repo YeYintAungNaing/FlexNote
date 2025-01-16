@@ -3,6 +3,7 @@ import { GlobalContext } from "../context/GlobalState";
 import {  Link, useNavigate } from "react-router-dom";
 import Login from "./Login";
 import "./../styles/Profile.scss"
+import luna from "../assets/luna.jpeg"
 
 export default function Profile() {
 
@@ -38,7 +39,8 @@ export default function Profile() {
           currentUser? (
             <div>
               <div className="profile-photo">
-                  <div> Imgs</div>
+                  <img src={luna} alt=""></img> 
+                  <p>{currentUser.dName || currentUser.userName}</p> 
               </div>
               <div className="profile-info">
                   <div className="info-1">

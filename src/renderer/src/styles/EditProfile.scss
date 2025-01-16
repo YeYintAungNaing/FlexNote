@@ -1,4 +1,53 @@
 .edit-profile{
-    
 
-}|
+    div{
+        margin-bottom: 20px;
+        
+
+        p{
+            size: 20px;
+            margin-bottom: 5px;
+        }
+
+        input{
+
+            width: 300px;
+            height: 35px;
+            padding-left: 7px;
+            
+            border: 1px solid;
+        
+            border-radius: 5px;
+            font-size: 16px;  
+            outline: none;     
+        }
+        input:focus{
+            border-color: green;
+            box-shadow: 0 0 5px green;    
+        }
+
+        .dropdown{
+            width: 300px;
+            height: 35px;
+            padding-left: 7px;  
+            border: 1px solid;
+            border-radius: 5px;
+            font-size: 16px;  
+        }
+
+        button{
+            width: 300px;
+            height: 35px;
+            font-size: 16px;
+            border: 0px;
+            color: white;
+            font-weight: 200;
+            background-color: rgb(100, 139, 211);
+
+            &:hover{
+                cursor: pointer;
+                transform: scale(1.05);
+            }
+        }
+    }
+}

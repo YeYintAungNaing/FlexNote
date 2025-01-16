@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { GlobalContext } from "../context/GlobalState";
 //import { GlobalAlertContext } from "../context/AlertContext";
 import { CountryDropdown } from 'react-country-region-selector';
-
+import "../styles/EditProfile.scss"
 
 export default function EditProfile() {
 
@@ -57,7 +57,7 @@ export default function EditProfile() {
             </div>
             <div>
                 <p>Location</p>
-                <CountryDropdown value={location} onChange={(val) => setLocation(val) } />
+                <CountryDropdown className="dropdown" value={location} onChange={(val) => setLocation(val) } />
             </div> 
             <div>
                 <button onClick={changeProfileDetails}>submit</button>
