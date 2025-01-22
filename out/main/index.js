@@ -5,6 +5,8 @@ const utils = require("@electron-toolkit/utils");
 const sqlite3 = require("sqlite3");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
+const fs = require("fs");
+require("@mui/icons-material");
 const icon = path.join(__dirname, "../../resources/icon.png");
 const dbPath = path.join(electron.app.getPath("userData"), "notes.db");
 const db = new sqlite3.Database(dbPath, (err) => {
@@ -306,6 +308,45 @@ electron.ipcMain.handle("edit-profile", async (_, { token, userName, email, loca
             }
           }
         );
+      }
+    );
+  });
+});
+electron.ipcMain.handle("upload-img", (_, { token, userId, fileName, fileData }) => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT * FROM users WHERE id = ? and sessionToken = ?",
+      [userId, token],
+      (err, rows) => {
+        if (err) {
+          console.error("db error", err);
+          return reject(err);
+        }
+        if (!rows) {
+          return resolve({ message: "Invalid user" });
+        }
+        try {
+          const uploadPath = path.join(electron.app.getPath("userData"), "images/profileImg");
+          if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+          }
+          const filePath = path.join(uploadPath, fileName);
+          fs.writeFileSync(filePath, Buffer.from(fileData));
+          db.run(
+            "UPDATE users SET profileImgPath = ? WHERE id = ?",
+            [filePath, userId],
+            (err2) => {
+              if (err2) {
+                console.error("Failed to upload image :", err2);
+                return reject(err2);
+              } else {
+                return resolve({ message: "Profile image has been saved" });
+              }
+            }
+          );
+        } catch (err2) {
+          console.error("File upload error:", err2);
+        }
       }
     );
   });

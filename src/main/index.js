@@ -5,6 +5,9 @@ import icon from '../../resources/icon.png?asset'
 import db from './database'
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
+import fs from 'fs'
+
+
 
 function createWindow() {
   // Create the browser window.
@@ -74,6 +77,8 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
+
+
 
 
 // Save a new note
@@ -240,7 +245,6 @@ ipcMain.handle('fetch-notes', async (_, userId) => {
 ipcMain.handle('create-user', async (_, { userName, password}) => {
   return new Promise((resolve, reject) => {
 
-
     db.get("SELECT * FROM users where userName = ?", [userName], (err, rows) => {
       if (err) {
         console.error('faled to create user account', err)
@@ -268,7 +272,6 @@ ipcMain.handle('create-user', async (_, { userName, password}) => {
     })
   })
 })
-
 
 
 // log in
@@ -350,6 +353,61 @@ ipcMain.handle('edit-profile', async  (_, {token, userName, email, location, gen
     )
   })
 })
+
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, '../client/public/uploads')
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, Date.now() + file.originalname)
+//   }
+// })
+
+
+ipcMain.handle('upload-img', (_, {token, userId, fileName, fileData}) => {  // returns img url
+  return new Promise((resolve, reject) => {
+  db.get('SELECT * FROM users WHERE id = ? and sessionToken = ?',
+    [userId, token ], (err, rows) => {
+      if (err) {
+        console.error('db error', err);
+        return reject(err);  
+      } 
+      if(!rows) {
+        return resolve({ message: 'Invalid user' })
+      } 
+
+      try{
+        //const uploadPath = path.join(__dirname, 'C:/Users/yeyin/AppData/Roaming/flexnote/images/profileImg');
+        const uploadPath = join(app.getPath('userData'), 'images/profileImg');
+
+         
+        if (!fs.existsSync(uploadPath)) {
+          fs.mkdirSync(uploadPath, { recursive: true }); 
+        }
+
+        const filePath = join(uploadPath, fileName);
+        fs.writeFileSync(filePath, Buffer.from(fileData)); 
+        //return resolve(filePath); 
+
+        db.run(
+          'UPDATE users SET profileImgPath = ? WHERE id = ?',
+          [filePath, userId ], (err) => {
+            if (err) {
+              console.error('Failed to upload image :', err);
+              return reject(err);
+            } else {
+              return resolve({ message: 'Profile image has been saved' })
+            }
+          }
+        )
+      }
+      catch(err) {
+        console.error("File upload error:", err);  
+      }
+    })
+  })
+})
+
 
 // this try to find the user with the token(from db) that matches the one from frontend
 ipcMain.handle('verify-token', async (_, token) => {

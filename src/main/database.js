@@ -5,6 +5,8 @@ import { app } from 'electron';
 // Path for the database file
 const dbPath = join(app.getPath('userData'), 'notes.db');
 
+//console.log(dbPath)
+
 // Initialize the database
 const db = new Database(dbPath, (err) => {
   if (err) {

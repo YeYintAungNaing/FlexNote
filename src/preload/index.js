@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld('electron', {
   fetchNotes: (userId) => ipcRenderer.invoke('fetch-notes', userId),
   verifyToken: (token) => ipcRenderer.invoke('verify-token', token),
   logoutUser: (userId) => ipcRenderer.invoke('logout-user', userId), 
+  uploadImg : (data) => ipcRenderer.invoke('upload-img', data) // {token, userId, fileName, fileData}
  });
 
 console.log('Preload script loaded');

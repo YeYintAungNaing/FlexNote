@@ -27,6 +27,7 @@ import Profile from "./components/Profile";
 import EditNote from "./components/EditNote";
 import EditProfile from "./components/EditProfile";
 import { GlobalContext } from "./context/GlobalState";
+import EditProfileImg from "./components/EditProfileImg";
 //import AlertContext from "./context/AlertContext";
 
 
@@ -127,6 +128,8 @@ const App = () => {
             <Route path="/login" element={<Login/>}></Route>
             <Route path="/" element={<Profile/>}></Route>
             <Route path="/editProfile" element={<EditProfile/>}></Route>
+            <Route path="/editProfileImg" element={<EditProfileImg/>}></Route>
+            
           </Routes>
            
         </div>

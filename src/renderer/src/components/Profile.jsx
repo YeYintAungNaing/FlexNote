@@ -39,7 +39,7 @@ export default function Profile() {
           currentUser? (
             <div>
               <div className="profile-photo">
-                  <img src={luna} alt=""></img> 
+                  <img  onClick={()=> navigate('editProfileImg')} src={luna} alt=""></img> 
                   <p>{currentUser.dName || currentUser.userName}</p> 
               </div>
               <div className="profile-info">
