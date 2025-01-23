@@ -409,6 +409,31 @@ ipcMain.handle('upload-img', (_, {token, userId, fileName, fileData}) => {  // r
 })
 
 
+ipcMain.handle('get-userImg', async  (_, {token, userId, imagePath }) => {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT * FROM users WHERE id = ? and sessionToken = ?',
+      [userId, token ], (err, rows) => {
+        if (err) {
+          console.error('db error', err);
+          return reject(err);  // have to explictly return to terminate
+        } 
+        if(!rows) {
+          return resolve({ message: 'Invalid user' })
+        }
+
+        try{
+          const imageBuffer = fs.readFileSync(imagePath);
+          return resolve(`data:image/png;base64,${imageBuffer.toString('base64')}`);
+        }
+        catch(e) {
+          return reject(e)
+        }  
+      }
+    )
+  })
+})
+
+
 // this try to find the user with the token(from db) that matches the one from frontend
 ipcMain.handle('verify-token', async (_, token) => {
   return new Promise((resolve, reject) => {

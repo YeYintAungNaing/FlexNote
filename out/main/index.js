@@ -6,7 +6,6 @@ const sqlite3 = require("sqlite3");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const fs = require("fs");
-require("@mui/icons-material");
 const icon = path.join(__dirname, "../../resources/icon.png");
 const dbPath = path.join(electron.app.getPath("userData"), "notes.db");
 const db = new sqlite3.Database(dbPath, (err) => {
@@ -346,6 +345,29 @@ electron.ipcMain.handle("upload-img", (_, { token, userId, fileName, fileData })
           );
         } catch (err2) {
           console.error("File upload error:", err2);
+        }
+      }
+    );
+  });
+});
+electron.ipcMain.handle("get-userImg", async (_, { token, userId, imagePath }) => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT * FROM users WHERE id = ? and sessionToken = ?",
+      [userId, token],
+      (err, rows) => {
+        if (err) {
+          console.error("db error", err);
+          return reject(err);
+        }
+        if (!rows) {
+          return resolve({ message: "Invalid user" });
+        }
+        try {
+          const imageBuffer = fs.readFileSync(imagePath);
+          return resolve(`data:image/png;base64,${imageBuffer.toString("base64")}`);
+        } catch (e) {
+          return reject(e);
         }
       }
     );

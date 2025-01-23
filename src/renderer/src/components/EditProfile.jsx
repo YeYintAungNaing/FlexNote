@@ -6,7 +6,7 @@ import "../styles/EditProfile.scss"
 
 export default function EditProfile() {
 
-    const {currentUser, token, verifyToken, showAlert} = useContext(GlobalContext);
+    const {currentUser, token, getUserDetails, showAlert} = useContext(GlobalContext);
     //const {showAlert} = useContext(GlobalAlertContext);
     const [userName, setUserName] =useState(currentUser?.userName || '') 
     const [dName, setdName] =useState(currentUser?.dName || '') 
@@ -32,7 +32,7 @@ export default function EditProfile() {
         }catch(e) {
             console.log(e)
         }
-        await verifyToken()
+        await getUserDetails()
         showAlert('successfully edited profile', 'success')   
     }
 

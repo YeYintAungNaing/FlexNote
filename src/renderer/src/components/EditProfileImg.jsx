@@ -4,7 +4,7 @@ import { GlobalContext } from "../context/GlobalState";
 export default function EditProfileImg() {
 
     const [file, setFile] = useState(null)
-    const {currentUser, token,} = useContext(GlobalContext);
+    const {currentUser, token, getUserDetails,  setProfileImg } = useContext(GlobalContext);
 
     // THIS method need express ( will implement later)
     // async function upload() { 
@@ -45,9 +45,11 @@ export default function EditProfileImg() {
               token,
               userId : currentUser.id
             });
+            await getUserDetails()    // get updated user details
+            //await fetchProfileImage()  // instantly change the profile image
+            setProfileImg(null)
+            setFile(null)
             console.log(response.message)
-            
-            
           }    
         }
         catch(e) {
@@ -60,9 +62,9 @@ export default function EditProfileImg() {
         <div>
             <input style={{display : 'none'}} type='file' id='imgFile' name='' onChange={(e)=> setFile(e.target.files[0])}></input>
             <button>
-                <label htmlFor='imgFile'> Upload Image</label>
+                <label htmlFor='imgFile'> Select Image</label>
             </button>
-            <button onClick={upload}>get url</button>    
+            <button onClick={upload}>Change profile image</button>    
         </div>
     )
 }

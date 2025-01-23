@@ -1,15 +1,16 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { GlobalContext } from "../context/GlobalState";
 import {  Link, useNavigate } from "react-router-dom";
 import Login from "./Login";
 import "./../styles/Profile.scss"
-import luna from "../assets/luna.jpeg"
+
+
 
 export default function Profile() {
 
     const navigate = useNavigate()
 
-    const {currentUser, clearToken} = useContext(GlobalContext);
+    const {currentUser, clearToken, fetchProfileImage, profileImg } = useContext(GlobalContext);
     // function current() {
     //   try{
     //     const token = window.localStorage.getItem('sessionToken');
@@ -19,6 +20,8 @@ export default function Profile() {
     //     }
     //   }
     //console.log(currentUser)
+
+    // console.log(currentUser?.profileImgPath)
   
     async function logoutUser() {
   
@@ -32,6 +35,15 @@ export default function Profile() {
         console.log(e)
       } 
     }
+    //console.log(profileImg)
+
+    useEffect(() => { 
+      if (profileImg) {
+        return
+      }
+      fetchProfileImage() 
+      console.log('profile img fetched') 
+    }, [currentUser]);   // in case currentUser is not updated in time when this useEffect takes place ( re-trigger the useeffect)
      
     return (
       <div className="profile">
@@ -39,7 +51,7 @@ export default function Profile() {
           currentUser? (
             <div>
               <div className="profile-photo">
-                  <img  onClick={()=> navigate('editProfileImg')} src={luna} alt=""></img> 
+                  <img  onClick={()=> navigate('/editProfileImg')} src={profileImg} alt=""></img> 
                   <p>{currentUser.dName || currentUser.userName}</p> 
               </div>
               <div className="profile-info">

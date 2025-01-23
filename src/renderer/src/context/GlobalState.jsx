@@ -12,9 +12,10 @@ export default function GlobalState({children}) {
     const [currentUser, setCurrentUser] = useState(null)
     const [token, setToken] = useState(() => window.localStorage.getItem('sessionToken'));  // lazy initializaiton instead of straight up call, 
     //const navigate = useNavigate()
+    const [profileImg, setProfileImg] = useState(null)
     console.log("from global state",currentUser)
 
-    async function verifyToken() {
+    async function getUserDetails() {
     
         try{
           if (token) {
@@ -35,9 +36,23 @@ export default function GlobalState({children}) {
         }
       }
 
+      async function fetchProfileImage() {
+        if (!currentUser) {
+          return
+        }
+        const imagePath = currentUser.profileImgPath;
+        const base64Image = await window.electron.getUserImg({
+          token,
+          imagePath,
+          userId : currentUser.id
+        })
+        
+        setProfileImg(base64Image);
+      }
+
 
     useEffect(() => {
-        verifyToken()
+        getUserDetails()
 
     },[])
 
@@ -72,8 +87,11 @@ export default function GlobalState({children}) {
             setCurrentUser,
             token,
             clearToken,
-            verifyToken,
-            showAlert
+            getUserDetails,
+            showAlert,
+            fetchProfileImage,
+            profileImg,
+            setProfileImg
         }}>
             {children}
             <Snackbar
