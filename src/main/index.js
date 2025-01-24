@@ -422,8 +422,8 @@ ipcMain.handle('get-userImg', async  (_, {token, userId, imagePath }) => {
         }
 
         try{
-          const imageBuffer = fs.readFileSync(imagePath);
-          return resolve(`data:image/png;base64,${imageBuffer.toString('base64')}`);
+          const imageBuffer = fs.readFileSync(imagePath);   
+          return resolve(`data:image/png;base64,${imageBuffer.toString('base64')}`);   // Encapsulates the image data in one string
         }
         catch(e) {
           return reject(e)

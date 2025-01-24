@@ -1,10 +1,13 @@
 import { useContext, useState } from "react";
 import { GlobalContext } from "../context/GlobalState";
+import "../styles/EditProfileImg.scss"
 
 export default function EditProfileImg() {
 
-    const [file, setFile] = useState(null)
+    const [file, setFile] = useState("")
     const {currentUser, token, getUserDetails,  setProfileImg } = useContext(GlobalContext);
+    
+    //const [previewImg, setPreviewImg] = useState()
 
     // THIS method need express ( will implement later)
     // async function upload() { 
@@ -27,6 +30,7 @@ export default function EditProfileImg() {
 
     async function upload() {
         if (!file) {
+          console.log('empty')
           return
         }
 
@@ -36,10 +40,10 @@ export default function EditProfileImg() {
           reader.onload = async () => {
             const arrayBuffer = reader.result;
     
-            console.log(file.name)
-            console.log(arrayBuffer)
+            // console.log(file.name)
+            // console.log(arrayBuffer)
     
-            const response = await window.electron.uploadImg({
+            const response = await window.electron.uploadImg({  // this save the img in the relevant user directory and store that new file path string in db 
               fileName: file.name,
               fileData: arrayBuffer,
               token,
@@ -48,29 +52,32 @@ export default function EditProfileImg() {
             await getUserDetails()    // get updated user details
             //await fetchProfileImage()  // instantly change the profile image
             setProfileImg(null)
-            setFile(null)
+            setFile('')
             console.log(response.message)
           }    
         }
         catch(e) {
           console.log(e)
         }
+    }
 
+    async function selectImage(e) {
+      setFile(e.target.files[0])
     }
 
     return (
-        <div>
-            <input style={{display : 'none'}} type='file' id='imgFile' name='' onChange={(e)=> setFile(e.target.files[0])}></input>
+        <div className="edit-profile-img">  
+          <div className="select-file">
+            <input style={{display : 'none'}} type='file' id='imgFile' name='' onChange={selectImage}></input>
             <button>
-                <label htmlFor='imgFile'> Select Image</label>
+              <label htmlFor='imgFile'>Select Image</label>
             </button>
-            <button onClick={upload}>Change profile image</button>    
+            <div>{file? file.name : "No file chosen"}</div> 
+          </div>   
+          <button onClick={upload}>Change profile image</button>    
         </div>
     )
 }
-
-
-
 
 
 // const handleFileUpload = async (event) => {

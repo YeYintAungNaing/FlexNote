@@ -36,7 +36,7 @@ export default function GlobalState({children}) {
         }
       }
 
-      async function fetchProfileImage() {
+      async function fetchProfileImage() {  // using filepath of db to encapsulate the image data that can be used directly on browser 
         if (!currentUser) {
           return
         }
