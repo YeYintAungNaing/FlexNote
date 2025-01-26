@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createContext } from "react";
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
+import axios from 'axios'
 
 
 export const GlobalContext = createContext(null);
@@ -14,6 +15,8 @@ export default function GlobalState({children}) {
     //const navigate = useNavigate()
     const [profileImg, setProfileImg] = useState(null)
     console.log("from global state",currentUser)
+
+    axios.defaults.withCredentials = true;
 
     async function getUserDetails() {
     
@@ -36,11 +39,27 @@ export default function GlobalState({children}) {
         }
       }
 
+      async function getUserDetailsOnline() {  // this first check where there is jwt token and get user details
+        try{
+         const response = await axios.get('http://localhost:7000/auth/verifyToken')
+          setCurrentUser(response.data)
+          console.log('token comfired and user data saved')
+
+        }catch(e) {
+          console.log(e.response.data.message)
+        }
+      }
+
       async function fetchProfileImage() {  // using filepath of db to encapsulate the image data that can be used directly on browser 
         if (!currentUser) {
           return
         }
         const imagePath = currentUser.profileImgPath;
+
+        if (!imagePath) {
+          return
+        }
+
         const base64Image = await window.electron.getUserImg({
           token,
           imagePath,
@@ -52,8 +71,12 @@ export default function GlobalState({children}) {
 
 
     useEffect(() => {
+      if(token) {   // this will happen when it is offline ( sessionToken is stored inside session storage)
         getUserDetails()
-
+      }
+      else{
+        getUserDetailsOnline()
+      }
     },[])
 
     function clearToken() {

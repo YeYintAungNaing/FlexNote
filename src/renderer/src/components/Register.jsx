@@ -1,12 +1,14 @@
 import { useContext, useState } from "react"
 import { GlobalContext } from "../context/GlobalState";
+import axios from 'axios'
 
 export default function Register() {
 
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
     const { showAlert} = useContext(GlobalContext);
-
+    const [mode, setMode] = useState("Offline")
+    
     async function register() {
 
         try{
@@ -29,6 +31,19 @@ export default function Register() {
         }    
       }
 
+      async function onlineRegister() {
+        try{
+            const response = await axios.post('http://localhost:7000/auth/register', {
+              userName,
+              password,
+              mode
+            })
+            console.log(response.data.message)
+        }catch(e) {
+          console.log("from frontend", e.response.data.message)
+        }
+      }
+
     return (
         <div>
           <div>register</div>
@@ -44,7 +59,12 @@ export default function Register() {
                 onChange={(e) => setPassword(e.target.value)}
                 >
             </input>
-            <button onClick={register}>Submit</button>
+            <input 
+                value={mode}
+                onChange={(e) => setMode(e.target.value)}
+                >
+            </input>
+            <button onClick={onlineRegister}>Submit</button>
         </div>
     )
 }

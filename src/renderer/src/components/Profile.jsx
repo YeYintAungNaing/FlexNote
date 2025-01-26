@@ -5,7 +5,6 @@ import Login from "./Login";
 import "./../styles/Profile.scss"
 
 
-
 export default function Profile() {
 
     const navigate = useNavigate()

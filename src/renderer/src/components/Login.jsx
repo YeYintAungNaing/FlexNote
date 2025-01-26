@@ -1,12 +1,15 @@
 import { useContext, useState } from "react"
 import { GlobalContext } from "../context/GlobalState"
 import { Link } from "react-router-dom";
+import axios from 'axios'
 
 export default function Login() {
 
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
     const { setCurrentUser} = useContext(GlobalContext);
+
+    //axios.defaults.withCredentials = true;
 
     async function login() {
 
@@ -29,6 +32,19 @@ export default function Login() {
         }    
       }
 
+      async function loginOnline() {
+        try{
+          const response = await axios.post("http://localhost:7000/auth/login", {userName, password});
+
+          setCurrentUser(response.data)
+          console.log('signed in')
+          
+          
+        }catch(e) {
+          console.log("from frontend", e.response.data.message)
+        }
+    }
+
     return (
         <div>
           <div>Login</div>
@@ -44,7 +60,7 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 >
             </input>
-            <button onClick={login}>Submit</button>
+            <button onClick={loginOnline}>Submit</button>
             <Link to='/register'>
               <button>register</button>
             </Link>

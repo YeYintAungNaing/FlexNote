@@ -79,8 +79,6 @@ app.on('window-all-closed', () => {
 })
 
 
-
-
 // Save a new note
 ipcMain.handle('save-note', async (_, { token, noteName, content, userId }) => {
   return new Promise((resolve, reject) => {
