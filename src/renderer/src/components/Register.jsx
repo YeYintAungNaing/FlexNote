@@ -9,6 +9,8 @@ export default function Register() {
     const { showAlert} = useContext(GlobalContext);
     const [mode, setMode] = useState("Offline")
     
+    console.log(mode)
+    
     async function register() {
 
         try{
@@ -44,6 +46,15 @@ export default function Register() {
         }
       }
 
+    function submitRegister() {
+      if (mode === "Offline") {
+        register()
+      }
+      else{
+        onlineRegister()
+      }
+    }
+
     return (
         <div>
           <div>register</div>
@@ -60,11 +71,26 @@ export default function Register() {
                 >
             </input>
             <input 
-                value={mode}
-                onChange={(e) => setMode(e.target.value)}
+                type="radio"
+                value="Offline"
+                name="mode"
+                id="offline"
+                onChange={(e)=> {setMode(e.target.value)}}
+                checked={mode === "Offline"}
                 >
             </input>
-            <button onClick={onlineRegister}>Submit</button>
+            <label htmlFor="offline">Offline</label>
+            <input 
+                type="radio"
+                value="Online"
+                name="mode"
+                id="online"
+                onChange={(e)=> {setMode(e.target.value)}}
+                checked={mode === "Online"}
+                >
+            </input>
+            <label htmlFor="online">Online</label>
+            <button onClick={submitRegister}>Submit</button>
         </div>
     )
 }
