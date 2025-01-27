@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken'
 import cookieParser from "cookie-parser"
 
 
+
 const app = express()
 
 app.use(express.json())
@@ -37,7 +38,6 @@ app.post('/auth/register', (req, res) => {
         db.prepare("INSERT INTO users (userName, password, mode) VALUES (?, ?, ?)").run(userName, hashedPassword, mode)
 
         res.status(200).json({message : "Successfully registered"})
-
     }
     catch(e) {
         res.status(500).json({ message: "Internal Server Error" })
@@ -57,10 +57,10 @@ app.get('/auth/verifyToken' , (req, res) => {
 
         jwt.verify(token, "jwtkey", (err, decoded) => {
             if (err) return res.status(403).json({ message: "Invalid token" });
-            console.log(decoded.id)
+            //console.log(decoded.id)
         
             const userData = db.prepare("SELECT * FROM users where userId = ?").get(decoded.id);  //  userId when the token is first created 
-            console.log("row", userData)
+            //console.log("row", userData)
             if(!userData) {
                 res.status(404).json({ message: "no valid user data" });
                 return
@@ -94,7 +94,7 @@ app.post("/auth/login", (req, res) => {
             return
         }
 
-        const token = jwt.sign({id : userData.userId}, "jwtkey", { expiresIn: '5h' })
+        const token = jwt.sign({userId : userData.userId}, "jwtkey", { expiresIn: '5h' })
         // eslint-disable-next-line no-unused-vars
         const {password, ...other} = userData  
         res.cookie('jwt_token', token, {    // can be found inside cookie session
@@ -106,9 +106,57 @@ app.post("/auth/login", (req, res) => {
         res.status(500).json({ message: "Internal Server Error" })
         console.log(e)
     }
-    
 })
 
+app.get('/notes', (req, res) => {
+
+    try{
+        const token = req.cookies.jwt_token;
+
+        jwt.verify(token, "jwtkey", (err, decoded) => {
+
+            if (err) {
+                return res.status(403).json({ message: "Invalid token" });
+            }
+
+            const notes = db.prepare('SELECT * FROM notes where userId = ?').all(decoded.id)
+            res.status(200).json(notes)  
+        })
+
+    }catch(e) {
+        res.status(500).json({ message: "Internal Server Error" })
+        console.log(e)
+    }
+})
+
+
+app.post('/notes', (req, res) => {
+    try{
+        const token = req.cookies.jwt_token;
+
+        jwt.verify(token, "jwtkey", (err, decoded) => {
+            if (err) return res.status(403).json({message: "Invalid token"})
+            
+            const {noteName, content} = req.body;
+
+            const duplicate = db.prepare(
+                'SELECT * FROM notes where name = ? and userId = ?').get(noteName, decoded.id)
+
+            if (duplicate) {
+                return res.status(409).json({ message: "Note Name is already taken" });
+            }
+
+            db.prepare(
+                'INSERT INTO notes (name, content, userId) VALUES (?, ?, ?)').run(noteName, content, decoded.id)
+
+            res.status(200).json({message : `${noteName} has been saved`})
+        })
+
+    }catch(e) {
+        res.status(500).json({ message : "Internal Server Error"})
+        console.log(e)
+    }
+})
 
 app.listen(7000, () => {
     console.log('connected to backend')

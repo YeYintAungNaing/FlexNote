@@ -14,6 +14,7 @@ import {
   TextField,
 } from '@mui/material';
 import { useLocation } from 'react-router-dom'
+import axios from 'axios'
 
 
 export default function NoteEditor() {
@@ -24,10 +25,10 @@ export default function NoteEditor() {
   const [content, setContent] = useState('')
   const [open, setOpen] = useState(false)
 
-  const handleOpen = () => setOpen(true); // Open modal
+  const handleOpen = () => setOpen(true); 
   const handleClose = () => {
         setNoteName('Default')
-        setOpen(false); // Close modal
+        setOpen(false); 
   }
 
   //let content = 'Enter your note here'
@@ -56,11 +57,31 @@ export default function NoteEditor() {
     }    
   }
 
-  // function test() {
-  //   console.log('test')
-  // }
+  async function saveNoteOnline() {
+    try{
+      const response = await axios.post('http://localhost:7000/notes', {
+        noteName : noteName,
+        content : content,
+       })
+
+       console.log(response.data.message)
+    }
+    catch(e) {
+      console.log(e.response.data.message)
+    }
+  }
+
   function editNoteName() {
     setOpen(false)
+  }
+
+  function save() {
+    if (currentUser.mode === "Online") {
+      saveNoteOnline()
+    }
+    else{
+      saveNote()
+    }
   }
  
   return (
@@ -91,7 +112,7 @@ export default function NoteEditor() {
             </DialogActions>
             </Dialog>
         <h2 onClick={handleOpen} className='note-title-btn'>{noteName}</h2>
-        <button onClick={saveNote}>save</button>
+        <button onClick={save}>save</button>
         <EditorProvider  
           slotBefore={<MenuBar />} 
           extensions={extensions} 

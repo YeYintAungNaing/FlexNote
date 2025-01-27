@@ -10,6 +10,8 @@ import {
   } from '@mui/material';
 import { Link, useNavigate } from "react-router-dom";
 import { GlobalContext } from "../context/GlobalState";
+import axios from 'axios'
+import { ReportSharp } from "@mui/icons-material";
 
 
 
@@ -49,10 +51,34 @@ export default function Notes() {
       }
     }
 
+    async function  getNotesOnline() {
+      try{
+          const response = await axios.get('http://localhost:7000/notes')
+          
+          if (response.data.length >  0) {
+            setNotes(response.data)
+            
+          }
+          else{
+            setNotes(null)
+          }
+
+      }
+      catch(e) {
+        console.log("from frontend", e.response.data.message)
+      }
+    }
+
 
     useEffect(()=>{
       if(currentUser) {
-        getNotes(currentUser.id)
+
+        if(currentUser.mode === "Online") {
+          getNotesOnline()  
+        }
+        else{
+          getNotes(currentUser.id)
+        }
       }
       console.log('notes effect')
 
