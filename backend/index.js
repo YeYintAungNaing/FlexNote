@@ -182,6 +182,26 @@ app.post('/notes', (req, res) => {
     }
 })
 
+
+app.put('/notes/:id', (req, res) => {
+    try{
+        const token = req.cookies.jwt_token;
+
+        jwt.verify(token, "jwtkey", (err, encoded) => {
+            if (err) return res.status(403).json({message : "Invalid token"})
+            
+            const { content, id} = req.body
+
+            db.prepare("UPDATE notes SET content = ? WHERE userId = ? and id = ?").run(content, encoded.userId, id)
+
+            return res.status(200).json({message : `Note with id :${id} has been updated`})
+        })
+
+    }catch(e) {
+        res.status(500).json({ message : "Internal Server Error"})
+    }
+})
+
 app.post('/auth/logout', (req, res) => {
 
     try{

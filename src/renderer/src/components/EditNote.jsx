@@ -13,6 +13,7 @@ import {
   DialogTitle,
   TextField,
 } from '@mui/material';
+import axios from "axios"
 
 
 export default function EditNote() {
@@ -46,6 +47,24 @@ export default function EditNote() {
     }  
   }
 
+  async function editNoteOnline() {
+    try{
+      const response =  await axios.put(`http://localhost:7000/notes/${location.state.id}`, {
+        id : location.state.id,
+        content
+      })
+      console.log(response.data.message)
+    }
+    catch(e) {
+      if(e.response) {
+        console.log(e.response.data.message)
+      }
+      else {
+        console.log(e)
+      }
+    }
+  }
+
   async function editNoteName() {
     try{
       const response = await window.electron.editNoteName({
@@ -69,6 +88,15 @@ export default function EditNote() {
     }
   }
   //console.log(window.location.href)
+
+  function edit() {
+    if (currentUser.mode === "Offline") {
+      editNote()
+    }
+    else{
+      editNoteOnline()
+    }
+  }
 
   return (
     <div>
@@ -99,7 +127,7 @@ export default function EditNote() {
               </Button>
             </DialogActions>
             </Dialog>
-            <button onClick={editNote}>Edit note</button>
+            <button onClick={edit}>Edit note</button>
             <EditorProvider  
               slotBefore={<MenuBar />} 
               extensions={extensions} 
