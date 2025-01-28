@@ -1,6 +1,7 @@
 import { useContext, useState } from "react"
 import { GlobalContext } from "../context/GlobalState";
 import axios from 'axios'
+import {DateTime} from 'luxon'
 
 export default function Register() {
 
@@ -8,6 +9,7 @@ export default function Register() {
     const [password, setPassword] = useState("")
     const { showAlert} = useContext(GlobalContext);
     const [mode, setMode] = useState("Offline")
+    const [timeStamp, setTimeStamp] = useState(null)
     
     console.log(mode)
     
@@ -38,7 +40,8 @@ export default function Register() {
             const response = await axios.post('http://localhost:7000/auth/register', {
               userName,
               password,
-              mode
+              mode,
+              timeStamp : DateTime.now().toLocaleString(DateTime.DATE_FULL)
             })
             console.log(response.data.message)
         }catch(e) {
@@ -54,6 +57,7 @@ export default function Register() {
         onlineRegister()
       }
     }
+
 
     return (
         <div>

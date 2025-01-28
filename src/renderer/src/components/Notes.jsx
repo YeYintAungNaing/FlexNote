@@ -13,6 +13,7 @@ import { GlobalContext } from "../context/GlobalState";
 import axios from 'axios'
 
 
+
 export default function Notes() {
 
     const {currentUser, token} = useContext(GlobalContext);
@@ -63,12 +64,18 @@ export default function Notes() {
 
       }
       catch(e) {
-        console.log("from frontend", e.response.data.message)
+        if(e.response) {
+          console.log(e.response.data.message)
+        }
+        else {
+          console.log(e)
+        }
       }
     }
 
 
     useEffect(()=>{
+      
       if(currentUser) {
 
         if(currentUser.mode === "Online") {
@@ -82,7 +89,7 @@ export default function Notes() {
 
     },[currentUser])
 
-
+    
     async function deleteNote (noteId) {
       console.log()
       try{

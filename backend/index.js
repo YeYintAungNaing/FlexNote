@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt'
 import cors from 'cors'
 import jwt from 'jsonwebtoken'
 import cookieParser from "cookie-parser"
-
+import rateLimit from "express-rate-limit"
 
 
 const app = express()
@@ -18,13 +18,22 @@ app.use(cors({
     credentials: true
 }))
 
+const limiter = rateLimit({
+    windowMs: 1 * 60 * 1000, 
+    max:4, 
+    message: {message : 'Too many requests from this IP, please try again after 15 minutes'},
+    headers: true, // Include rate limit info in response headers
+});
+
+app.use(limiter)
+
 const dbPath = 'C:/Users/yeyin/AppData/Roaming/flexnote/online_db/flexNote.db';  // temp path
 
 const db = new sqlite3(dbPath);
 
 app.post('/auth/register', (req, res) => {
     try{
-        const {userName, password, mode} = req.body
+        const {userName, password, mode, timeStamp} = req.body
         const row = db.prepare("SELECT * FROM users where userName = ?").get(userName);
         
         if (row) {
@@ -35,7 +44,7 @@ app.post('/auth/register', (req, res) => {
         const salt = bcrypt.genSaltSync(10);
         const hashedPassword = bcrypt.hashSync(password, salt);
 
-        db.prepare("INSERT INTO users (userName, password, mode) VALUES (?, ?, ?)").run(userName, hashedPassword, mode)
+        db.prepare("INSERT INTO users (userName, password, mode, createdAt) VALUES (?, ?, ?, ?)").run(userName, hashedPassword, mode, timeStamp)
 
         res.status(200).json({message : "Successfully registered"})
     }
@@ -94,12 +103,12 @@ app.post("/auth/login", (req, res) => {
             return
         }
 
-        const token = jwt.sign({userId : userData.userId}, "jwtkey", { expiresIn: '5h' })
+        const token = jwt.sign({userId : userData.userId}, "jwtkey", { expiresIn: '10h' })
         // eslint-disable-next-line no-unused-vars
         const {password, ...other} = userData  
         res.cookie('jwt_token', token, {    // can be found inside cookie session
             httpOnly:true,
-            maxAge: 18000000 
+            maxAge: 3600 * 10 * 1000 
         }).status(200).json(other)     
     }
     catch(e) {

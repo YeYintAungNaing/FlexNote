@@ -118,7 +118,7 @@ export default function Profile() {
                       </tr>
                       <tr>
                         <th >Account Created</th>
-                        <td>YeYe </td>  
+                        <td>{currentUser.createdAt} </td>  
                       </tr>
                       <tr>
                         <th >Premium</th>
