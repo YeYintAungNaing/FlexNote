@@ -87,6 +87,25 @@ export default function EditNote() {
       console.log(e)
     }
   }
+
+  async function editNoteNameOnline() {
+      try{
+        const response = await axios.put(`http://localhost:7000/notes/${location.state.id}/name`, {
+          noteName,
+          id : location.state.id,
+        })
+        console.log(response.data.message)
+      }
+      catch(e) {
+        if(e.response) {
+          console.log(e.response.data.message)
+        }
+        else {
+          console.log(e)
+        }
+      }
+      setOpen(false)
+  }
   //console.log(window.location.href)
 
   function edit() {
@@ -98,13 +117,21 @@ export default function EditNote() {
     }
   }
 
+  function changeName() {
+    if (currentUser.mode === "Offline") {
+      editNoteName()
+    }
+    else{
+      editNoteNameOnline()
+    }
+  }
+
   return (
     <div>
       {
         currentUser?  (
           <div> 
-            <h2>{noteName}</h2>
-            <button onClick={handleOpen}>Edit name</button>
+            <h2 className='note-title-btn' onClick={handleOpen}>{noteName}</h2>
             <Dialog open={open} onClose={handleClose}>
             <DialogTitle>Enter Note Name</DialogTitle>
             <DialogContent>
@@ -122,12 +149,12 @@ export default function EditNote() {
               <Button onClick={handleClose} color="secondary">
                 Cancel
               </Button>
-              <Button onClick={editNoteName} color="primary">
+              <Button onClick={changeName} color="primary">
                 Save
               </Button>
             </DialogActions>
             </Dialog>
-            <button onClick={edit}>Edit note</button>
+            <button onClick={edit}>Save note</button>
             <EditorProvider  
               slotBefore={<MenuBar />} 
               extensions={extensions} 

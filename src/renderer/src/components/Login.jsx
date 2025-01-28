@@ -2,6 +2,7 @@ import { useContext, useState } from "react"
 import { GlobalContext } from "../context/GlobalState"
 import { Link } from "react-router-dom";
 import axios from 'axios'
+import "../styles/Login.scss"
 
 export default function Login() {
 
@@ -46,8 +47,9 @@ export default function Login() {
     }
 
     return (
-        <div>
-          <div>Login</div>
+        <div className="login">
+          <div className="login-card">
+          <p>Login</p>
             <input 
                 placeholder="Name" 
                 value={userName}
@@ -62,9 +64,9 @@ export default function Login() {
             </input>
             <button onClick={loginOnline}>Submit</button>
             <Link to='/register'>
-              <button>register</button>
+              <button className="register">Register new account</button>
             </Link>
-            
+            </div>
         </div>
     )
 }
