@@ -57,9 +57,9 @@ app.get('/auth/verifyToken' , (req, res) => {
 
         jwt.verify(token, "jwtkey", (err, decoded) => {
             if (err) return res.status(403).json({ message: "Invalid token" });
-            //console.log(decoded.id)
+            // 
         
-            const userData = db.prepare("SELECT * FROM users where userId = ?").get(decoded.id);  //  userId when the token is first created 
+            const userData = db.prepare("SELECT * FROM users where userId = ?").get(decoded.userId);  //  userId when the token is first created 
             //console.log("row", userData)
             if(!userData) {
                 res.status(404).json({ message: "no valid user data" });
@@ -80,7 +80,7 @@ app.get('/auth/verifyToken' , (req, res) => {
 
 app.post("/auth/login", (req, res) => {
     try{
-        
+    
         const userData = db.prepare("SELECT * FROM users where userName = ?").get(req.body.userName);  // .get returns undefined if no matching row is found and returns a single obj if found (.all returns empty list)
         
         if (!userData) {
@@ -119,7 +119,7 @@ app.get('/notes', (req, res) => {
                 return res.status(403).json({ message: "Invalid token" });
             }
 
-            const notes = db.prepare('SELECT * FROM notes where userId = ?').all(decoded.id)
+            const notes = db.prepare('SELECT * FROM notes where userId = ?').all(decoded.userId)
             res.status(200).json(notes)  
         })
 
@@ -140,14 +140,14 @@ app.post('/notes', (req, res) => {
             const {noteName, content} = req.body;
 
             const duplicate = db.prepare(
-                'SELECT * FROM notes where name = ? and userId = ?').get(noteName, decoded.id)
+                'SELECT * FROM notes where name = ? and userId = ?').get(noteName, decoded.userId)
 
             if (duplicate) {
                 return res.status(409).json({ message: "Note Name is already taken" });
             }
 
             db.prepare(
-                'INSERT INTO notes (name, content, userId) VALUES (?, ?, ?)').run(noteName, content, decoded.id)
+                'INSERT INTO notes (name, content, userId) VALUES (?, ?, ?)').run(noteName, content, decoded.userId)
 
             res.status(200).json({message : `${noteName} has been saved`})
         })
@@ -157,6 +157,21 @@ app.post('/notes', (req, res) => {
         console.log(e)
     }
 })
+
+app.post('/auth/logout', (req, res) => {
+
+    try{
+        res.clearCookie("jwt_token",{
+            sameSite:"none",
+            secure:true
+          }).status(200).json({message : "User has been logged out"})
+    }
+    catch(e) {
+        res.status(500).json({message : "Internal Server Error"})
+        console.log(e)
+    } 
+})
+
 
 app.listen(7000, () => {
     console.log('connected to backend')

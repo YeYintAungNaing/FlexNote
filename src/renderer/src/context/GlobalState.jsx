@@ -69,7 +69,6 @@ export default function GlobalState({children}) {
         setProfileImg(base64Image);
       }
 
-
     useEffect(() => {
       if(token) {   // this will happen when it is offline ( sessionToken is stored inside session storage)
         getUserDetails()

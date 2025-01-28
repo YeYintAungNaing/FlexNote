@@ -3,13 +3,14 @@ import { GlobalContext } from "../context/GlobalState";
 import {  Link, useNavigate } from "react-router-dom";
 import Login from "./Login";
 import "./../styles/Profile.scss"
+import axios from 'axios'
 
 
 export default function Profile() {
 
     const navigate = useNavigate()
 
-    const {currentUser, clearToken, fetchProfileImage, profileImg } = useContext(GlobalContext);
+    const {currentUser,setCurrentUser, clearToken, fetchProfileImage, profileImg } = useContext(GlobalContext);
     // function current() {
     //   try{
     //     const token = window.localStorage.getItem('sessionToken');
@@ -21,8 +22,17 @@ export default function Profile() {
     //console.log(currentUser)
 
     // console.log(currentUser?.profileImgPath)
+
+    function logout() {
+      if (currentUser.mode === 'Offline') {
+        logoutOffline()
+      }
+      else{
+        logoutOnline()
+      }
+    }
   
-    async function logoutUser() {
+    async function logoutOffline() {
   
       try{
         const response = await window.electron.logoutUser(currentUser.id)
@@ -36,6 +46,18 @@ export default function Profile() {
     }
     //console.log(profileImg)
 
+    async function logoutOnline() {
+      try{
+        const response =  await axios.post('http://localhost:7000/auth/logout')
+        setCurrentUser(null)
+        console.log(response.data.message)
+      }
+      catch(e) {
+        console.log(e.response.data.message)
+      }
+        
+    }
+
     useEffect(() => { 
       if (profileImg) {
         return
@@ -44,6 +66,7 @@ export default function Profile() {
       console.log('profile img fetched') 
     }, [currentUser]);   // in case currentUser is not updated in time when this useEffect takes place ( re-trigger the useeffect)
      
+
     return (
       <div className="profile">
         {
@@ -107,7 +130,7 @@ export default function Profile() {
               </div> 
               <div className="logout">
                 <Link to='/editProfile'><button>Edit</button></Link> 
-                <button onClick={logoutUser}>Logout</button>
+                <button onClick={logout}>Logout</button>
               </div> 
               
             </div>

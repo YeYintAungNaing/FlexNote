@@ -13,7 +13,6 @@ import { GlobalContext } from "../context/GlobalState";
 import axios from 'axios'
 
 
-
 export default function Notes() {
 
     const {currentUser, token} = useContext(GlobalContext);
