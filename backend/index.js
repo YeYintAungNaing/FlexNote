@@ -108,6 +108,30 @@ app.post("/auth/login", (req, res) => {
     }
 })
 
+
+app.put('/users/:id', (req, res) => {
+    try{
+        const token = req.cookies.jwt_token;
+
+        jwt.verify(token, "jwtkey", (err, decoded) => {
+
+            if (err) {
+                return res.status(403).json({ message: "Invalid token" });
+            }
+
+            const {userName, email, location, gender, dName} = req.body
+
+            db.prepare(
+                'UPDATE users SET userName = ?, email = ?, location = ?, gender = ?, dName = ? WHERE userId = ?')
+                .run(userName, email, location, gender, dName, decoded.userId)
+            res.status(200).json({message : "Profile has been updated"})  
+        })
+
+    }catch(e){
+        res.status(500).json({message : "Internal Server Error"});
+    }
+})
+
 app.get('/notes', (req, res) => {
 
     try{

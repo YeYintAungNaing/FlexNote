@@ -3,10 +3,11 @@ import { GlobalContext } from "../context/GlobalState";
 //import { GlobalAlertContext } from "../context/AlertContext";
 import { CountryDropdown } from 'react-country-region-selector';
 import "../styles/EditProfile.scss"
+import axios from 'axios'
 
 export default function EditProfile() {
 
-    const {currentUser, token, getUserDetails, showAlert} = useContext(GlobalContext);
+    const {currentUser, token, getUserDetails, getUserDetailsOnline, showAlert} = useContext(GlobalContext);
     //const {showAlert} = useContext(GlobalAlertContext);
     const [userName, setUserName] =useState(currentUser?.userName || '') 
     const [dName, setdName] =useState(currentUser?.dName || '') 
@@ -15,7 +16,7 @@ export default function EditProfile() {
     const [location, setLocation] =useState(currentUser.location || '')
     //console.log(userName, dName, email, gender, location)
 
-    async function changeProfileDetails() {
+    async function editProfile() {
         try{
             const response = await window.electron.editProfile({
                 userName,
@@ -36,7 +37,38 @@ export default function EditProfile() {
         showAlert('successfully edited profile', 'success')   
     }
 
-    
+    async function editProfileOnline() {
+        try{
+            const response = await axios.put(`http://localhost:7000/users/${currentUser.userId}`, {
+                userName,
+                dName,
+                email,
+                gender,
+                location, 
+            })
+            console.log(response.data.message)
+        }catch(e) {
+            if(e.response) {
+                console.log(e.response.data.message)
+            }
+            else {
+                console.log(e)
+            }
+        }
+        await getUserDetailsOnline()
+        showAlert('successfully edited profile', 'success') 
+    }
+
+    function changeProfileDetails() {
+        if (currentUser.mode === "Offline") {
+            editProfile()
+        }
+        else{
+            editProfileOnline()
+        }
+    }
+
+  
     return (
         <div className="edit-profile"> 
             <div>

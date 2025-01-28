@@ -114,7 +114,7 @@ export default function Profile() {
                       </tr>
                       <tr>
                         <th >Mode</th>
-                        <td>Offline</td>
+                        <td>{currentUser.mode}</td>
                       </tr>
                       <tr>
                         <th >Account Created</th>

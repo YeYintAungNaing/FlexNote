@@ -42,7 +42,7 @@ export default function Register() {
             })
             console.log(response.data.message)
         }catch(e) {
-          console.log("from frontend", e.response.data.message)
+          console.log(e.response.data.message)
         }
       }
 

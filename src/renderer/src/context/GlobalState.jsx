@@ -110,6 +110,7 @@ export default function GlobalState({children}) {
             token,
             clearToken,
             getUserDetails,
+            getUserDetailsOnline,
             showAlert,
             fetchProfileImage,
             profileImg,
