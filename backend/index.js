@@ -6,6 +6,9 @@ import cors from 'cors'
 import jwt from 'jsonwebtoken'
 import cookieParser from "cookie-parser"
 import rateLimit from "express-rate-limit"
+import { v2 as cloudinary } from 'cloudinary';
+import 'dotenv/config';
+
 
 
 const app = express()
@@ -19,8 +22,8 @@ app.use(cors({
 }))
 
 const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, 
-    max:4, 
+    windowMs: 10 * 60 * 1000, 
+    max:100, 
     message: {message : 'Too many requests from this IP, please try again after 15 minutes'},
     headers: true, // Include rate limit info in response headers
 });
@@ -30,6 +33,18 @@ app.use(limiter)
 const dbPath = 'C:/Users/yeyin/AppData/Roaming/flexnote/online_db/flexNote.db';  // temp path
 
 const db = new sqlite3(dbPath);
+
+const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
+const API_KEY = process.env.CLOUDINARY_API_KEY;
+const API_SECRET = process.env.CLOUDINARY_API_SECRET;
+
+
+cloudinary.config({
+  cloud_name: CLOUD_NAME,
+  api_key: API_KEY,
+  api_secret: API_SECRET
+});
+
 
 app.post('/auth/register', (req, res) => {
     try{
@@ -141,6 +156,55 @@ app.put('/users/:id', (req, res) => {
     }
 })
 
+
+app.get('/generateSignature', (req, res) => {
+    try{
+        const token = req.cookies.jwt_token;
+
+        jwt.verify(token, "jwtkey", (err) => {
+
+            if (err) {
+                return res.status(403).json({ message: "Invalid token" });
+            }
+            const timestamp = Math.round(new Date().getTime() / 1000); 
+            const params = {
+                timestamp,
+                folder: "profile_images" 
+            };
+            const signature = cloudinary.utils.api_sign_request(params, API_SECRET);
+  
+            res.status(200).json({ signature, timestamp, cloud_name: CLOUD_NAME, api_key: API_KEY });    
+        })
+
+    }catch(e) {
+        res.status(500).json({ message: "Internal Server Error" })
+        console.log(e)
+    }
+})
+
+
+app.put("/users/:id/profileImage", (req, res) => {
+    try{
+        const token = req.cookies.jwt_token;
+
+        jwt.verify(token, "jwtkey", (err, decoded) => {
+
+            if (err) {
+                return res.status(403).json({ message: "Invalid token" });
+            }
+
+            db.prepare(
+                'UPDATE users SET profileImgPath = ? WHERE userId = ?')
+                .run(req.body.image_url, decoded.userId)
+            res.status(200).json({message : "Profile image has been updated"})  
+        })
+
+    }catch(e){
+        res.status(500).json({message : "Internal Server Error"});
+    }
+})
+
+
 app.get('/notes', (req, res) => {
 
     try{
@@ -251,3 +315,34 @@ app.post('/auth/logout', (req, res) => {
 app.listen(7000, () => {
     console.log('connected to backend')
 })
+
+
+
+// const cloudinary = require("cloudinary").v2;
+// const express = require("express");
+// const app = express();
+
+// cloudinary.config({
+//   cloud_name: "your_cloud_name",
+//   api_key: "your_api_key",
+//   api_secret: "your_api_secret"
+// });
+
+// app.get("/generate-signature", (req, res) => {
+//   const timestamp = Math.round(new Date().getTime() / 1000); // Current time
+//   const params = {
+//     timestamp,
+//     folder: "user_uploads" // Optional: restrict uploads to a folder
+//   };
+//   const signature = cloudinary.utils.api_sign_request(params, process.env.CLOUDINARY_API_SECRET);
+  
+//   res.json({ signature, timestamp, cloud_name: "your_cloud_name", api_key: "your_api_key" });
+// });
+
+// app.listen(7000, () => console.log("Server running on port 7000"));
+
+
+// const cloudinaryResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, {
+//     method: "POST",
+//     body: formData
+// });

@@ -62,7 +62,7 @@ export default function Profile() {
       if (profileImg) {
         return
       }
-      fetchProfileImage() 
+      fetchProfileImage()  // this set a new profileImg state  
       console.log('profile img fetched') 
     }, [currentUser]);   // in case currentUser is not updated in time when this useEffect takes place ( re-trigger the useeffect)
      

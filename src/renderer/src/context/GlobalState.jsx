@@ -43,14 +43,14 @@ export default function GlobalState({children}) {
         try{
          const response = await axios.get('http://localhost:7000/auth/verifyToken')
           setCurrentUser(response.data)
-          console.log('token comfired and user data saved')
+          console.log('token comfired and get latest user data')
 
         }catch(e) {
           console.log(e.response.data.message)
         }
       }
 
-      async function fetchProfileImage() {  // using filepath of db to encapsulate the image data that can be used directly on browser 
+      async function fetchProfileImage() {   
         if (!currentUser) {
           return
         }
@@ -60,13 +60,17 @@ export default function GlobalState({children}) {
           return
         }
 
-        const base64Image = await window.electron.getUserImg({
-          token,
-          imagePath,
-          userId : currentUser.id
-        })
-        
-        setProfileImg(base64Image);
+        if (currentUser.mode === "Online") {
+          setProfileImg(imagePath)
+        }
+        else{
+          const base64Image = await window.electron.getUserImg({  // using filepath of db to encapsulate the image data that can be used directly on browser
+            token,
+            imagePath,
+            userId : currentUser.id
+          })
+          setProfileImg(base64Image);
+        }
       }
 
     useEffect(() => {

@@ -1,39 +1,75 @@
 import { useContext, useState } from "react";
 import { GlobalContext } from "../context/GlobalState";
 import "../styles/EditProfileImg.scss"
+import axios from "axios";
+
 
 export default function EditProfileImg() {
 
     const [file, setFile] = useState("")
-    const {currentUser, token, getUserDetails,  setProfileImg } = useContext(GlobalContext);
+    const {currentUser, token, getUserDetails, getUserDetailsOnline,  setProfileImg } = useContext(GlobalContext);
     
     //const [previewImg, setPreviewImg] = useState()
-
-    // THIS method need express ( will implement later)
-    // async function upload() { 
-    //     if (!file) {
-    //         console.log('kek')
-    //         return
-    //     }
-    //     try{
-    //       const formData = new FormData();
-    //       formData.append("file", file)
-    //       console.log(formData)
-    //       //console.log(res)
-    //       //return res.data
-    //     }
-    //     catch(err){
-    //       console.log(err)
-    //     }
-    //   }
     //console.log(file)
 
     async function upload() {
-        if (!file) {
-          console.log('empty')
-          return
-        }
+      if (!file) {
+        console.log('empty')
+        return
+      }
 
+      if (currentUser.mode === "Offline") {
+        uploadOffline()
+      }
+      else{
+        uploadOnline()
+      }
+    }
+
+    async function uploadOnline() { 
+      if (!file) {
+          console.log('kek')
+          return
+      }
+      try{
+        const response = await axios.get("http://localhost:7000/generateSignature");
+        //console.log(response.data)
+        const { signature, timestamp, cloud_name, api_key } = response.data
+    
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("timestamp", timestamp);
+        formData.append("api_key", api_key);
+        formData.append("signature", signature);
+        formData.append("folder", "profile_images");
+    
+        const cloudinaryResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, {
+            method: "POST",
+            body: formData
+        });
+        const resObj = await cloudinaryResponse.json()
+        
+        const res = await axios.put(`http://localhost:7000/users/${currentUser.userId}/profileImage`, {
+          image_url : resObj.url
+        })
+        await getUserDetailsOnline()    // get updated user details
+        setProfileImg(null)
+        setFile('')
+        console.log(res.data.message)
+      }
+
+      catch(e){
+        if(e.response) {
+          console.log(e.response.data.message)
+        }
+        else {
+          console.log(e)
+        }
+      }
+    }
+
+    async function uploadOffline() {
+        
         try{
           const reader = new FileReader();
           reader.readAsArrayBuffer(file);
@@ -49,8 +85,8 @@ export default function EditProfileImg() {
               token,
               userId : currentUser.id
             });
+
             await getUserDetails()    // get updated user details
-            //await fetchProfileImage()  // instantly change the profile image
             setProfileImg(null)
             setFile('')
             console.log(response.message)
@@ -60,6 +96,7 @@ export default function EditProfileImg() {
           console.log(e)
         }
     }
+
 
     async function selectImage(e) {
       setFile(e.target.files[0])
@@ -79,54 +116,4 @@ export default function EditProfileImg() {
     )
 }
 
-
-// const handleFileUpload = async (event) => {
-//   const file = event.target.files[0]; // Get selected file
-//   if (!file) return;
-
-//   // Convert file to base64 or send file path
-//   const reader = new FileReader();
-//   reader.readAsArrayBuffer(file);
-//   reader.onload = async () => {
-//     const arrayBuffer = reader.result;
-
-//     // Send to Electron main process via IPC
-//     const savedFilePath = await window.electron.uploadFile({
-//       fileName: file.name,
-//       fileData: arrayBuffer
-//     });
-
-//     console.log("Saved file at:", savedFilePath);
-//   };
-// };
-
-// return (
-//   <input type="file" onChange={handleFileUpload} />
-// );
-
-
-// const { ipcMain } = require('electron');
-// const fs = require('fs');
-// const path = require('path');
-
-// ipcMain.handle('uploadFile', async (_, { fileName, fileData }) => {
-//     try {
-//         const uploadPath = path.join(__dirname, 'uploads'); // Folder to store images
-//         if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath); // Create folder if not exists
-
-//         const filePath = path.join(uploadPath, fileName);
-//         fs.writeFileSync(filePath, Buffer.from(fileData)); // Save file
-
-//         return filePath; // Return saved path to frontend
-//     } catch (err) {
-//         console.error("File upload error:", err);
-//         throw err;
-//     }
-// });
-
-
-// db.run("INSERT INTO notes (image_path) VALUES (?)", [savedFilePath], (err) => {
-//   if (err) console.error(err);
-//   console.log("File path stored successfully");
-// });
 
