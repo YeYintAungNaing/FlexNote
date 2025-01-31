@@ -8,6 +8,8 @@ export default function EditProfileImg() {
 
     const [file, setFile] = useState("")
     const {currentUser, token, getUserDetails, getUserDetailsOnline,  setProfileImg } = useContext(GlobalContext);
+    const MAX_FILE_SIZE =  7 * 1024 * 1024
+    const allowedFileTypes = ["image/jpeg", "image/png"]
     
     //const [previewImg, setPreviewImg] = useState()
     //console.log(file)
@@ -17,6 +19,18 @@ export default function EditProfileImg() {
         console.log('empty')
         return
       }
+
+      if (!allowedFileTypes.includes(file.type)) {
+        console.log("Image has to be in JPEG and PNG format")
+        return
+      }
+
+      if (file.size > MAX_FILE_SIZE ) {
+        console.log('Only allow file size under 7mb')
+        setFile("")
+        return
+      }
+
 
       if (currentUser.mode === "Offline") {
         uploadOffline()
