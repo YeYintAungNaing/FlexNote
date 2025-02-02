@@ -4,6 +4,7 @@ import { GlobalContext } from "../context/GlobalState";
 import { CountryDropdown } from 'react-country-region-selector';
 import "../styles/EditProfile.scss"
 import axios from 'axios'
+import emailValidator from 'email-validator';
 
 export default function EditProfile() {
 
@@ -14,6 +15,7 @@ export default function EditProfile() {
     const [email, setEmail] =useState(currentUser?.email || '') 
     const [gender, setGender] =useState(currentUser?.gender || '')
     const [location, setLocation] =useState(currentUser.location || '')
+    const [validEmail, setValidEmail] = useState("Empty")
     //console.log(userName, dName, email, gender, location)
 
     async function editProfile() {
@@ -60,11 +62,32 @@ export default function EditProfile() {
     }
 
     function changeProfileDetails() {
+        
+        if(validEmail !== "Empty") {
+            if(!validEmail) {
+                console.log('Invalid email')
+                return
+            }
+        }
+
         if (currentUser.mode === "Offline") {
             editProfile()
         }
         else{
             editProfileOnline()
+        }
+    }
+
+    function changeEmail(e) {
+        const v = e.target.value
+        setEmail(v)
+        if (emailValidator.validate(v)) {
+            //console.log('valid')
+            setValidEmail(true)
+        }
+        else{
+            setValidEmail(false)
+           //console.log('not valid')
         }
     }
 
@@ -81,7 +104,7 @@ export default function EditProfile() {
             </div>
             <div>
                 <p>Email</p>
-                <input value={email} onChange={(e) => setEmail(e.target.value) } ></input>
+                <input value={email} onChange={ changeEmail } ></input>
             </div>
             <div>
                 <p>Gender</p>
@@ -93,8 +116,7 @@ export default function EditProfile() {
             </div> 
             <div>
                 <button onClick={changeProfileDetails}>submit</button>
-            </div> 
-            
+            </div>   
         </div>
     )
 }

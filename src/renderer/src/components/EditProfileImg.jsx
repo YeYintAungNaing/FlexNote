@@ -61,7 +61,9 @@ export default function EditProfileImg() {
             method: "POST",
             body: formData
         });
-        const resObj = await cloudinaryResponse.json()
+        const resObj =  await cloudinaryResponse.json()
+        //console.log(resObj.url)
+
         
         const res = await axios.put(`http://localhost:7000/users/${currentUser.userId}/profileImage`, {
           image_url : resObj.url
@@ -70,7 +72,7 @@ export default function EditProfileImg() {
         setProfileImg(null)
         setFile('')
         console.log(res.data.message)
-      }
+       }
 
       catch(e){
         if(e.response) {

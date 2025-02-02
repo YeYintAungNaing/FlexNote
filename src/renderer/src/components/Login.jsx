@@ -9,8 +9,18 @@ export default function Login() {
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
     const { setCurrentUser} = useContext(GlobalContext);
+    const [selectedMode, setSelectedMode] = useState('Online')
 
     //axios.defaults.withCredentials = true;
+
+    function formSubmit() {
+      if (selectedMode === "Offline") {
+        login()
+      }
+      else{
+        loginOnline()
+      }
+    }
 
     async function login() {
 
@@ -40,10 +50,28 @@ export default function Login() {
           setCurrentUser(response.data)
           console.log('signed in')
           
-          
         }catch(e) {
           console.log("from frontend", e.response.data.message)
         }
+    }
+    //console.log(selectedMode)
+
+    function toggleOnline() {
+      if (selectedMode === "Online") {
+        return
+      }
+      setSelectedMode("Online")
+      document.getElementById('online').className = "toggle-btn selected"
+      document.getElementById('offline').className = "toggle-btn"
+    }
+
+    function toggleOffline() {
+      if (selectedMode === "Offline") {
+        return
+      }
+      setSelectedMode("Offline")
+      document.getElementById('online').className = "toggle-btn"
+      document.getElementById('offline').className = "toggle-btn selected"
     }
 
     return (
@@ -62,7 +90,11 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 >
             </input>
-            <button onClick={loginOnline}>Submit</button>
+            <div className="toggles">
+              <button id="online" className="toggle-btn selected"  onClick={toggleOnline}>Online</button>
+              <button id="offline" className="toggle-btn" onClick={toggleOffline}>Offline</button>
+            </div>
+            <button onClick={formSubmit}>Login</button>
             <Link to='/register'>
               <button className="register">Register new account</button>
             </Link>

@@ -49,9 +49,9 @@ cloudinary.config({
 app.post('/auth/register', (req, res) => {
     try{
         const {userName, password, mode, timeStamp} = req.body
-        const row = db.prepare("SELECT * FROM users where userName = ?").get(userName);
+        const duplicate = db.prepare("SELECT * FROM users where userName = ?").get(userName);
         
-        if (row) {
+        if (duplicate) {
             res.status(409).json({ message: "Username is already taken" });
             return
         }
@@ -121,7 +121,7 @@ app.post("/auth/login", (req, res) => {
         const token = jwt.sign({userId : userData.userId}, "jwtkey", { expiresIn: '10h' })
         // eslint-disable-next-line no-unused-vars
         const {password, ...other} = userData  
-        res.cookie('jwt_token', token, {    // can be found inside cookie session
+        res.cookie('jwt_token', token, {    // can be found inside cookie session in browser
             httpOnly:true,
             maxAge: 3600 * 10 * 1000 
         }).status(200).json(other)     
@@ -144,6 +144,13 @@ app.put('/users/:id', (req, res) => {
             }
 
             const {userName, email, location, gender, dName} = req.body
+
+            //const duplicate = db.prepare("SELECT * FROM users where userName = ?").get(userName);
+        
+            // if (duplicate) {
+            //     res.status(409).json({ message: "Username is already taken" });
+            //     return
+            // }
 
             db.prepare(
                 'UPDATE users SET userName = ?, email = ?, location = ?, gender = ?, dName = ? WHERE userId = ?')
@@ -260,12 +267,12 @@ app.put('/notes/:id', (req, res) => {
     try{
         const token = req.cookies.jwt_token;
 
-        jwt.verify(token, "jwtkey", (err, encoded) => {
+        jwt.verify(token, "jwtkey", (err, decoded) => {
             if (err) return res.status(403).json({message : "Invalid token"})
             
             const { content, id} = req.body
 
-            db.prepare("UPDATE notes SET content = ? WHERE userId = ? and id = ?").run(content, encoded.userId, id)
+            db.prepare("UPDATE notes SET content = ? WHERE userId = ? and id = ?").run(content, decoded.userId, id)
 
             return res.status(200).json({message : `Note with id :${id} has been updated`})
         })
@@ -281,12 +288,19 @@ app.put('/notes/:id/name', (req, res) => {
     try{
         const token = req.cookies.jwt_token;
 
-        jwt.verify(token, "jwtkey", (err, encoded) => {
+        jwt.verify(token, "jwtkey", (err, decoded) => {
             if (err) return res.status(403).json({message : "Invalid token"})
             
             const { noteName, id} = req.body
 
-            db.prepare("UPDATE notes SET name = ? WHERE userId = ? and id = ?").run(noteName, encoded.userId, id)
+            const duplicate = db.prepare(
+                'SELECT * FROM notes where name = ? and userId = ?').get(noteName, decoded.userId)
+
+            if (duplicate) {
+                return res.status(409).json({ message: "Note Name is already taken" });
+            }
+
+            db.prepare("UPDATE notes SET name = ? WHERE userId = ? and id = ?").run(noteName, decoded.userId, id)
 
             return res.status(200).json({message : `name of Note with id :${id} has been updated`})
         })

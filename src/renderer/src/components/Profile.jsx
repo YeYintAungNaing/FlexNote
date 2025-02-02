@@ -4,6 +4,7 @@ import {  Link, useNavigate } from "react-router-dom";
 import Login from "./Login";
 import "./../styles/Profile.scss"
 import axios from 'axios'
+import coverImage from "../assets/cover.jpg"
 
 
 export default function Profile() {
@@ -72,9 +73,10 @@ export default function Profile() {
         {
           currentUser? (
             <div>
-              <div className="profile-photo">
+              <div className="profile-photo" style={{ backgroundImage: `url(${coverImage})` }} >
                   <img  onClick={()=> navigate('/editProfileImg')} src={profileImg} alt=""></img> 
-                  <p>{currentUser.dName || currentUser.userName}</p> 
+                  <p>{currentUser.dName || currentUser.userName}</p>
+                  <p>{currentUser.email || currentUser.email}</p>
               </div>
               <div className="profile-info">
                   <div className="info-1">
@@ -118,7 +120,7 @@ export default function Profile() {
                       </tr>
                       <tr>
                         <th >Account Created</th>
-                        <td>{currentUser.createdAt} </td>  
+                        <td>{currentUser.createdAt || 'None'} </td>  
                       </tr>
                       <tr>
                         <th >Premium</th>
@@ -132,7 +134,6 @@ export default function Profile() {
                 <Link to='/editProfile'><button>Edit</button></Link> 
                 <button onClick={logout}>Logout</button>
               </div> 
-              
             </div>
           ):(
             <Login></Login>

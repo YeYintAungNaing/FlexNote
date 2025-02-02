@@ -35,8 +35,7 @@
         font-size: 16px;
         border: 0px;
         color: white;
-        font-weight: 200;
-        background-color: rgb(100, 139, 211);
+        background-color: rgb(47, 108, 223);
 
         &:hover{
             cursor: pointer;
@@ -44,16 +43,33 @@
         }
     }
 
+    .toggles{
+        display: flex;
+
+        .toggle-btn{
+            width: 150px;
+            background-color:white;
+            color: rgb(100, 139, 211);
+            border: solid 1px  rgb(47, 108, 223);
+        }
+        .toggle-btn.selected{
+            background-color: rgb(47, 108, 223);
+            color: white;
+           
+        }
+
+    }
+
     .register{
         background-color:white;
         color: rgb(100, 139, 211);
-        border: solid 1px  rgb(100, 139, 211);
+        border: solid 1px  rgb(47, 108, 223);
     }
 
 
     .login-card{
-        height: 320px;
-        width: 400px;
+        height: 400px;
+        width: 370px;
         background-color: aliceblue;
         display: flex;
         justify-content: center;
@@ -62,5 +78,6 @@
         align-items: center;
         border: 0.5px solid ;
         border-radius: 15px;
+        
     }
 }
