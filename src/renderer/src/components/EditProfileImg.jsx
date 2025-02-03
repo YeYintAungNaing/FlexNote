@@ -7,7 +7,7 @@ import axios from "axios";
 export default function EditProfileImg() {
 
     const [file, setFile] = useState("")
-    const {currentUser, token, getUserDetails, getUserDetailsOnline,  setProfileImg } = useContext(GlobalContext);
+    const {currentUser, token, getUserDetails, getUserDetailsOnline,  setProfileImg, showAlert } = useContext(GlobalContext);
     const MAX_FILE_SIZE =  7 * 1024 * 1024
     const allowedFileTypes = ["image/jpeg", "image/png"]
     
@@ -72,6 +72,7 @@ export default function EditProfileImg() {
         setProfileImg(null)
         setFile('')
         console.log(res.data.message)
+        showAlert(res.data.message, 'success')
        }
 
       catch(e){
@@ -106,6 +107,7 @@ export default function EditProfileImg() {
             setProfileImg(null)
             setFile('')
             console.log(response.message)
+            showAlert(response.message, 'success')
           }    
         }
         catch(e) {

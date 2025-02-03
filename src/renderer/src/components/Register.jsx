@@ -9,7 +9,6 @@ export default function Register() {
     const [password, setPassword] = useState("")
     const { showAlert} = useContext(GlobalContext);
     const [mode, setMode] = useState("Offline")
-    const [timeStamp, setTimeStamp] = useState(null)
     
     console.log(mode)
     
@@ -44,6 +43,7 @@ export default function Register() {
               timeStamp : DateTime.now().toLocaleString(DateTime.DATE_FULL)
             })
             console.log(response.data.message)
+            showAlert(response.data.message, 'success')
         }catch(e) {
           console.log(e.response.data.message)
         }
@@ -57,7 +57,6 @@ export default function Register() {
         onlineRegister()
       }
     }
-
 
     return (
         <div>

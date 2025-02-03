@@ -65,6 +65,7 @@ export default function NoteEditor() {
        })
 
        console.log(response.data.message)
+       showAlert(response.data.message, 'success')
     }
     catch(e) {
       console.log(e.response.data.message)

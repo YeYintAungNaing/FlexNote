@@ -21,6 +21,8 @@ export default function Notes() {
     const [open, setOpen] = useState(false); // State to control modal visibility
     const [noteName, setNoteName] = useState(''); // State to store the note name
     const [notes, setNotes] = useState(null)
+    const [searchParams, setSearchParams] = useState('')
+    const [searchResults, setSearchResults] = useState(null)
   
     const handleOpen = () => setOpen(true); // Open modal
     const handleClose = () => {
@@ -89,6 +91,15 @@ export default function Notes() {
 
     },[currentUser])
 
+    function searchNotes() {
+      if (searchParams.length < 3 ) {
+        console.log('at least 3 characters')
+        return
+      }
+      const result = notes.filter((note) => note.content.toLowerCase().includes(searchParams.toLowerCase()))
+      setSearchResults(result)
+    }
+
     
     async function deleteNote (noteId) {
       console.log()
@@ -107,7 +118,14 @@ export default function Notes() {
     return (
         <div className="notes-page">
             <div>
-                <input placeholder="Search your notes"></input>
+                <input 
+                  value={searchParams} 
+                  onChange={(e) => setSearchParams(e.target.value)} 
+                  placeholder="Search your notes"
+                  >
+                </input>
+                <button onClick={searchNotes}>search</button>
+                <button onClick={(e) => setSearchResults(null)}>clear results</button>
             </div>
             <Button variant="contained" color="primary" onClick={handleOpen}>
                     Add Note
@@ -115,23 +133,41 @@ export default function Notes() {
             <div className="notes">
               {
                 notes? (
-                  notes.map((note, index) => (
-                    <div className="note-card" key={index}>
-                      <div className="note-header">
-                          <h3>{note.name}</h3>
-                          <span className="note-date">Nov 30, 2024</span>
-                      </div>
-                      <div className="note-body">
-                        <div dangerouslySetInnerHTML={{ __html: note.content }} />
-                      </div>
-                      <div className="note-footer">
-                        <Link to={`/editNote/${note.id}`} state={note}> <button className="edit-btn">Edit</button></Link>
-                          <button className="delete-btn" onClick={()=> deleteNote(note.id)}>Delete</button>
-                      </div>
-                  </div>
-                  ))
-                ) 
-                : (<div>lol</div>)
+                  searchResults? (
+                    searchResults.map((note, index) => (
+                        <div className="note-card" key={index}>
+                          <div className="note-header">
+                              <h3>{note.name}</h3>
+                              <span className="note-date">Nov 30, 2024</span>
+                          </div>
+                          <div className="note-body">
+                            <div dangerouslySetInnerHTML={{ __html: note.content }} />
+                          </div>
+                          <div className="note-footer">
+                            <Link to={`/editNote/${note.id}`} state={note}> <button className="edit-btn">Edit</button></Link>
+                              <button className="delete-btn" onClick={()=> deleteNote(note.id)}>Delete</button>
+                          </div>
+                        </div>
+                      ))
+                    ) 
+                    : (
+                      notes.map((note, index) => (
+                        <div className="note-card" key={index}>
+                          <div className="note-header">
+                              <h3>{note.name}</h3>
+                              <span className="note-date">Nov 30, 2024</span>
+                          </div>
+                          <div className="note-body">
+                            <div dangerouslySetInnerHTML={{ __html: note.content }} />
+                          </div>
+                          <div className="note-footer">
+                            <Link to={`/editNote/${note.id}`} state={note}> <button className="edit-btn">Edit</button></Link>
+                              <button className="delete-btn" onClick={()=> deleteNote(note.id)}>Delete</button>
+                          </div>
+                        </div>
+                      ))
+                    ) 
+                  ): (<div>lol</div>)
               }
                 
             </div> 

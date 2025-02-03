@@ -49,7 +49,7 @@ cloudinary.config({
 app.post('/auth/register', (req, res) => {
     try{
         const {userName, password, mode, timeStamp} = req.body
-        const duplicate = db.prepare("SELECT * FROM users where userName = ?").get(userName);
+        const duplicate = db.prepare("SELECT * FROM users where userName = ? ").get(userName);
         
         if (duplicate) {
             res.status(409).json({ message: "Username is already taken" });
@@ -145,12 +145,12 @@ app.put('/users/:id', (req, res) => {
 
             const {userName, email, location, gender, dName} = req.body
 
-            //const duplicate = db.prepare("SELECT * FROM users where userName = ?").get(userName);
+            const duplicate = db.prepare("SELECT * FROM users where userName = ? AND userId != ?").get(userName, decoded.userId );
         
-            // if (duplicate) {
-            //     res.status(409).json({ message: "Username is already taken" });
-            //     return
-            // }
+            if (duplicate) {
+                res.status(409).json({ message: "Username is already taken" });
+                return
+            }
 
             db.prepare(
                 'UPDATE users SET userName = ?, email = ?, location = ?, gender = ?, dName = ? WHERE userId = ?')
