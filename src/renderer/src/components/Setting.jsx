@@ -1,15 +1,15 @@
-// import { useContext } from "react";
-// import { GlobalContext } from "../context/GlobalState";
+import { useContext } from "react";
+import { GlobalContext } from "../context/GlobalState";
 //import { useNavigate } from "react-router-dom";
 
-import { useState } from "react"
+
 
 export default function Setting() {
 
   // const navigate = useNavigate()
-  const [data, setData] = useState("")
+  //const [data, setData] = useState("")
 
-  // const {currentUser, setCurrentUser} = useContext(GlobalContext);
+ const {saveLog, currentUser} = useContext(GlobalContext);
   // function current() {
   //   try{
   //     const token = window.localStorage.getItem('sessionToken');
@@ -55,34 +55,33 @@ export default function Setting() {
 
   //   function selectImage() {
       
+  // //   }
+
+  // const MAX_FILE_SIZE =  7 * 1024 * 1024
+
+  // function  selectImage(e) {
+  //   setData(e.target.files[0])
+  // }
+
+  // function getDetails() {
+  //   if (!data) {
+  //     return
   //   }
+  //   if (data.size > MAX_FILE_SIZE ) {
+  //     console.log('Only allow file size under 7mb')
+  //     return
+  //   }
+  //   console.log('submitted')
+  // }
 
-  const MAX_FILE_SIZE =  7 * 1024 * 1024
-
-  function  selectImage(e) {
-    setData(e.target.files[0])
-  }
-
-  function getDetails() {
-    if (!data) {
-      return
-    }
-    if (data.size > MAX_FILE_SIZE ) {
-      console.log('Only allow file size under 7mb')
-      return
-    }
-    console.log('submitted')
-    
+  function save() {
+     saveLog("logContent", "createdAt", "success")
   }
 
     
   return (
     <div>
-        <input style={{display : 'none'}} type='file' id='imgFile' name='' onChange={selectImage}></input>
-        <button>
-          <label htmlFor='imgFile'>Select Image</label>
-        </button>
-        <button onClick={getDetails}>Get details</button>
+        <button onClick={save}>Get details</button>
     </div>
   )
 }

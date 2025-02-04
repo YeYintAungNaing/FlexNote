@@ -450,6 +450,7 @@ ipcMain.handle('verify-token', async (_, token) => {
   })
 })
 
+
 ipcMain.handle('logout-user', async (_, userId) => {
   return new Promise ((resolve, reject) => {
     db.run("UPDATE users set sessionToken = null where id = ?", [userId], (err) => {

@@ -10,7 +10,6 @@ import { v2 as cloudinary } from 'cloudinary';
 import 'dotenv/config';
 
 
-
 const app = express()
 
 app.use(express.json())
@@ -310,6 +309,26 @@ app.put('/notes/:id/name', (req, res) => {
     }
 })
 
+app.post('/users/:id/history', (req, res) => {
+    try{
+        const token = req.cookies.jwt_token;
+
+        jwt.verify(token, "jwtkey", (err, decoded) => {
+            if (err) return res.status(403).json({message : "Invalid token"})
+
+            const {logContent, createdAt, logType} = req.body
+            
+            db.prepare("INSERT INTO activityLogs (logContent, userId, createdAt, logType) VALUES (?, ?, ?, ?) ").run(
+                logContent, decoded.userId, createdAt, logType
+            )
+            return res.status(200).json({message : "log has been created"})
+        })
+    }
+    catch(e) {
+        res.status(500).json({ message : "Falied to create activity log"}) 
+    }
+})
+
 
 app.post('/auth/logout', (req, res) => {
 
@@ -324,6 +343,8 @@ app.post('/auth/logout', (req, res) => {
         console.log(e)
     } 
 })
+
+
 
 
 app.listen(7000, () => {

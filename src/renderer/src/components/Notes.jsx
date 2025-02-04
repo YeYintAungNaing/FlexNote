@@ -75,7 +75,6 @@ export default function Notes() {
       }
     }
 
-
     useEffect(()=>{
       
       if(currentUser) {
@@ -125,7 +124,7 @@ export default function Notes() {
                   >
                 </input>
                 <button onClick={searchNotes}>search</button>
-                <button onClick={(e) => setSearchResults(null)}>clear results</button>
+                <button onClick={() => setSearchResults(null)}>clear results</button>
             </div>
             <Button variant="contained" color="primary" onClick={handleOpen}>
                     Add Note

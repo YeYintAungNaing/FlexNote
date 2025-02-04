@@ -106,6 +106,26 @@ export default function GlobalState({children}) {
   };
 
 
+  async function saveLog(logContent, createdAt, logType) {
+    try{
+      const res = await axios.post(`http://localhost:7000/users/${currentUser.userId}/history`, {
+        logContent, 
+        createdAt, 
+        logType
+      })
+      console.log(res.data.message)
+    }
+    catch(e) {
+      if(e.response) {
+        console.log(e.response.data.message)
+      }
+      else {
+        console.log(e)
+      }
+    }  
+  }
+
+
     return (
         <GlobalContext.Provider
         value={{
@@ -118,7 +138,8 @@ export default function GlobalState({children}) {
             showAlert,
             fetchProfileImage,
             profileImg,
-            setProfileImg
+            setProfileImg,
+            saveLog
         }}>
             {children}
             <Snackbar
