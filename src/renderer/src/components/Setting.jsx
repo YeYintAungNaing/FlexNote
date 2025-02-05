@@ -1,12 +1,12 @@
 import { useContext } from "react";
 import { GlobalContext } from "../context/GlobalState";
-//import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 
 export default function Setting() {
 
-  // const navigate = useNavigate()
+   const navigate = useNavigate()
   //const [data, setData] = useState("")
 
  const {saveLog, currentUser} = useContext(GlobalContext);
@@ -82,6 +82,7 @@ export default function Setting() {
   return (
     <div>
         <button onClick={save}>Get details</button>
+        <button onClick={() => { navigate('/logs')}}></button>
     </div>
   )
 }

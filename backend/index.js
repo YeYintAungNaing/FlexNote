@@ -267,7 +267,7 @@ app.put('/notes/:id', (req, res) => {
         const token = req.cookies.jwt_token;
 
         jwt.verify(token, "jwtkey", (err, decoded) => {
-            if (err) return res.status(403).json({message : "Invalid token"})
+            if (err) return res.status(403).json({ServerErrorMsg : "Invalid token"})
             
             const { content, id} = req.body
 
@@ -277,7 +277,7 @@ app.put('/notes/:id', (req, res) => {
         })
 
     }catch(e) {
-        res.status(500).json({ message : "Internal Server Error"})
+        res.status(500).json({ ServerErrorMsg : "Internal Server Error"})
     }
 })
 
@@ -311,10 +311,10 @@ app.put('/notes/:id/name', (req, res) => {
 
 app.post('/users/:id/history', (req, res) => {
     try{
-        const token = req.cookies.jwt_token;
+        const token = req.cookies.jwt_token; 
 
         jwt.verify(token, "jwtkey", (err, decoded) => {
-            if (err) return res.status(403).json({message : "Invalid token"})
+            if (err) return res.status(403).json({ServerErrorMsg : "Invalid token"})
 
             const {logContent, createdAt, logType} = req.body
             
@@ -325,7 +325,28 @@ app.post('/users/:id/history', (req, res) => {
         })
     }
     catch(e) {
-        res.status(500).json({ message : "Falied to create activity log"}) 
+        res.status(500).json({ ServerErrorMsg : "Falied to create activity log"}) 
+    }
+})
+
+app.get('/users/:id/history', (req, res) => {
+
+    try{
+        const token = req.cookies.jwt_token;
+
+        jwt.verify(token, "jwtkey", (err, decoded) => {
+
+            if (err) {
+                return res.status(403).json({ ServerErrorMsg: "Invalid token" });
+            }
+
+            const logs = db.prepare('SELECT * FROM activityLogs where userId = ?').all(decoded.userId)
+            res.status(200).json(logs)  
+        })
+
+    }catch(e) {
+        res.status(500).json({ ServerErrorMsg: "Internal Server Error" })
+        console.log(e)
     }
 })
 

@@ -3,6 +3,7 @@ import { createContext } from "react";
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import axios from 'axios'
+import {DateTime} from 'luxon'
 
 
 export const GlobalContext = createContext(null);
@@ -110,17 +111,17 @@ export default function GlobalState({children}) {
     try{
       const res = await axios.post(`http://localhost:7000/users/${currentUser.userId}/history`, {
         logContent, 
-        createdAt, 
+        createdAt : DateTime.now().toLocaleString(DateTime.DATETIME_FULL),
         logType
       })
       console.log(res.data.message)
     }
     catch(e) {
-      if(e.response) {
-        console.log(e.response.data.message)
+      if(e.response.data.ServerErrorMsg) {
+        console.log(e.response.data.ServerErrorMsg)
       }
       else {
-        console.log(e)
+        console.log(e.message)
       }
     }  
   }

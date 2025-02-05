@@ -21,7 +21,7 @@ export default function EditNote() {
 
   const [noteName, setNoteName] = useState(location.state.name ? location.state.name : null )
   const [content, setContent] = useState(location.state.content ? location.state.content : null )
-  const {currentUser, token, showAlert} = useContext(GlobalContext);
+  const {currentUser, token, showAlert, saveLog} = useContext(GlobalContext);
   const [open, setOpen] = useState(false)
 
   const handleOpen = () => setOpen(true); // Open modal
@@ -54,13 +54,19 @@ export default function EditNote() {
         content
       })
       console.log(response.data.message)
+      showAlert(response.data.message, 'success')
+      saveLog(response.data.message, "createdAt", "success")
     }
     catch(e) {
-      if(e.response) {
-        console.log(e.response.data.message)
+      if(e.response.data.ServerErrorMsg) {
+        console.log(e.response.data.ServerErrorMsg)
+        showAlert(e.response.data.ServerErrorMsg, 'error')
+        saveLog(e.response.data.ServerErrorMsg, "createdAt", "error")
       }
       else {
-        console.log(e)
+        console.log(e.message)
+        showAlert(e.message, 'error')
+        saveLog(e.message, "createdAt", "error")
       }
     }
   }
