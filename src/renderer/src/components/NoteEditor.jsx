@@ -20,7 +20,7 @@ import axios from 'axios'
 export default function NoteEditor() {
   
   const location = useLocation();
-  const {currentUser, token, showAlert} = useContext(GlobalContext);
+  const {currentUser, token, showAlert, alertAndLog} = useContext(GlobalContext);
   const [noteName, setNoteName] = useState(location.state || "Default")
   const [content, setContent] = useState('')
   const [open, setOpen] = useState(false)
@@ -64,11 +64,18 @@ export default function NoteEditor() {
         content : content,
        })
 
-       console.log(response.data.message)
-       showAlert(response.data.message, 'success')
+       //console.log(response.data.message)
+       alertAndLog(response.data.message, 'success')
     }
     catch(e) {
-      console.log(e.response.data.message)
+      if(e.response.data.ServerErrorMsg) {
+        //console.log(e.response.data.ServerErrorMsg)
+        alertAndLog(e.response.data.ServerErrorMsg, 'error')
+    }
+    else {
+        //console.log(e.message)
+        alertAndLog(e.message, 'error')
+    }
     }
   }
 

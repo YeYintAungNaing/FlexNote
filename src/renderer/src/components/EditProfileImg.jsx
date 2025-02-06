@@ -7,7 +7,14 @@ import axios from "axios";
 export default function EditProfileImg() {
 
     const [file, setFile] = useState("")
-    const {currentUser, token, getUserDetails, getUserDetailsOnline,  setProfileImg, showAlert } = useContext(GlobalContext);
+    const { currentUser, 
+            token, 
+            getUserDetails, 
+            getUserDetailsOnline,  
+            setProfileImg, 
+            showAlert, 
+            alertAndLog 
+          } = useContext(GlobalContext);
     const MAX_FILE_SIZE =  7 * 1024 * 1024
     const allowedFileTypes = ["image/jpeg", "image/png"]
     
@@ -30,7 +37,6 @@ export default function EditProfileImg() {
         setFile("")
         return
       }
-
 
       if (currentUser.mode === "Offline") {
         uploadOffline()
@@ -76,11 +82,13 @@ export default function EditProfileImg() {
        }
 
       catch(e){
-        if(e.response) {
-          console.log(e.response.data.message)
+        if(e.response.data.ServerErrorMsg) {
+          //console.log(e.response.data.ServerErrorMsg)
+          alertAndLog(e.response.data.ServerErrorMsg, 'error')
         }
         else {
-          console.log(e)
+          //console.log(e.message)
+          alertAndLog(e.message, 'error')
         }
       }
     }

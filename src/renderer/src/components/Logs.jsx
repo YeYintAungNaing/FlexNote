@@ -5,7 +5,7 @@ import axios from "axios";
 
 export default function Logs() {
 
-    const {currentUser, showAlert, saveLog} = useContext(GlobalContext);
+    const {currentUser, showAlert} = useContext(GlobalContext);
     const [messageLogs, setMessageLogs] = useState(null)
 
 
@@ -19,16 +19,14 @@ export default function Logs() {
             if(e.response.data.ServerErrorMsg) {
                 console.log(e.response.data.ServerErrorMsg)
                 showAlert(e.response.data.ServerErrorMsg, 'error')
-                saveLog(e.response.data.ServerErrorMsg, "createdAt", "error")
+                
             }
             else {
                 console.log(e.message)
-                showAlert(e.message, 'error')
-                saveLog(e.message, "createdAt", "error")
+                showAlert(e.message, 'error')    
             }
         }
     }
-
 
 
     useEffect( () => {

@@ -8,7 +8,7 @@ import emailValidator from 'email-validator';
 
 export default function EditProfile() {
 
-    const {currentUser, token, getUserDetails, getUserDetailsOnline, showAlert} = useContext(GlobalContext);
+    const {currentUser, token, getUserDetails, getUserDetailsOnline, showAlert, alertAndLog} = useContext(GlobalContext);
     //const {showAlert} = useContext(GlobalAlertContext);
     const [userName, setUserName] =useState(currentUser?.userName || '') 
     const [dName, setdName] =useState(currentUser?.dName || '') 
@@ -49,12 +49,15 @@ export default function EditProfile() {
                 location, 
             })
             console.log(response.data.message)
+            alertAndLog(response.data.message, 'success')
         }catch(e) {
-            if(e.response) {
-                console.log(e.response.data.message)
+            if(e.response.data.ServerErrorMsg) {
+                //console.log(e.response.data.ServerErrorMsg)
+                alertAndLog(e.response.data.ServerErrorMsg, 'error')
             }
             else {
-                console.log(e)
+                //console.log(e.message)
+                alertAndLog(e.message, 'error')
             }
         }
         await getUserDetailsOnline()

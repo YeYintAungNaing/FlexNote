@@ -309,6 +309,26 @@ app.put('/notes/:id/name', (req, res) => {
     }
 })
 
+app.delete('/notes/:id', (req, res) => {
+    try{
+        const token = req.cookies.jwt_token;
+
+        jwt.verify(token, "jwtkey", (err, decoded) => {
+            if (err) return res.status(403).json({ServerErrorMsg : "Invalid token"})
+            
+            //const {id} = req.body  // wtf is that 
+            const id = req.params.id
+
+            db.prepare("DELETE FROM notes WHERE id = ? AND userId = ?").run(id, decoded.userId)
+
+            return res.status(200).json({message : `Note with id :${id} has been deleted`})
+        })
+
+    }catch(e) {
+        res.status(500).json({ ServerErrorMsg : "Internal Server Error"})
+    }
+})
+
 app.post('/users/:id/history', (req, res) => {
     try{
         const token = req.cookies.jwt_token; 

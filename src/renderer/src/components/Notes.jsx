@@ -16,7 +16,7 @@ import axios from 'axios'
 
 export default function Notes() {
 
-    const {currentUser, token} = useContext(GlobalContext);
+    const {currentUser, token, alertAndLog} = useContext(GlobalContext);
     const navigate = useNavigate()
     const [open, setOpen] = useState(false); // State to control modal visibility
     const [noteName, setNoteName] = useState(''); // State to store the note name
@@ -99,9 +99,37 @@ export default function Notes() {
       setSearchResults(result)
     }
 
+
+    function delete_(noteId) {
+      if (currentUser.mode === "Offline") {
+        deleteNote(noteId)
+      }
+      else{
+        deleteNoteOnline(noteId)
+      }
+    }
+
+    async function deleteNoteOnline(noteId) {
+      console.log(noteId)
+      try{
+        const response = await axios.delete(`http://localhost:7000/notes/${noteId}`)
+        alertAndLog(response.data.message, 'success')
+      }
+      catch(e) {
+        if(e.response.data.ServerErrorMsg) {
+          //console.log(e.response.data.ServerErrorMsg)
+          alertAndLog(e.response.data.ServerErrorMsg, 'error')
+        }
+        else {
+          //console.log(e.message)
+          alertAndLog(e.message, 'error')
+        }
+      }
+    }
+    
     
     async function deleteNote (noteId) {
-      console.log()
+      //console.log()
       try{
         const response = await window.electron.deleteNote(token, noteId, currentUser.id);
         // console.log('noteId:', noteId, 'Type:', typeof noteId);
@@ -144,7 +172,7 @@ export default function Notes() {
                           </div>
                           <div className="note-footer">
                             <Link to={`/editNote/${note.id}`} state={note}> <button className="edit-btn">Edit</button></Link>
-                              <button className="delete-btn" onClick={()=> deleteNote(note.id)}>Delete</button>
+                              <button className="delete-btn" onClick={()=> delete_(note.id)}>Delete</button>
                           </div>
                         </div>
                       ))
@@ -161,7 +189,7 @@ export default function Notes() {
                           </div>
                           <div className="note-footer">
                             <Link to={`/editNote/${note.id}`} state={note}> <button className="edit-btn">Edit</button></Link>
-                              <button className="delete-btn" onClick={()=> deleteNote(note.id)}>Delete</button>
+                              <button className="delete-btn" onClick={()=> delete_(note.id)}>Delete</button>
                           </div>
                         </div>
                       ))

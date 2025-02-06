@@ -21,7 +21,7 @@ export default function EditNote() {
 
   const [noteName, setNoteName] = useState(location.state.name ? location.state.name : null )
   const [content, setContent] = useState(location.state.content ? location.state.content : null )
-  const {currentUser, token, showAlert, saveLog} = useContext(GlobalContext);
+  const {currentUser, token, showAlert, alertAndLog} = useContext(GlobalContext);
   const [open, setOpen] = useState(false)
 
   const handleOpen = () => setOpen(true); // Open modal
@@ -53,20 +53,17 @@ export default function EditNote() {
         id : location.state.id,
         content
       })
-      console.log(response.data.message)
-      showAlert(response.data.message, 'success')
-      saveLog(response.data.message, "createdAt", "success")
+      //console.log(response.data.message)
+      alertAndLog(response.data.message, "success")
     }
     catch(e) {
       if(e.response.data.ServerErrorMsg) {
-        console.log(e.response.data.ServerErrorMsg)
-        showAlert(e.response.data.ServerErrorMsg, 'error')
-        saveLog(e.response.data.ServerErrorMsg, "createdAt", "error")
+        //console.log(e.response.data.ServerErrorMsg)
+        alertAndLog(e.response.data.ServerErrorMsg, 'error')
       }
       else {
         console.log(e.message)
-        showAlert(e.message, 'error')
-        saveLog(e.message, "createdAt", "error")
+        alertAndLog(e.message, 'error')
       }
     }
   }
@@ -100,14 +97,17 @@ export default function EditNote() {
           noteName,
           id : location.state.id,
         })
-        console.log(response.data.message)
+        //console.log(response.data.message)
+        alertAndLog(response.data.message, "success")
       }
       catch(e) {
-        if(e.response) {
-          console.log(e.response.data.message)
+        if(e.response.data.ServerErrorMsg) {
+          //console.log(e.response.data.ServerErrorMsg)
+          alertAndLog(e.response.data.ServerErrorMsg, 'error')
         }
         else {
-          console.log(e)
+          console.log(e.message)
+          alertAndLog(e.message, 'error')
         }
       }
       setOpen(false)

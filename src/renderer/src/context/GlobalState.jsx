@@ -106,8 +106,13 @@ export default function GlobalState({children}) {
       setAlert({ ...alert, open: false });
   };
 
+  function alertAndLog(message, messageType) {
+    showAlert(message, messageType)
+    saveLog(message, messageType)
+  }
 
-  async function saveLog(logContent, createdAt, logType) {
+
+  async function saveLog(logContent, logType) {
     try{
       const res = await axios.post(`http://localhost:7000/users/${currentUser.userId}/history`, {
         logContent, 
@@ -140,7 +145,8 @@ export default function GlobalState({children}) {
             fetchProfileImage,
             profileImg,
             setProfileImg,
-            saveLog
+            saveLog,
+            alertAndLog
         }}>
             {children}
             <Snackbar
