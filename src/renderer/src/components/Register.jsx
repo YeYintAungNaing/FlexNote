@@ -2,15 +2,17 @@ import { useContext, useState } from "react"
 import { GlobalContext } from "../context/GlobalState";
 import axios from 'axios'
 import {DateTime} from 'luxon'
+import '../styles/Register.scss'
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Register() {
-
+    const navigate = useNavigate()
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
     const { showAlert} = useContext(GlobalContext);
-    const [mode, setMode] = useState("Offline")
+    const [selectedMode, setSelectedMode] = useState('Online')
     
-    console.log(mode)
+    
     
     async function register() {
 
@@ -39,18 +41,27 @@ export default function Register() {
             const response = await axios.post('http://localhost:7000/auth/register', {
               userName,
               password,
-              mode,
+              mode : selectedMode,
               timeStamp : DateTime.now().toLocaleString(DateTime.DATE_FULL)
             })
-            console.log(response.data.message)
+            //console.log(response.data.message)
             showAlert(response.data.message, 'success')
-        }catch(e) {
-          console.log(e.response.data.message)
+            navigate('/login')
+        }
+        catch(e) {
+          if(e.response.data.ServerErrorMsg) {
+            //console.log(e.response.data.ServerErrorMsg)
+            showAlert(e.response.data.ServerErrorMsg, 'error')
+          }
+          else {
+            //console.log(e.message)
+            showAlert(e.message, 'error')
+          }
         }
       }
 
     function submitRegister() {
-      if (mode === "Offline") {
+      if (selectedMode === "Offline") {
         register()
       }
       else{
@@ -58,9 +69,28 @@ export default function Register() {
       }
     }
 
+    function toggleOnline() {
+      if (selectedMode === "Online") {
+        return
+      }
+      setSelectedMode("Online")
+      document.getElementById('online').className = "toggle-btn selected"
+      document.getElementById('offline').className = "toggle-btn"
+    }
+
+    function toggleOffline() {
+      if (selectedMode === "Offline") {
+        return
+      }
+      setSelectedMode("Offline")
+      document.getElementById('online').className = "toggle-btn"
+      document.getElementById('offline').className = "toggle-btn selected"
+    }
+    
     return (
-        <div>
-          <div>register</div>
+        <div className="register">
+          <div className="register-card">
+          <p>Register</p>
             <input 
                 placeholder="Name" 
                 value={userName}
@@ -73,27 +103,16 @@ export default function Register() {
                 onChange={(e) => setPassword(e.target.value)}
                 >
             </input>
-            <input 
-                type="radio"
-                value="Offline"
-                name="mode"
-                id="offline"
-                onChange={(e)=> {setMode(e.target.value)}}
-                checked={mode === "Offline"}
-                >
-            </input>
-            <label htmlFor="offline">Offline</label>
-            <input 
-                type="radio"
-                value="Online"
-                name="mode"
-                id="online"
-                onChange={(e)=> {setMode(e.target.value)}}
-                checked={mode === "Online"}
-                >
-            </input>
-            <label htmlFor="online">Online</label>
-            <button onClick={submitRegister}>Submit</button>
+            <div className="toggles">
+              <button id="online" className="toggle-btn selected"  onClick={toggleOnline}>Online</button>
+              <button id="offline" className="toggle-btn" onClick={toggleOffline}>Offline</button>
+            </div>
+            <button onClick={submitRegister}>Register</button>
+            <Link className="links" to='/login'>
+              <button className="login">Login into existing account ?</button>
+            </Link>
+            
+          </div>
         </div>
     )
 }

@@ -15,7 +15,7 @@ export default function GlobalState({children}) {
     const [token, setToken] = useState(() => window.localStorage.getItem('sessionToken'));  // lazy initializaiton instead of straight up call, 
     //const navigate = useNavigate()
     const [profileImg, setProfileImg] = useState(null)
-    console.log("from global state",currentUser)
+    //console.log("from global state",currentUser)
 
     axios.defaults.withCredentials = true;
 
@@ -113,6 +113,10 @@ export default function GlobalState({children}) {
 
 
   async function saveLog(logContent, logType) {
+    if (!currentUser) {
+      console.log('bruh')
+      return
+    }
     try{
       const res = await axios.post(`http://localhost:7000/users/${currentUser.userId}/history`, {
         logContent, 
@@ -122,12 +126,17 @@ export default function GlobalState({children}) {
       console.log(res.data.message)
     }
     catch(e) {
-      if(e.response.data.ServerErrorMsg) {
-        console.log(e.response.data.ServerErrorMsg)
+      if(e.response) {    // if the error has a response 
+        if(e.response.data.ServerErrorMsg) {  // check if error is from server
+          console.log(e.response.data.ServerErrorMsg)  // have to access message via data (cause of axios)
+        }
+        else {
+          console.log(e.message)   // if not from server, directly get message
+        }
       }
-      else {
-        console.log(e.message)
-      }
+      else{  // for other errors (type error and some shit, when the axios request does not get through)
+        console.log(e)
+      }   
     }  
   }
 

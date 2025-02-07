@@ -47,7 +47,7 @@ export default function Logs() {
             ))
          ) 
          : (
-            <div></div>
+            <div>You must sign in first</div>
          )
         }
     </div>

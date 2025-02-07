@@ -1,9 +1,9 @@
-.login{
+.register{
     display: flex;
     justify-content: center;
     align-items: center;
     height: 80vh;
-
+    
 
     p{
         font-size: 22px;
@@ -13,10 +13,13 @@
     }
 
     input{
+
         width: 300px;
         height: 35px;
-        padding-left: 7px;    
-        border: 1px solid;  
+        padding-left: 7px;
+        
+        border: 1px solid;
+    
         border-radius: 5px;
         font-size: 16px;  
         outline: none;     
@@ -57,10 +60,9 @@
 
     .links{
         text-decoration: none;
-        
     }
 
-    .register{
+    .login{
         background-color:white;
         color: rgb(100, 139, 211);
         border: solid 1px  rgb(47, 108, 223);
@@ -68,7 +70,7 @@
     }
 
 
-    .login-card{
+    .register-card{
         height: 400px;
         width: 370px;
         background-color: aliceblue;
@@ -78,6 +80,7 @@
         gap: 23px;
         align-items: center;
         border: 0.5px solid ;
-        border-radius: 15px;   
+        border-radius: 15px;
+        
     }
 }

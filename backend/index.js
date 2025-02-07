@@ -107,13 +107,13 @@ app.post("/auth/login", (req, res) => {
         const userData = db.prepare("SELECT * FROM users where userName = ?").get(req.body.userName);  // .get returns undefined if no matching row is found and returns a single obj if found (.all returns empty list)
         
         if (!userData) {
-            res.status(404).json({ message: "User does not exist" });
+            res.status(404).json({ ServerErrorMsg: "User does not exist" });
             return
         }
         const isCorrect = bcrypt.compareSync(req.body.password, userData.password);
 
         if(!isCorrect) {
-            res.status(401).json({ message: "Incorrect password" });
+            res.status(401).json({ ServerErrorMsg: "Incorrect password" });
             return
         }
 
@@ -126,7 +126,7 @@ app.post("/auth/login", (req, res) => {
         }).status(200).json(other)     
     }
     catch(e) {
-        res.status(500).json({ message: "Internal Server Error" })
+        res.status(500).json({ ServerErrorMsg: "Internal Server Error" })
         console.log(e)
     }
 })
@@ -332,6 +332,11 @@ app.delete('/notes/:id', (req, res) => {
 app.post('/users/:id/history', (req, res) => {
     try{
         const token = req.cookies.jwt_token; 
+
+        if (!token){
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
+            return
+        }
 
         jwt.verify(token, "jwtkey", (err, decoded) => {
             if (err) return res.status(403).json({ServerErrorMsg : "Invalid token"})

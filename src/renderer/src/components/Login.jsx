@@ -8,7 +8,7 @@ export default function Login() {
 
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
-    const { setCurrentUser} = useContext(GlobalContext);
+    const { setCurrentUser, showAlert} = useContext(GlobalContext);
     const [selectedMode, setSelectedMode] = useState('Online')
 
     //axios.defaults.withCredentials = true;
@@ -48,10 +48,22 @@ export default function Login() {
           const response = await axios.post("http://localhost:7000/auth/login", {userName, password});
 
           setCurrentUser(response.data)
-          console.log('signed in')
-          
+          showAlert("Login scuuess", "success")
+            
         }catch(e) {
-          console.log("from frontend", e.response.data.message)
+          if(e.response) {   
+            if(e.response.data.ServerErrorMsg) {  
+              //console.log(e.response.data.ServerErrorMsg)
+              showAlert(e.response.data.ServerErrorMsg, "error") 
+            }
+            else {
+              //console.log(e.message)   
+              showAlert(e.messag, "error")
+            }
+          }
+          else{  
+            console.log(e)
+          } 
         }
     }
     //console.log(selectedMode)
@@ -95,7 +107,7 @@ export default function Login() {
               <button id="offline" className="toggle-btn" onClick={toggleOffline}>Offline</button>
             </div>
             <button onClick={formSubmit}>Login</button>
-            <Link to='/register'>
+            <Link className="links" to='/register'>
               <button className="register">Register new account</button>
             </Link>
             </div>
