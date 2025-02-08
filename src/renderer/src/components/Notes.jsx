@@ -144,7 +144,7 @@ export default function Notes() {
 
     return (
         <div className="notes-page">
-            <div>
+            <div className="search">
                 <input 
                   value={searchParams} 
                   onChange={(e) => setSearchParams(e.target.value)} 
@@ -152,10 +152,10 @@ export default function Notes() {
                   >
                 </input>
                 <button onClick={searchNotes}>search</button>
-                <button onClick={() => setSearchResults(null)}>clear results</button>
+                <button className="clear" onClick={() => setSearchResults(null)}>clear results</button>
             </div>
-            <Button variant="contained" color="primary" onClick={handleOpen}>
-                    Add Note
+            <Button className="floating-btn" variant="contained" color="primary" onClick={handleOpen}>
+              Add note
             </Button>
             <div className="notes">
               {

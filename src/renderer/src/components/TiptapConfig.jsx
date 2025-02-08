@@ -55,19 +55,6 @@ export default function MenuBar() {
         >
           Strike
         </button>
-        <button
-          onClick={() => editor.chain().focus().toggleCode().run()}
-          disabled={
-            !editor.can()
-              .chain()
-              .focus()
-              .toggleCode()
-              .run()
-          }
-          className={editor.isActive('code') ? 'is-active' : ''}
-        >
-          Code
-        </button>
         <button onClick={() => editor.chain().focus().unsetAllMarks().run()}>
           Clear marks
         </button>

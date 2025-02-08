@@ -1,13 +1,23 @@
 .control-group{
-    background-color: aliceblue;
+    
     
 
     button{
         margin: 3px;
         border-radius: 5px;
         border: transparent;
-        padding: 5px;
+        padding: 7px;
         background-color: rgb(233, 237, 241);
-       
+        font-size: 16px;
+
+        &:hover{
+            cursor: pointer;
+        }
+
+    }
+
+    .is-active{
+        color: white;
+        background-color: rgb(47, 108, 223);
     }
 }

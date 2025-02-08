@@ -31,10 +31,7 @@ import EditProfileImg from "./components/EditProfileImg";
 import Logs from "./components/Logs";
 //import AlertContext from "./context/AlertContext";
 
-
-
-
-const drawerWidth = 240;
+const drawerWidth = 170;
 
 const App = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);

@@ -119,11 +119,13 @@ export default function NoteEditor() {
               </Button>
             </DialogActions>
             </Dialog>
-        <h2 onClick={handleOpen} className='note-title-btn'>{noteName}</h2>
-        <button onClick={save}>save</button>
+            <div className='buttons'>
+              <p onClick={handleOpen} className='note-title-btn'>{noteName}</p>
+              <button className='save-note'  onClick={save}>Save Note</button>
+            </div>
         <EditorProvider  
           slotBefore={<MenuBar />} 
-          extensions={extensions} 
+          extensions={extensions}
           content={content}
           onUpdate={({ editor }) => setContent(editor.getHTML())}>
         </EditorProvider>

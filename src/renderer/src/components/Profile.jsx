@@ -76,7 +76,7 @@ export default function Profile() {
               <div className="profile-photo" style={{ backgroundImage: `url(${coverImage})` }} >
                   <img  onClick={()=> navigate('/editProfileImg')} src={profileImg} alt=""></img> 
                   <p>{currentUser.dName || currentUser.userName}</p>
-                  <p>{currentUser.email || currentUser.email}</p>
+                  <p className="email">{currentUser.email || currentUser.email}</p>
               </div>
               <div className="profile-info">
                   <div className="info-1">
@@ -130,9 +130,9 @@ export default function Profile() {
                   </table>
                   </div>
               </div> 
-              <div className="logout">
+              <div className="buttons_">
                 <Link to='/editProfile'><button>Edit</button></Link> 
-                <button onClick={logout}>Logout</button>
+                <button className="logout" onClick={logout}>Logout</button>
               </div> 
             </div>
           ):(

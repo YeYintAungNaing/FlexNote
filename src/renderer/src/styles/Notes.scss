@@ -18,6 +18,58 @@ $note-margin: 20px;
 
 .notes-page{
 
+    .search{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+
+      input{
+        
+          width: 300px;
+          height: 35px;
+          padding-left: 7px;    
+          border: 1px solid;  
+          border-radius: 5px;
+          font-size: 16px;  
+          outline: none; 
+      }    
+      
+        input:focus{
+          border-color:  rgb(100, 139, 211);
+          box-shadow: 0 0 5px  rgb(100, 139, 211);    
+        }
+      
+
+      button{
+        border-radius: 7px;
+        height: 35px;
+        font-size: 16px;
+        border: 0px;
+        color: white;
+        background-color: rgb(47, 108, 223);
+
+        &:hover{
+            cursor: pointer;
+            transform: scale(1.05);
+        }
+      }
+
+      .clear{
+        background-color: #da4747;
+      }
+
+    }
+
+    .floating-btn{
+      
+      position: fixed;
+      bottom: 30px; 
+      right: 30px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
     .notes{
         margin-top: 15px;
 

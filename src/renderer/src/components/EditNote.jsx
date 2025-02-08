@@ -137,7 +137,10 @@ export default function EditNote() {
       {
         currentUser?  (
           <div> 
-            <h2 className='note-title-btn' onClick={handleOpen}>{noteName}</h2>
+            <div className='buttons'>
+              <h2 className='note-title-btn' onClick={handleOpen}>{noteName}</h2>
+              <button className='save-note' onClick={edit}>Save note</button>
+            </div>  
             <Dialog open={open} onClose={handleClose}>
             <DialogTitle>Enter Note Name</DialogTitle>
             <DialogContent>
@@ -160,10 +163,11 @@ export default function EditNote() {
               </Button>
             </DialogActions>
             </Dialog>
-            <button onClick={edit}>Save note</button>
+            
             <EditorProvider  
               slotBefore={<MenuBar />} 
               extensions={extensions} 
+              spellcheck="false"
               content={content}
               onUpdate={({ editor }) => setContent(editor.getHTML())}>
             </EditorProvider>

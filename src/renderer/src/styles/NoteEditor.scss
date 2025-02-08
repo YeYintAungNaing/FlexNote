@@ -30,14 +30,14 @@
   h5, 
   h6 {
     line-height: 1.1;
-    margin-top: 2.5rem;
+    margin-top: 10px;
     text-wrap: pretty;
   }
 
   h1, 
   h2 {
-    margin-top: 3.5rem;
-    margin-bottom: 1.5rem;
+    margin-top: 25px;
+    margin-bottom: 20px;
   }
 
   h1 { 
@@ -59,34 +59,52 @@
   }
 
   /* Code and preformatted text styles */
-  code {
-    background-color: rgb(17, 17, 17);
-    color: green;
-    font-size: 0.85rem;
-    padding: 0.25em 0.3em;
-  }
-
+  
   pre {
-    background: var(--black);
-    border-radius: 0.5rem;
-    color: rgb(48, 50, 48);
+    background: rgb(56, 56, 56);
+    border-radius: 10px;
     font-family: 'JetBrainsMono', monospace;
-    margin: 1.5rem 0;
-    padding: 0.75rem 1rem;
+    padding: 14px;
 
     code {
-      background: rgb(214, 47, 47);
-      color: inherit;
-      font-size: 0.8rem;
+      background: none;
+      color: white;
+      font-size: 15px;
       padding: 0;
     }
+  } 
   }
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  .note-title-btn{
+    font-size: 26px;
+    font-weight: 800;
+    
+    &:hover{
+       color: rgb(50, 110, 213);
+       cursor: pointer;
+      }
+  }
+  
+  
+  .save-note{     
+      font-size: 20px;
+      border-radius: 7px;
+      height: 35px;
+      border: 0px;
+      color: white;
+      background-color:  rgb(50, 110, 213);
+  
+      &:hover{
+          cursor: pointer;
+          transform: scale(1.05);
+      }
+  }  
 }
 
-.note-title-btn{
-  &:hover{
-     color: rgb(50, 110, 213);
-     cursor: pointer;
-    }
-}
+
 
