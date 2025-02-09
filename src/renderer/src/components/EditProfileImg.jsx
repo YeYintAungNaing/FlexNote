@@ -77,19 +77,24 @@ export default function EditProfileImg() {
         await getUserDetailsOnline()    // get updated user details
         setProfileImg(null)
         setFile('')
-        console.log(res.data.message)
-        showAlert(res.data.message, 'success')
+        //console.log(res.data.message)
+        alertAndLog(res.data.message, 'success')
        }
 
       catch(e){
-        if(e.response.data.ServerErrorMsg) {
-          //console.log(e.response.data.ServerErrorMsg)
-          alertAndLog(e.response.data.ServerErrorMsg, 'error')
+        if(e.response) {   
+          if(e.response.data.ServerErrorMsg) {  
+            //console.log(e.response.data.ServerErrorMsg)
+            alertAndLog(e.response.data.ServerErrorMsg, "error")
+          }
+          else {
+            //console.log(e.message)   
+            alertAndLog(e.message, "error")
+          }
         }
-        else {
-          //console.log(e.message)
-          alertAndLog(e.message, 'error')
-        }
+        else{  
+          console.log(e)
+        } 
       }
     }
 

@@ -17,6 +17,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import HistoryIcon from '@mui/icons-material/History';
 import {  Routes, Route, Link } from 'react-router-dom';
 import Notes from "./components/Notes";
 import Setting from "./components/Setting";
@@ -52,7 +53,8 @@ const App = () => {
     { text: currentUser?.dName || 'Profile', icon: <AccountCircleIcon/>,path: "/" }, 
     { text: "Notes", icon: <StickyNote2Icon/>, path: "/notes" },
     { text: "Create", icon: <NoteAddIcon />, path: "/createNote" },
-    { text: "Setting", icon: <SettingsIcon/>, path: "/setting" },
+    { text: "Logs", icon: <HistoryIcon/>, path: "/logs" },
+    { text: "testing", icon: <SettingsIcon/>, path: "/setting" },
   ];
 
   
@@ -115,8 +117,7 @@ const App = () => {
         }}
       >
         <Toolbar />
-        <div className="currentPage">
-          
+        <div className="currentPage"> 
           <Routes>
             <Route path="/notes" element={<Notes />} />
             <Route path="/setting" element={<Setting />} />

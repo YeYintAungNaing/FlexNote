@@ -48,20 +48,25 @@ export default function EditProfile() {
                 gender,
                 location, 
             })
-            console.log(response.data.message)
+            //console.log(response.data.message)
             alertAndLog(response.data.message, 'success')
-        }catch(e) {
-            if(e.response.data.ServerErrorMsg) {
-                //console.log(e.response.data.ServerErrorMsg)
-                alertAndLog(e.response.data.ServerErrorMsg, 'error')
-            }
-            else {
-                //console.log(e.message)
-                alertAndLog(e.message, 'error')
-            }
+            getUserDetailsOnline()
         }
-        await getUserDetailsOnline()
-        showAlert('successfully edited profile', 'success') 
+        catch(e) {
+            if(e.response) {   
+                if(e.response.data.ServerErrorMsg) {  
+                  //console.log(e.response.data.ServerErrorMsg)
+                  alertAndLog(e.response.data.ServerErrorMsg, "error")
+                }
+                else {
+                  //console.log(e.message)   
+                  alertAndLog(e.message, "error")
+                }
+              }
+              else{  
+                console.log(e)
+              }
+        }
     }
 
     function changeProfileDetails() {

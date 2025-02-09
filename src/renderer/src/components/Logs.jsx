@@ -42,12 +42,14 @@ export default function Logs() {
         {
          messageLogs? ( 
             <table> 
+                <tbody>
                 <tr className="caption-row">
                     <th>TimeStamp</th>
                     <th>UserName</th>
                     <th>Description</th>
                     <th>Log type</th>
                 </tr>
+                
             {
             messageLogs.map((eachLog, index ) => (
                 <tr key={index} className="data-row">
@@ -57,6 +59,7 @@ export default function Logs() {
                     <td className="logType">{eachLog.logType}</td>
                 </tr>                  
             ))}
+                </tbody>
             </table>
          ) 
          : (

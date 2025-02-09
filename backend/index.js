@@ -132,14 +132,20 @@ app.post("/auth/login", (req, res) => {
 })
 
 
+// update user profile
 app.put('/users/:id', (req, res) => {
     try{
         const token = req.cookies.jwt_token;
 
+        if (!token){
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
+            return
+        }
+
         jwt.verify(token, "jwtkey", (err, decoded) => {
 
             if (err) {
-                return res.status(403).json({ message: "Invalid token" });
+                return res.status(403).json({ ServerErrorMsg: "Invalid token" });
             }
 
             const {userName, email, location, gender, dName} = req.body
@@ -147,7 +153,7 @@ app.put('/users/:id', (req, res) => {
             const duplicate = db.prepare("SELECT * FROM users where userName = ? AND userId != ?").get(userName, decoded.userId );
         
             if (duplicate) {
-                res.status(409).json({ message: "Username is already taken" });
+                res.status(409).json({ ServerErrorMsg: "Username is already taken" });
                 return
             }
 
@@ -158,19 +164,24 @@ app.put('/users/:id', (req, res) => {
         })
 
     }catch(e){
-        res.status(500).json({message : "Internal Server Error"});
+        res.status(500).json({ServerErrorMsge : "Internal Server Error"});
     }
 })
 
-
+// generating signature for cloudinary
 app.get('/generateSignature', (req, res) => {
     try{
         const token = req.cookies.jwt_token;
 
+        if (!token){
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
+            return
+        }
+
         jwt.verify(token, "jwtkey", (err) => {
 
             if (err) {
-                return res.status(403).json({ message: "Invalid token" });
+                return res.status(403).json({ServerErrorMsg: "Invalid token" });
             }
             const timestamp = Math.round(new Date().getTime() / 1000); 
             const params = {
@@ -183,20 +194,25 @@ app.get('/generateSignature', (req, res) => {
         })
 
     }catch(e) {
-        res.status(500).json({ message: "Internal Server Error" })
+        res.status(500).json({ ServerErrorMsg: "Internal Server Error" })
         console.log(e)
     }
 })
 
-
+// updating profile image (image url in db)
 app.put("/users/:id/profileImage", (req, res) => {
     try{
         const token = req.cookies.jwt_token;
 
+        if (!token){
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
+            return
+        }
+
         jwt.verify(token, "jwtkey", (err, decoded) => {
 
             if (err) {
-                return res.status(403).json({ message: "Invalid token" });
+                return res.status(403).json({ ServerErrorMsg: "Invalid token" });
             }
 
             db.prepare(
@@ -206,15 +222,20 @@ app.put("/users/:id/profileImage", (req, res) => {
         })
 
     }catch(e){
-        res.status(500).json({message : "Internal Server Error"});
+        res.status(500).json({ServerErrorMsg : "Internal Server Error"});
     }
 })
 
-
+// getting notes
 app.get('/notes', (req, res) => {
 
     try{
         const token = req.cookies.jwt_token;
+
+        if (!token){
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
+            return
+        }
 
         jwt.verify(token, "jwtkey", (err, decoded) => {
 
@@ -233,12 +254,18 @@ app.get('/notes', (req, res) => {
 })
 
 
+// adding new note
 app.post('/notes', (req, res) => {
     try{
         const token = req.cookies.jwt_token;
 
+        if (!token){
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
+            return
+        }
+
         jwt.verify(token, "jwtkey", (err, decoded) => {
-            if (err) return res.status(403).json({message: "Invalid token"})
+            if (err) return res.status(403).json({ServerErrorMsg: "Invalid token"})
             
             const {noteName, content} = req.body;
 
@@ -246,7 +273,7 @@ app.post('/notes', (req, res) => {
                 'SELECT * FROM notes where name = ? and userId = ?').get(noteName, decoded.userId)
 
             if (duplicate) {
-                return res.status(409).json({ message: "Note Name is already taken" });
+                return res.status(409).json({ ServerErrorMsg: "Note Name is already taken" });
             }
 
             db.prepare(
@@ -256,15 +283,20 @@ app.post('/notes', (req, res) => {
         })
 
     }catch(e) {
-        res.status(500).json({ message : "Internal Server Error"})
+        res.status(500).json({ ServerErrorMsg : "Internal Server Error"})
         console.log(e)
     }
 })
 
-
+// editing existing note
 app.put('/notes/:id', (req, res) => {
     try{
         const token = req.cookies.jwt_token;
+
+        if (!token){
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
+            return
+        }
 
         jwt.verify(token, "jwtkey", (err, decoded) => {
             if (err) return res.status(403).json({ServerErrorMsg : "Invalid token"})
@@ -282,13 +314,19 @@ app.put('/notes/:id', (req, res) => {
 })
 
 
+// edit note name
 app.put('/notes/:id/name', (req, res) => {
 
     try{
         const token = req.cookies.jwt_token;
 
+        if (!token){
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
+            return
+        }
+
         jwt.verify(token, "jwtkey", (err, decoded) => {
-            if (err) return res.status(403).json({message : "Invalid token"})
+            if (err) return res.status(403).json({ServerErrorMsg : "Invalid token"})
             
             const { noteName, id} = req.body
 
@@ -296,7 +334,7 @@ app.put('/notes/:id/name', (req, res) => {
                 'SELECT * FROM notes where name = ? and userId = ?').get(noteName, decoded.userId)
 
             if (duplicate) {
-                return res.status(409).json({ message: "Note Name is already taken" });
+                return res.status(409).json({ ServerErrorMsg: "Note Name is already taken" });
             }
 
             db.prepare("UPDATE notes SET name = ? WHERE userId = ? and id = ?").run(noteName, decoded.userId, id)
@@ -305,10 +343,11 @@ app.put('/notes/:id/name', (req, res) => {
         })
 
     }catch(e) {
-        res.status(500).json({ message : "Internal Server Error"})
+        res.status(500).json({ ServerErrorMsg : "Internal Server Error"})
     }
 })
 
+// delete note
 app.delete('/notes/:id', (req, res) => {
     try{
         const token = req.cookies.jwt_token;
@@ -329,6 +368,7 @@ app.delete('/notes/:id', (req, res) => {
     }
 })
 
+// add log
 app.post('/users/:id/history', (req, res) => {
     try{
         const token = req.cookies.jwt_token; 
@@ -354,11 +394,17 @@ app.post('/users/:id/history', (req, res) => {
     }
 })
 
+
+// get logs
 app.get('/users/:id/history', (req, res) => {
 
     try{
         const token = req.cookies.jwt_token;
 
+        if (!token){
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
+            return
+        }
         jwt.verify(token, "jwtkey", (err, decoded) => {
 
             if (err) {
@@ -385,7 +431,7 @@ app.post('/auth/logout', (req, res) => {
           }).status(200).json({message : "User has been logged out"})
     }
     catch(e) {
-        res.status(500).json({message : "Internal Server Error"})
+        res.status(500).json({ServerErrorMsg : "Internal Server Error"})
         console.log(e)
     } 
 })

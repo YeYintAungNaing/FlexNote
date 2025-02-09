@@ -68,14 +68,19 @@ export default function NoteEditor() {
        alertAndLog(response.data.message, 'success')
     }
     catch(e) {
-      if(e.response.data.ServerErrorMsg) {
-        //console.log(e.response.data.ServerErrorMsg)
-        alertAndLog(e.response.data.ServerErrorMsg, 'error')
-    }
-    else {
-        //console.log(e.message)
-        alertAndLog(e.message, 'error')
-    }
+      if(e.response) {   
+        if(e.response.data.ServerErrorMsg) {  
+          //console.log(e.response.data.ServerErrorMsg)
+          alertAndLog(e.response.data.ServerErrorMsg, "error")
+        }
+        else {
+          //console.log(e.message)   
+          alertAndLog(e.message, "error")
+        }
+      }
+      else{  
+        console.log(e)
+      } 
     }
   }
 
