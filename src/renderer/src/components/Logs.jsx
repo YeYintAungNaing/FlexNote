@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react"
 import { GlobalContext } from "../context/GlobalState";
 import axios from "axios";
+import '../styles/Log.scss'
 
 
 export default function Logs() {
@@ -37,14 +38,26 @@ export default function Logs() {
 
 
   return (
-    <div>
+    <div className="logs">
         {
-         messageLogs? (
-            messageLogs.map((eachLog, index )=> (
-                <div key={index}>
-                    <p>{eachLog.logContent} || {eachLog.createdAt}</p>
-                </div>
-            ))
+         messageLogs? ( 
+            <table> 
+                <tr className="caption-row">
+                    <th>TimeStamp</th>
+                    <th>UserName</th>
+                    <th>Description</th>
+                    <th>Log type</th>
+                </tr>
+            {
+            messageLogs.map((eachLog, index ) => (
+                <tr key={index} className="data-row">
+                    <td>{eachLog.createdAt}</td>
+                    <td className="userName">{currentUser.userName}</td>
+                    <td>{eachLog.logContent}</td>
+                    <td className="logType">{eachLog.logType}</td>
+                </tr>                  
+            ))}
+            </table>
          ) 
          : (
             <div>You must sign in first</div>
@@ -53,3 +66,6 @@ export default function Logs() {
     </div>
   )
 }
+
+
+

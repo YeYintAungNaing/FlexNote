@@ -1,0 +1,46 @@
+.logs{
+    table{
+        border-collapse: collapse;
+        border: 1px solid rgb(121, 121, 121);
+        font-family: sans-serif;
+        font-size: 0.8rem;
+        letter-spacing: 1px; 
+        width: 100%;
+
+            
+            .caption-row {
+                font-size: 20px;
+                background-color: rgb(76, 138, 204);
+                text-align: center;
+                
+                
+
+                th{ 
+                    color: aliceblue;
+                    padding: 5px; 
+                    border-left: 1px solid rgb(201, 222, 226);
+                    border-right: 1px solid rgb(201, 222, 226); 
+                    
+                }
+            }
+
+            .data-row{
+                &:nth-child(odd) {
+                    background-color: aliceblue;   
+                }
+            }
+
+            td{
+                padding: 5px;
+                font-size: 18px;
+                font-weight:500;
+                border-left: 1px solid rgb(201, 222, 226);
+                border-right: 1px solid rgb(201, 222, 226);
+                
+            }  
+
+            .userName, .logType{
+                text-align: center
+            }
+    }
+}
