@@ -4,6 +4,7 @@ import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import axios from 'axios'
 import {DateTime} from 'luxon'
+import { useQuery } from '@tanstack/react-query'
 
 
 export const GlobalContext = createContext(null);
@@ -16,6 +17,7 @@ export default function GlobalState({children}) {
     //const navigate = useNavigate()
     const [profileImg, setProfileImg] = useState(null)
     //console.log("from global state",currentUser)
+
 
     axios.defaults.withCredentials = true;
 
@@ -39,12 +41,12 @@ export default function GlobalState({children}) {
           console.log(e)
         }
       }
-
       async function getUserDetailsOnline() {  // this first check where there is jwt token and get user details
         try{
          const response = await axios.get('http://localhost:7000/auth/verifyToken')
           setCurrentUser(response.data)
           console.log('token comfired and get latest user data')
+          refetch()
 
         }catch(e) {
           console.log(e.response.data.message)
@@ -71,6 +73,40 @@ export default function GlobalState({children}) {
             userId : currentUser.id
           })
           setProfileImg(base64Image);
+        }
+      }
+
+
+      const {data : notes, refetch} = useQuery({
+        queryKey : ['notes'],
+        queryFn : getNotesOnline,
+        staleTime: 10 * 60 * 1000,
+      })
+
+  
+      async function  getNotesOnline() {
+        try{
+            const response = await axios.get('http://localhost:7000/notes')
+            
+            if (response.data.length >  0) {
+              console.log('notes fetched')
+              return response.data
+              
+            }
+            else{
+              return null
+            }
+  
+        }
+        catch(e) {
+          if(e.response) {
+            console.log(e.response.data.message)
+            return null
+          }
+          else {
+            console.log(e)
+            return null
+          }
         }
       }
 
@@ -150,6 +186,8 @@ export default function GlobalState({children}) {
             clearToken,
             getUserDetails,
             getUserDetailsOnline,
+            notes,
+            refetch,
             showAlert,
             fetchProfileImage,
             profileImg,

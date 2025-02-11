@@ -1,6 +1,7 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { GlobalContext } from "../context/GlobalState";
 import { useNavigate } from "react-router-dom";
+import '../styles/Setting.scss'
 
 
 
@@ -9,7 +10,7 @@ export default function Setting() {
    const navigate = useNavigate()
   //const [data, setData] = useState("")
 
- const {saveLog, currentUser} = useContext(GlobalContext);
+ const {alertAndLog, currentUser, setCurrentUser} = useContext(GlobalContext);
   // function current() {
   //   try{
   //     const token = window.localStorage.getItem('sessionToken');
@@ -18,6 +19,10 @@ export default function Setting() {
   //       console.log(e)
   //     }
   //   }
+
+  useEffect(()=>{
+        console.log('useeffecttestsetting')
+  },)
 
 
   // async function logoutUser() {
@@ -75,14 +80,23 @@ export default function Setting() {
   // }
 
   function save() {
-     saveLog("logContent", "createdAt", "success")
+    setCurrentUser({...currentUser, secret : '123'})
   }
+
+  console.log(currentUser)
+
+
+  //console.log('setting_rendered')
 
     
   return (
-    <div>
+    <div className="setting">
+      <div>
         <button onClick={save}>Get details</button>
         <button onClick={() => { navigate('/logs')}}></button>
+      </div>
+        
+        <button onClick={() => alertAndLog('test', 'success')}></button>
     </div>
   )
 }

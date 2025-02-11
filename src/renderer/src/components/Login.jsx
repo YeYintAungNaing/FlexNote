@@ -8,7 +8,7 @@ export default function Login() {
 
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
-    const { setCurrentUser, showAlert} = useContext(GlobalContext);
+    const { setCurrentUser, showAlert, refetch} = useContext(GlobalContext);
     const [selectedMode, setSelectedMode] = useState('Online')
 
     //axios.defaults.withCredentials = true;
@@ -49,6 +49,7 @@ export default function Login() {
 
           setCurrentUser(response.data)
           showAlert("Login scuuess", "success")
+          refetch()
             
         }catch(e) {
           if(e.response) {   
