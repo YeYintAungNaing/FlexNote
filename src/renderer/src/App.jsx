@@ -57,7 +57,7 @@ const App = () => {
     { text: "testing", icon: <SettingsIcon/>, path: "/setting" },
   ];
 
-  console.log('rendered')
+  //console.log('rendered')
 
   return (
     <>

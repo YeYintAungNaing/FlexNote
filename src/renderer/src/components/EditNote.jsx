@@ -29,7 +29,7 @@ export default function EditNote() {
         setNoteName(location.state.name ? location.state.name : null)
         setOpen(false); // Close modal
   }
-
+  console.log('editnote')
 
   async function editNote() {
 

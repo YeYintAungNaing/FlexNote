@@ -16,11 +16,12 @@ import axios from 'axios'
 
 export default function Notes() {
 
-    const {currentUser, token, alertAndLog, notes, refetch} = useContext(GlobalContext);
+    const {currentUser, alertAndLog, onlineNotes, refetch} = useContext(GlobalContext);
+    const [notes, setNotes] = useState(onlineNotes)
     const navigate = useNavigate()
     const [open, setOpen] = useState(false); // State to control modal visibility
     const [noteName, setNoteName] = useState(''); // State to store the note name
-    //const [notes, setNotes] = useState(null)
+    
     const [searchParams, setSearchParams] = useState('')
     const [searchResults, setSearchResults] = useState(null)
   
@@ -37,22 +38,22 @@ export default function Notes() {
 
     console.log('rendered_')
 
-    // async function getNotes(userId) {
+    async function getNotes(userId) {
 
-    //   try{
-    //     const response = await window.electron.fetchNotes(userId);
-    //     if (response.length >  0) {
-    //       //console.log(response)
-    //       setNotes(response)
-    //     }
-    //     else{
-    //       setNotes(null)
-    //     }
-    //   }
-    //   catch(e) {
-    //     console.log(e)
-    //   }
-    // }
+      try{
+        const response = await window.electron.fetchNotes(userId);
+        if (response.length >  0) {
+          //console.log(response)
+          setNotes(response)
+        }
+        else{
+          setNotes(null)
+        }
+      }
+      catch(e) {
+        console.log(e)
+      }
+    }
 
     // async function  getNotesOnline() {
     //   try{
@@ -77,20 +78,15 @@ export default function Notes() {
     //   }
     // }
 
-    // useEffect(()=>{
+    useEffect(()=>{
       
-    //   if(currentUser) {
+      if(currentUser && currentUser.mode === 'Offline') {
+        getNotes(currentUser.id)
+        
+      }
+      console.log('notes effect')
 
-    //     if(currentUser.mode === "Online") {
-    //       getNotesOnline()  
-    //     }
-    //     else{
-    //       getNotes(currentUser.id)
-    //     }
-    //   }
-    //   console.log('notes effect')
-
-    // },[currentUser])
+    },[])
 
     function searchNotes() {
       if (!notes) {
@@ -167,7 +163,7 @@ export default function Notes() {
             </Button>
             <div className="notes">
               {
-                notes? (
+                currentUser && notes? (
                   searchResults? (
                     searchResults.map((note, index) => (
                         <div className="note-card" key={index}>

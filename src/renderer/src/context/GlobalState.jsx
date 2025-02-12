@@ -77,10 +77,12 @@ export default function GlobalState({children}) {
       }
 
 
-      const {data : notes, refetch} = useQuery({
+      const {data : onlineNotes, refetch} = useQuery({
         queryKey : ['notes'],
         queryFn : getNotesOnline,
         staleTime: 10 * 60 * 1000,
+        enabled: currentUser?.mode === "Online" ? true : false, 
+        initialData : null
       })
 
   
@@ -186,7 +188,7 @@ export default function GlobalState({children}) {
             clearToken,
             getUserDetails,
             getUserDetailsOnline,
-            notes,
+            onlineNotes,
             refetch,
             showAlert,
             fetchProfileImage,
