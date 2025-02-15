@@ -198,7 +198,11 @@ export default function Notes() {
                         </div>
                       ))
                     ) 
-                  ): (<div>lol</div>)
+                  ): (
+                  <div className="empty-notes">
+                    You have not created any note yet!
+                  </div>
+                  )
               }
                 
             </div> 

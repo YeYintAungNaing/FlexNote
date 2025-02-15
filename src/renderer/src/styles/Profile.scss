@@ -97,24 +97,32 @@
 
     .buttons_{
         margin-top: 4px;
-        text-align: center;
-        
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap:5px;
+
 
         button{
-            width: 100px;
+           
             font-size: 16px;
-            padding: 4px;
+            padding: 6px;
             border: 1px solid;
             color: white;
             background-color: rgb(47, 108, 223);
 
             &:hover{
                 cursor: pointer;
+                background-color: rgb(109, 135, 236);
             }
             
         }
         .logout{
             background-color: rgb(185, 29, 29);
+
+            &:hover{
+                background-color: rgb(216, 84, 84);
+            }
         }
     }
 }

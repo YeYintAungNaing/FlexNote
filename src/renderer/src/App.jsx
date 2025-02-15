@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -30,6 +30,7 @@ import EditProfile from "./components/EditProfile";
 import { GlobalContext } from "./context/GlobalState";
 import EditProfileImg from "./components/EditProfileImg";
 import Logs from "./components/Logs";
+import ResetPassword from "./components/ResetPassword";
 //import AlertContext from "./context/AlertContext";
 
 const drawerWidth = 170;
@@ -127,6 +128,7 @@ const App = () => {
             <Route path="/" element={<Profile/>}></Route>
             <Route path="/editProfile" element={<EditProfile/>}></Route>
             <Route path="/editProfileImg" element={<EditProfileImg/>}></Route>
+            <Route path="/passwordReset" element={<ResetPassword/>}></Route>
             <Route path="/logs" element={<Logs/>}></Route>
           </Routes>
            

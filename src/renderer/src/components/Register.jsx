@@ -61,6 +61,21 @@ export default function Register() {
       }
 
     function submitRegister() {
+      if (!userName || !password) {
+        showAlert('name and password cannot be empty', 'error')
+        return
+      }
+
+      if (userName.length < 4 || userName.length > 10) {
+        showAlert('UserName must be between 4 and 10 characters ', 'error')
+        return
+      }
+
+      if (password.length < 3 || password.length > 16) {
+        showAlert('password must be between 2 and 16 characters', 'error')
+        return
+      }
+
       if (selectedMode === "Offline") {
         register()
       }

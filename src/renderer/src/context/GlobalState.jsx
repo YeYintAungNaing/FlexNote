@@ -18,8 +18,8 @@ export default function GlobalState({children}) {
     const [profileImg, setProfileImg] = useState(null)
     //console.log("from global state",currentUser)
 
-
     axios.defaults.withCredentials = true;
+    //console.log(currentUser)
 
     async function getUserDetails() {
     

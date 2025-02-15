@@ -5,11 +5,13 @@ import Login from "./Login";
 import "./../styles/Profile.scss"
 import axios from 'axios'
 import coverImage from "../assets/cover.jpg"
+import { useQueryClient } from '@tanstack/react-query';
 
 
 export default function Profile() {
 
     const navigate = useNavigate()
+    const queryClient = useQueryClient();
 
     const {currentUser,setCurrentUser, clearToken, fetchProfileImage, profileImg } = useContext(GlobalContext);
     // function current() {
@@ -51,6 +53,7 @@ export default function Profile() {
       try{
         const response =  await axios.post('http://localhost:7000/auth/logout')
         setCurrentUser(null)
+        queryClient.removeQueries(['notes']);
         console.log(response.data.message)
       }
       catch(e) {
@@ -60,7 +63,7 @@ export default function Profile() {
     }
 
     useEffect(() => { 
-      if (profileImg) {
+      if (!currentUser || profileImg){
         return
       }
       fetchProfileImage()  // this set a new profileImg state  
@@ -131,7 +134,8 @@ export default function Profile() {
                   </div>
               </div> 
               <div className="buttons_">
-                <Link to='/editProfile'><button>Edit</button></Link> 
+                <Link to='/editProfile'><button>Edit profile details</button></Link> 
+                <Link to='/passwordReset'><button>Reset passoword</button></Link> 
                 <button className="logout" onClick={logout}>Logout</button>
               </div> 
             </div>

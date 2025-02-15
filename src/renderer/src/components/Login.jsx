@@ -3,13 +3,15 @@ import { GlobalContext } from "../context/GlobalState"
 import { Link } from "react-router-dom";
 import axios from 'axios'
 import "../styles/Login.scss"
+import Profile from "./Profile";
 
 export default function Login() {
 
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
-    const { setCurrentUser, showAlert, refetch} = useContext(GlobalContext);
+    const { setCurrentUser, showAlert, refetch, currentUser} = useContext(GlobalContext);
     const [selectedMode, setSelectedMode] = useState('Online')
+    //const navigate = useNavigate()
 
     //axios.defaults.withCredentials = true;
 
@@ -88,30 +90,39 @@ export default function Login() {
     }
 
     return (
-        <div className="login">
-          <div className="login-card">
-          <p>Login</p>
-            <input 
-                placeholder="Name" 
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                >
-            </input>
-            <input 
-                placeholder="Password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                >
-            </input>
-            <div className="toggles">
-              <button id="online" className="toggle-btn selected"  onClick={toggleOnline}>Online</button>
-              <button id="offline" className="toggle-btn" onClick={toggleOffline}>Offline</button>
-            </div>
-            <button onClick={formSubmit}>Login</button>
-            <Link className="links" to='/register'>
-              <button className="register">Register new account</button>
-            </Link>
-            </div>
-        </div>
+      <>
+        {
+          currentUser? (
+            <Profile></Profile>
+          ) 
+          : (
+          <div className="login">
+            <div className="login-card">
+            <p>Login</p>
+              <input 
+                  placeholder="Name" 
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  >
+              </input>
+              <input 
+                  placeholder="Password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  >
+              </input>
+              <div className="toggles">
+                <button id="online" className="toggle-btn selected"  onClick={toggleOnline}>Online</button>
+                <button id="offline" className="toggle-btn" onClick={toggleOffline}>Offline</button>
+              </div>
+              <button onClick={formSubmit}>Login</button>
+              <Link className="links" to='/register'>
+                <button className="register">Register new account</button>
+              </Link>
+              </div>
+          </div>
+          )
+        }
+        </>
     )
 }

@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser"
 import rateLimit from "express-rate-limit"
 import { v2 as cloudinary } from 'cloudinary';
 import 'dotenv/config';
+import { Resend } from "resend";
 
 
 const app = express()
@@ -36,6 +37,8 @@ const db = new sqlite3(dbPath);
 const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 const API_KEY = process.env.CLOUDINARY_API_KEY;
 const API_SECRET = process.env.CLOUDINARY_API_SECRET;
+const RESEND_API_SECRET = process.env.RESEND_API_SECRET;
+const RESEND_EMAIL = process.env.RESEND_EMAIL;
 
 
 cloudinary.config({
@@ -43,6 +46,8 @@ cloudinary.config({
   api_key: API_KEY,
   api_secret: API_SECRET
 });
+
+const resend = new Resend(RESEND_API_SECRET);
 
 
 app.post('/auth/register', (req, res) => {
@@ -225,6 +230,46 @@ app.put("/users/:id/profileImage", (req, res) => {
         res.status(500).json({ServerErrorMsg : "Internal Server Error"});
     }
 })
+
+
+
+app.get('/users/:id/verifyCode',  (req, res) => {
+
+    try{
+        const token = req.cookies.jwt_token;
+
+        if (!token){
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
+            return
+        }
+
+        jwt.verify(token, "jwtkey", async (err, decoded) => {
+
+            if (err) {
+                return res.status(403).json({ message: "Invalid token" });
+            }
+
+            //const code = '12345'
+
+            await resend.emails.send({
+                from: RESEND_EMAIL,
+                to: ["bruh"],
+                subject: "hello world",
+                html: "<strong>it works!</strong>",
+            }); 
+
+            res.status(200).json({message : "email has been sent"})
+        })
+
+    }catch(e) {
+        res.status(500).json({ message: "Internal Server Error" })
+        console.log(e)
+    }
+})
+
+
+//reseting password
+//app.get('/users/:id/resetPassword')
 
 // getting notes
 app.get('/notes', (req, res) => {
