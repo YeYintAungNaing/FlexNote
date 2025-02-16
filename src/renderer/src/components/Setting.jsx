@@ -20,9 +20,6 @@ export default function Setting() {
   //     }
   //   }
 
-  useEffect(()=>{
-        console.log('useeffecttestsetting')
-  },)
 
 
   // async function logoutUser() {

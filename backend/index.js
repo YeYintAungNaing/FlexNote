@@ -9,6 +9,7 @@ import rateLimit from "express-rate-limit"
 import { v2 as cloudinary } from 'cloudinary';
 import 'dotenv/config';
 import { Resend } from "resend";
+import crypto from 'crypto'
 
 
 const app = express()
@@ -86,6 +87,7 @@ app.get('/auth/verifyToken' , (req, res) => {
         jwt.verify(token, "jwtkey", (err, decoded) => {
             if (err) return res.status(403).json({ message: "Invalid token" });
             // 
+            console.log(typeof(decoded.userId))
         
             const userData = db.prepare("SELECT * FROM users where userId = ?").get(decoded.userId);  //  userId when the token is first created 
             //console.log("row", userData)
@@ -231,9 +233,8 @@ app.put("/users/:id/profileImage", (req, res) => {
     }
 })
 
-
-
-app.get('/users/:id/verifyCode',  (req, res) => {
+// generating code and sending code
+app.get('/users/:id/generateCode',  (req, res) => {
 
     try{
         const token = req.cookies.jwt_token;
@@ -246,30 +247,133 @@ app.get('/users/:id/verifyCode',  (req, res) => {
         jwt.verify(token, "jwtkey", async (err, decoded) => {
 
             if (err) {
-                return res.status(403).json({ message: "Invalid token" });
+                return res.status(403).json({ ServerErrorMsg: "Invalid token" });
             }
 
-            //const code = '12345'
+            const code = crypto.randomInt(100000, 999999).toString()
+            const expirationTime = 3 * 60 * 1000; 
+            const expiresAt = new Date(Date.now() + expirationTime).toISOString();
+
+            db.prepare("INSERT INTO verificationCodes (userId, code, expiresAt) VALUES (?, ?, ?) ").run(
+                 decoded.userId, 
+                 code, 
+                 expiresAt
+            )
 
             await resend.emails.send({
                 from: RESEND_EMAIL,
-                to: ["bruh"],
-                subject: "hello world",
-                html: "<strong>it works!</strong>",
+                to: [""],
+                subject: "Verification code",
+                html:  `
+                <div style="font-family: Arial, sans-serif; color: #333; text-align: center;">
+                  <h1>Your Verification Code</h1>
+                  <p>Use the code below to complete your verification process:</p>
+                  <div style="
+                    display: inline-block;
+                    padding: 10px 20px;
+                    background-color: #f2f2f2;
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                    font-size: 24px;
+                    letter-spacing: 4px;
+                    font-weight: bold;
+                  ">
+                    ${code}
+                  </div>
+                  <p style="margin-top: 20px; color: #777; font-size: 12px;">
+                    This code will expire in 10 minutes. If you did not request this, please ignore this email.
+                  </p>
+                </div>
+              `
             }); 
 
-            res.status(200).json({message : "email has been sent"})
+            res.status(200).json({message : "Code has been sent"})
         })
 
     }catch(e) {
-        res.status(500).json({ message: "Internal Server Error" })
+        res.status(500).json({ ServerErrorMsg: "Internal Server Error" })
         console.log(e)
     }
 })
 
 
-//reseting password
-//app.get('/users/:id/resetPassword')
+//verifying code
+app.put('/users/:id/verifyCode', (req, res) => {
+    try{
+        const token = req.cookies.jwt_token;
+
+        if (!token){
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
+            return
+        }
+
+        jwt.verify(token, "jwtkey", async (err, decoded) => {
+
+            if (err) {
+                return res.status(403).json({ ServerErrorMsg: "Invalid token" });
+            }
+
+            const code = req.body.code
+            console.log(code)
+            const veriCode = db.prepare("SELECT * from verificationCodes WHERE userId = ? AND code = ?").get(  // return undefined if no match
+                 decoded.userId,
+                 code  
+            )
+
+            if (veriCode) {
+                const now = new Date();
+                if (new Date(veriCode.expiresAt) > now) {
+                    res.status(200).json({message : "Verification successful"})
+                    return
+                }
+                else{
+                    res.status(403).json({ServerErrorMsg : "Your code is expired"})
+                    return
+                }
+            }
+            else {
+                res.status(404).json({ServerErrorMsg : "Wrong code"})
+                return
+            }
+        })
+
+    }catch(e) {
+        res.status(500).json({ ServerErrorMsg: "Internal Server Error" })
+        console.log(e)
+    }
+})
+
+
+//resetting password
+app.put('/users/:id/resetPassword', (req, res) => {
+    try{
+        const token = req.cookies.jwt_token;
+
+        if (!token){
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
+            return
+        }
+
+        jwt.verify(token, "jwtkey", async (err, decoded) => {
+
+            if (err) {
+                return res.status(403).json({ ServerErrorMsg: "Invalid token" });
+            }
+            const password = req.body.password
+            const salt = bcrypt.genSaltSync(10);
+            const hashedPassword = bcrypt.hashSync(password, salt);
+
+            db.prepare("UPDATE users SET password = ? where userId = ?").run(hashedPassword, decoded.userId)
+
+            res.status(200).json({message : "Successfully changed the password"})
+        })    
+    }
+    catch(e) {
+        res.status(500).json({ ServerErrorMsg: "Internal Server Error" })
+        //console.log(e)
+    }
+})
+
 
 // getting notes
 app.get('/notes', (req, res) => {

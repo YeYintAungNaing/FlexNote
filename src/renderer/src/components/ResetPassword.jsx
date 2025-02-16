@@ -4,17 +4,89 @@ import '../styles/ResetPass.scss'
 import axios from "axios";
 export default function ResetPassword() {
 
-    const {alertAndLog, currentUser, setCurrentUser} = useContext(GlobalContext);
+    const {alertAndLog, showAlert,  currentUser, setCurrentUser} = useContext(GlobalContext);
     const [isAuthorized, setIsAuthorized] = useState(false)
 
     const [password, setPassword] = useState('')
     const [confirmPass, setConfirmPass] = useState('')
     const [secretCode, setSecretCode] = useState('')
-    console.log(currentUser)
+    const [toggleInput, setToggleInput] = useState(false)
+    //console.log(currentUser)
     
     async function sendMail() {
-        const res = await axios.get(`http://localhost:7000/users/${currentUser.userId}/verifyCode`)
-        console.log(res.data.message)
+        try {
+            const res = await axios.get(`http://localhost:7000/users/${currentUser.userId}/generateCode`)
+            setToggleInput(true)
+            //console.log(res.data.message)
+            showAlert(res.data.message)
+        }
+       
+        catch(e) {
+            if(e.response) {   
+                if(e.response.data.ServerErrorMsg) {  
+                  //console.log(e.response.data.ServerErrorMsg)
+                  showAlert(e.response.data.ServerErrorMsg, "error") 
+                }
+                else {
+                  console.log(e.message)   
+                  showAlert(e.message, "error")
+                }
+              }
+              else{  
+                console.log(e)
+              } 
+        }
+    }
+
+    async function verifyCode() {
+        //console.log(secretCode)
+        try{
+            const res = await axios.put(`http://localhost:7000/users/${currentUser.userId}/verifyCode`, {
+                code : secretCode 
+            })
+            showAlert(res.data.message)
+            setIsAuthorized(true)
+        }
+        catch(e) {
+            if(e.response) {   
+                if(e.response.data.ServerErrorMsg) {  
+                  console.log(e.response.data.ServerErrorMsg)
+                  //showAlert(e.response.data.ServerErrorMsg, "error") 
+                }
+                else {
+                  console.log(e.message)   
+                  //showAlert(e.messag, "error")
+                }
+              }
+              else{  
+                console.log(e)
+              } 
+        }
+    }
+
+    async function resetPassword() {
+        try{
+            const res = await axios.put(`http://localhost:7000/users/${currentUser.userId}/resetPassword`, {
+                password
+            })
+            showAlert(res.data.message)
+            
+        }   
+       catch(e) {
+            if(e.response) {   
+                if(e.response.data.ServerErrorMsg) {  
+                    //console.log(e.response.data.ServerErrorMsg)
+                    showAlert(e.response.data.ServerErrorMsg, "error") 
+                }
+                else{
+                //console.log(e.message)   
+                showAlert(e.messag, "error")
+                }
+            }
+            else{  
+            console.log(e)
+            } 
+       }
     }
 
     return (
@@ -35,19 +107,21 @@ export default function ResetPassword() {
                        onChange={(e) => setConfirmPass(e.target.value)}
                        >
                    </input>
-                   <button>Reset password</button>
+                   <button onClick={resetPassword}>Reset password</button>
                  </div>
             ) 
             : (
             <div className="card"> 
               <p>Verify Code</p>
-                 <input 
-                       placeholder="Verification Code" 
-                       value={secretCode}
-                       onChange={(e) => setSecretCode(e.target.value)}
-                       >
-                </input>
-                <button onClick={sendMail}>Verify code</button>
+              {toggleInput &&
+                <input 
+                    placeholder="Verification Code" 
+                    value={secretCode}
+                    onChange={(e) => setSecretCode(e.target.value)}
+                >
+                </input> }
+                <button onClick={sendMail}>get coode</button>
+                <button onClick={verifyCode}>Verify code</button>
             </div>  
             )}   
         </div>

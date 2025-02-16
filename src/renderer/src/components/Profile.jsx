@@ -13,7 +13,7 @@ export default function Profile() {
     const navigate = useNavigate()
     const queryClient = useQueryClient();
 
-    const {currentUser,setCurrentUser, clearToken, fetchProfileImage, profileImg } = useContext(GlobalContext);
+    const {currentUser,setCurrentUser, clearToken, fetchProfileImage, profileImg, setProfileImg } = useContext(GlobalContext);
     // function current() {
     //   try{
     //     const token = window.localStorage.getItem('sessionToken');
@@ -27,6 +27,7 @@ export default function Profile() {
     // console.log(currentUser?.profileImgPath)
 
     function logout() {
+      setProfileImg(null)
       if (currentUser.mode === 'Offline') {
         logoutOffline()
       }
@@ -63,14 +64,15 @@ export default function Profile() {
     }
 
     useEffect(() => { 
+      //console.log('useeffect')
       if (!currentUser || profileImg){
         return
       }
       fetchProfileImage()  // this set a new profileImg state  
-      console.log('profile img fetched') 
+      //console.log('profile img fetched') 
     }, [currentUser]);   // in case currentUser is not updated in time when this useEffect takes place ( re-trigger the useeffect)
      
-
+    //console.log('outside')
     return (
       <div className="profile">
         {

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -58,7 +58,9 @@ const App = () => {
     { text: "testing", icon: <SettingsIcon/>, path: "/setting" },
   ];
 
-  //console.log('rendered')
+  useEffect(()=> {
+    console.log('useEffect')
+  }, [currentUser])
 
   return (
     <>
