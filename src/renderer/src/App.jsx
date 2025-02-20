@@ -16,6 +16,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import DrawIcon from '@mui/icons-material/Draw';
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import HistoryIcon from '@mui/icons-material/History';
 import {  Routes, Route, Link } from 'react-router-dom';
@@ -31,6 +32,7 @@ import { GlobalContext } from "./context/GlobalState";
 import EditProfileImg from "./components/EditProfileImg";
 import Logs from "./components/Logs";
 import ResetPassword from "./components/ResetPassword";
+import DrawingBoard from "./components/DrawingBoard";
 //import AlertContext from "./context/AlertContext";
 
 const drawerWidth = 170;
@@ -54,13 +56,11 @@ const App = () => {
     { text: currentUser?.dName || 'Profile', icon: <AccountCircleIcon/>,path: "/" }, 
     { text: "Notes", icon: <StickyNote2Icon/>, path: "/notes" },
     { text: "Create", icon: <NoteAddIcon />, path: "/createNote" },
+    { text: "Board", icon: <DrawIcon />, path: "/drawingBoard" },
     { text: "Logs", icon: <HistoryIcon/>, path: "/logs" },
     { text: "testing", icon: <SettingsIcon/>, path: "/setting" },
   ];
 
-  useEffect(()=> {
-    console.log('useEffect')
-  }, [currentUser])
 
   return (
     <>
@@ -125,6 +125,7 @@ const App = () => {
             <Route path="/setting" element={<Setting />} />
             <Route path="/createNote" element={<NoteEditor />} />
             <Route path="/editNote/:id" element={<EditNote />} />
+            <Route path="/drawingBoard" element={<DrawingBoard/>}></Route>
             <Route path="/register" element={<Register/>}></Route>
             <Route path="/login" element={<Login/>}></Route>
             <Route path="/" element={<Profile/>}></Route>

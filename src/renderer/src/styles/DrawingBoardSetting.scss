@@ -1,0 +1,23 @@
+.settings {
+    position: fixed;
+    top: 200px;
+    right: 10px;
+    background-color: rgb(198, 222, 243);
+    width: 100px;
+    height: 65px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border: 1px solid;
+    
+
+        input{  
+            height: 35px;
+            width: 100%;
+            background-color: rgb(198, 222, 243);
+            border: transparent;
+            cursor: pointer;
+        } 
+    
+}

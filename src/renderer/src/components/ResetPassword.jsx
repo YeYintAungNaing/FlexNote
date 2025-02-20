@@ -15,7 +15,9 @@ export default function ResetPassword() {
     
     async function sendMail() {
         try {
-            const res = await axios.get(`http://localhost:7000/users/${currentUser.userId}/generateCode`)
+            const res = await axios.post(`http://localhost:7000/users/${currentUser.userId}/generateCode`, {
+                email : currentUser.email
+            })
             setToggleInput(true)
             //console.log(res.data.message)
             showAlert(res.data.message)

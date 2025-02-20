@@ -87,7 +87,7 @@ app.get('/auth/verifyToken' , (req, res) => {
         jwt.verify(token, "jwtkey", (err, decoded) => {
             if (err) return res.status(403).json({ message: "Invalid token" });
             // 
-            console.log(typeof(decoded.userId))
+            //console.log(typeof(decoded.userId))
         
             const userData = db.prepare("SELECT * FROM users where userId = ?").get(decoded.userId);  //  userId when the token is first created 
             //console.log("row", userData)
@@ -234,7 +234,7 @@ app.put("/users/:id/profileImage", (req, res) => {
 })
 
 // generating code and sending code
-app.get('/users/:id/generateCode',  (req, res) => {
+app.post('/users/:id/generateCode',  (req, res) => {
 
     try{
         const token = req.cookies.jwt_token;
@@ -253,6 +253,7 @@ app.get('/users/:id/generateCode',  (req, res) => {
             const code = crypto.randomInt(100000, 999999).toString()
             const expirationTime = 3 * 60 * 1000; 
             const expiresAt = new Date(Date.now() + expirationTime).toISOString();
+            const email = req.body.email
 
             db.prepare("INSERT INTO verificationCodes (userId, code, expiresAt) VALUES (?, ?, ?) ").run(
                  decoded.userId, 
@@ -262,7 +263,7 @@ app.get('/users/:id/generateCode',  (req, res) => {
 
             await resend.emails.send({
                 from: RESEND_EMAIL,
-                to: [""],
+                to: [email],
                 subject: "Verification code",
                 html:  `
                 <div style="font-family: Arial, sans-serif; color: #333; text-align: center;">
@@ -301,6 +302,7 @@ app.get('/users/:id/generateCode',  (req, res) => {
 app.put('/users/:id/verifyCode', (req, res) => {
     try{
         const token = req.cookies.jwt_token;
+        
 
         if (!token){
             res.status(401).json({ ServerErrorMsg: "Not logged in" });
@@ -314,7 +316,8 @@ app.put('/users/:id/verifyCode', (req, res) => {
             }
 
             const code = req.body.code
-            console.log(code)
+            
+            //console.log(code)
             const veriCode = db.prepare("SELECT * from verificationCodes WHERE userId = ? AND code = ?").get(  // return undefined if no match
                  decoded.userId,
                  code  

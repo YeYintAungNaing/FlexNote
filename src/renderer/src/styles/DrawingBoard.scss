@@ -1,0 +1,46 @@
+.drawing-page{
+    display: flex;
+    align-items: center;
+    height: 80vh;
+    justify-content: center;
+    .drawing-board{
+        border: 1px solid;
+
+    }
+
+    .canvas-setting {
+        position: fixed;
+        bottom: 5px;
+        right: 10px;
+    }
+
+    .tools-bar{
+        display: flex;
+        flex-direction: column;
+        padding: 4px;
+        background-color: rgb(177, 185, 193);
+        gap: 5px;
+        border-radius: 6px;
+        position: fixed;
+        top: 50%;
+        right: 15px;
+
+        button{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 35px;
+            height: 35px;
+        }
+
+        .toggle-btn.active {
+            background-color: rgb(30, 121, 211);
+            color: white;
+        }
+
+        .toggle-btn.inactive {
+            background-color: rgb(177, 185, 193);
+            color: black;
+        }   
+    }
+}

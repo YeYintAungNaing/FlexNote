@@ -39,6 +39,7 @@
     "crypto": "^1.0.1",
     "electron-updater": "^6.1.7",
     "email-validator": "^2.0.4",
+    "fabric": "^6.6.1",
     "fs": "^0.0.1-security",
     "highlight.js": "^11.10.0",
     "lowlight": "^3.2.0",
@@ -48,6 +49,7 @@
     "react-country-region-selector": "^4.0.2",
     "react-router-dom": "^7.0.1",
     "sass": "^1.81.0",
+    "sebikostudio-icons": "^1.4.9",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
