@@ -36,7 +36,7 @@ export default function Notes() {
     }
     //console.log(noteName)
 
-    console.log('rendered_')
+    //console.log('rendered_')
 
     async function getNotes(userId) {
 
@@ -83,6 +83,9 @@ export default function Notes() {
       if(currentUser && currentUser.mode === 'Offline') {
         getNotes(currentUser.id)
         
+      }
+      else{
+        return
       }
       console.log('notes effect')
 

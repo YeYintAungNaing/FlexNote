@@ -520,6 +520,90 @@ app.delete('/notes/:id', (req, res) => {
     }
 })
 
+// saving drawing board data
+app.post('/drawingBoard', (req, res) => {
+    try{
+        const token = req.cookies.jwt_token; 
+
+        if (!token){
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
+            return
+        }
+
+        jwt.verify(token, "jwtkey", (err, decoded) => {
+            if (err) return res.status(403).json({ServerErrorMsg : "Invalid token"})
+
+                const drawingData = JSON.stringify(req.body.drawingData);
+            
+            db.prepare("INSERT INTO drawingBoard (drawingData, userId) VALUES (?, ?)").run(
+                drawingData, decoded.userId
+            )
+            return res.status(200).json({message : "Data has been saved"})
+        })
+    }
+    catch(e) {
+        res.status(500).json({ ServerErrorMsg : "Falied to save drawing data"}) 
+        console.log(e)
+    }
+})
+
+
+app.get('/drawingBoard', (req, res) => {
+
+    try{
+        const token = req.cookies.jwt_token;
+
+        if (!token){
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
+            return
+        }
+
+        jwt.verify(token, "jwtkey", (err, decoded) => {
+
+            if (err) {
+                return res.status(403).json({ ServerErrorMsg: "Invalid token" });
+            }
+
+            const drawingData = db.prepare('SELECT * FROM drawingBoard where userId = ?').get(decoded.userId)
+            res.status(200).json(drawingData)  
+        })
+
+    }catch(e) {
+        res.status(500).json({ ServerErrorMsg: "Internal Server Error" })
+        console.log(e)
+    }
+})
+
+// editing board data
+app.put('/drawingBoard', (req, res) => {
+    
+    try{
+        const token = req.cookies.jwt_token; 
+
+        if (!token){
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
+            return
+        }
+
+        jwt.verify(token, "jwtkey", (err, decoded) => {
+            if (err) return res.status(403).json({ServerErrorMsg : "Invalid token"})
+
+                const drawingData = JSON.stringify(req.body.drawingData);
+            
+                db.prepare("UPDATE drawingBoard SET drawingData = ? WHERE userId = ?").run(
+                    drawingData, decoded.userId
+                )
+
+                return res.status(200).json({message : "Data has been updated"})
+        })
+    }
+    catch(e) {
+        res.status(500).json({ ServerErrorMsg : "Falied to save drawing data"}) 
+        console.log(e)
+    }
+})
+
+
 // add log
 app.post('/users/:id/history', (req, res) => {
     try{
@@ -587,8 +671,6 @@ app.post('/auth/logout', (req, res) => {
         console.log(e)
     } 
 })
-
-
 
 
 app.listen(7000, () => {

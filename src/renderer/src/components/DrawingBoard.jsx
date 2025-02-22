@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { Canvas, Rect, Circle, PencilBrush} from "fabric"
 //import fabric from 'fabric'
 import '../styles/drawingBoard.scss'
-import { SquareIcon, CircleIcon } from "sebikostudio-icons"
+import { SquareIcon, CircleIcon,  Pencil1Icon} from "sebikostudio-icons"
 import DrawingBoardSetting from "./DrawingBoardSetting"
+import axios from "axios"
+import  { GlobalContext } from "../context/GlobalState"
 
 
 
@@ -13,26 +15,105 @@ export default function DrawingBoard() {
 
     const [canvas, setCanvas] = useState(null)
     const [canvasSize, setCanvasSize ] = useState({ width : 500, height : 500})
+    const { alertAndLog, showAlert } = useContext(GlobalContext);
+    //const canvasInstanceRef = useRef(null);
+    //const [canvasInitialized, setCanvasInitialized] = useState(false)
 
-    useEffect(() => {
-        if (canvasRef.current) {
-            const inintCanvas = new Canvas(canvasRef.current, {
-                width : canvasSize.width,
-                height : canvasSize.height,
-                isDrawingMode : false
-            });
+    // useEffect(() => {
+    //     if (canvasRef.current) {
+    //         const inintCanvas = new Canvas(canvasRef.current, {
+    //             width : canvasSize.width,
+    //             height : canvasSize.height,
+    //             isDrawingMode : false
+    //         });
             
-            inintCanvas.backgroundColor = "aliceblue"
-            inintCanvas.freeDrawingBrush = new PencilBrush(inintCanvas)
-            inintCanvas.freeDrawingBrush.color = "#000000"
-            inintCanvas.renderAll()
-            setCanvas(inintCanvas)
+    //         inintCanvas.backgroundColor = "aliceblue"
+    //         inintCanvas.freeDrawingBrush = new PencilBrush(inintCanvas)
+    //         inintCanvas.freeDrawingBrush.color = "#000000"
+    //         inintCanvas.renderAll()
+    //         setCanvas(inintCanvas)
 
-            return () => {
-                inintCanvas.dispose()
-            }  
+    //         return () => {
+    //             inintCanvas.dispose()
+    //         }  
+    //     }
+    // } ,[])
+
+
+    // async function initializeCanvas() {
+    //     if (!canvasRef.current) return;
+
+    //     // Dispose of existing canvas instance
+    //     if (canvasInstanceRef.current) {
+    //         canvasInstanceRef.current.dispose();
+    //         canvasInstanceRef.current = null;
+    //     }
+
+    //     // Create a new Fabric.js canvas
+    //     const inintCanvas = new Canvas(canvasRef.current, {
+    //         width: canvasSize.width,
+    //         height: canvasSize.height,
+    //         isDrawingMode: false,
+    //     });
+
+    //     inintCanvas.backgroundColor = "aliceblue";
+    //     inintCanvas.freeDrawingBrush = new PencilBrush(inintCanvas);
+    //     inintCanvas.freeDrawingBrush.color = "#000000";
+    //     inintCanvas.renderAll();
+
+    //     try {
+    //         const res = await axios.get("http://localhost:7000/drawingBoard");
+    //         if (res.data) {
+    //             console.log(res.data.drawingData)
+    //             inintCanvas.loadFromJSON(res.data.drawingData, () => {
+    //                 inintCanvas.renderAll();
+    //             });
+    //         }
+    //     } catch (e) {
+    //         console.error("Error loading drawing data:", e.response?.data?.ServerErrorMsg || e.message);
+    //     }
+
+    //     // Store Fabric.js instance in ref & mark as initialized
+    //     canvasInstanceRef.current = inintCanvas;
+    //     setCanvas(inintCanvas)
+    //     setCanvasInitialized(true);
+        
+    // }
+
+
+    async function initializeCanvas() {
+        if (!canvasRef.current) return;
+    
+        // Create Fabric.js canvas
+        const inintCanvas = new Canvas(canvasRef.current, {
+            width: canvasSize.width,
+            height: canvasSize.height,
+            isDrawingMode: false
+        });
+    
+        inintCanvas.backgroundColor = "aliceblue";
+        inintCanvas.freeDrawingBrush = new PencilBrush(inintCanvas);
+        inintCanvas.freeDrawingBrush.color = "#000000";
+        inintCanvas.renderAll();
+    
+        try {
+            const res = await axios.get("http://localhost:7000/drawingBoard");
+    
+            if (res.data) {
+                console.log("Fetched Data:", res.data.drawingData);
+    
+                await inintCanvas.loadFromJSON(res.data.drawingData)
+
+                inintCanvas.renderAll();
+                 
+            }
+        } catch (e) {
+            console.error("Error loading drawing data:", e.response?.data?.ServerErrorMsg || e.message);
         }
-    } ,[])
+    
+        setCanvas(inintCanvas);
+    }
+    
 
     function addRectangle() {
         if(canvas) {
@@ -82,7 +163,7 @@ export default function DrawingBoard() {
             canvasRef.current.width = newWidth;
             canvasRef.current.height = newHeight;
 
-            canvas.current.renderAll();
+            canvas.renderAll();
         }
     }
 
@@ -94,12 +175,72 @@ export default function DrawingBoard() {
         resizeCanvas(newSize.width, newSize.height);
     }
 
+    async function saveBoard(){
+
+        try{
+            const drawingData = canvas.toJSON()
+            const res = await axios.post(`http://localhost:7000/drawingBoard`, {
+                drawingData
+            })
+            showAlert(res.data.message, "success")
+        }
+        
+        catch(e) {
+            if(e.response) {   
+              if(e.response.data.ServerErrorMsg) {  
+                console.log(e.response.data.ServerErrorMsg)
+                //alertAndLog(e.response.data.ServerErrorMsg, "error")
+              }
+              else {
+                console.log(e.message)   
+                //alertAndLog(e.message, "error")
+              }
+            }
+            else{  
+              console.log(e)
+            } 
+          }
+    }
+
+
+    async function editBoard(){
+
+        try{
+            const drawingData = canvas.toJSON()
+            const res = await axios.put(`http://localhost:7000/drawingBoard`, {
+                drawingData
+            })
+            showAlert(res.data.message, "success")
+        }
+        
+        catch(e) {
+            if(e.response) {   
+              if(e.response.data.ServerErrorMsg) {  
+                console.log(e.response.data.ServerErrorMsg)
+                //alertAndLog(e.response.data.ServerErrorMsg, "error")
+              }
+              else {
+                console.log(e.message)   
+                //alertAndLog(e.message, "error")
+              }
+            }
+            else{  
+              console.log(e)
+            } 
+          }
+    }
+
     
     return (
         <div className="drawing-page">
+            <button onClick={initializeCanvas} >
+                click
+            </button>
+        
+             <canvas className="drawing-board" id="canvas" ref={canvasRef}></canvas>
             
-            <canvas className="drawing-board" id="canvas" ref={canvasRef}></canvas>
             <DrawingBoardSetting canvas={canvas}></DrawingBoardSetting>
+            <button className="board-save" onClick={editBoard}>Save</button>
             <div className="canvas-setting">
             <label>Width: </label>
                 <input
@@ -124,7 +265,7 @@ export default function DrawingBoard() {
                     <CircleIcon></CircleIcon>
                 </button>
                 <button id="drawing" className="toggle-btn" onClick={toggleDrawingMode}>
-                    D
+                    <Pencil1Icon></Pencil1Icon>
                 </button>
             </div>
         </div>
