@@ -1,9 +1,9 @@
 import { useContext, useState } from "react"
 import { GlobalContext } from "../context/GlobalState"
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios'
 import "../styles/Login.scss"
-import Profile from "./Profile";
+
 
 export default function Login() {
 
@@ -11,7 +11,7 @@ export default function Login() {
     const [password, setPassword] = useState("")
     const { setCurrentUser, showAlert, refetch, currentUser} = useContext(GlobalContext);
     const [selectedMode, setSelectedMode] = useState('Online')
-    //const navigate = useNavigate()
+    const navigate = useNavigate()
 
     //axios.defaults.withCredentials = true;
 
@@ -53,6 +53,8 @@ export default function Login() {
           setCurrentUser(response.data)
           showAlert("Login scuuess", "success")
           refetch()
+          navigate('/')
+         
             
         }catch(e) {
           if(e.response) {   
@@ -94,7 +96,7 @@ export default function Login() {
       <>
         {
           currentUser? (
-            <Profile></Profile>
+            <div>your have already log in</div>
           ) 
           : (
           <div className="login">

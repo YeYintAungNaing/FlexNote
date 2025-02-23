@@ -13,7 +13,7 @@ export default function Profile() {
     const navigate = useNavigate()
     const queryClient = useQueryClient();
 
-    const {currentUser,setCurrentUser, clearToken, fetchProfileImage, profileImg, setProfileImg } = useContext(GlobalContext);
+    const {currentUser,setCurrentUser, isLoading, clearToken, fetchProfileImage, profileImg, setProfileImg } = useContext(GlobalContext);
     // function current() {
     //   try{
     //     const token = window.localStorage.getItem('sessionToken');
@@ -59,24 +59,27 @@ export default function Profile() {
       }
       catch(e) {
         console.log(e.response.data.message)
-      }
-        
+      } 
     }
 
     useEffect(() => { 
       //console.log('useeffect')
-      if (!currentUser || profileImg){
+      if (!currentUser && !isLoading){
+        navigate('/login')
+        
+      }
+      if (profileImg || !currentUser ) {
         return
       }
       fetchProfileImage()  // this set a new profileImg state  
       //console.log('profile img fetched') 
-    }, [currentUser]);   // in case currentUser is not updated in time when this useEffect takes place ( re-trigger the useeffect)
+    }, [currentUser, isLoading]);   // in case currentUser is not updated in time when this useEffect takes place ( re-trigger the useeffect)
      
     //console.log('outside')
     return (
       <div className="profile">
         {
-          currentUser? (
+          currentUser && !isLoading ? (
             <div>
               <div className="profile-photo" style={{ backgroundImage: `url(${coverImage})` }} >
                   <img  onClick={()=> navigate('/editProfileImg')} src={profileImg} alt=""></img> 
@@ -142,7 +145,7 @@ export default function Profile() {
               </div> 
             </div>
           ):(
-            <Login></Login>
+            <div>Loading...</div>
           )
         }  
       </div>

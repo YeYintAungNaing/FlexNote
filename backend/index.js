@@ -215,6 +215,7 @@ app.put("/users/:id/profileImage", (req, res) => {
             res.status(401).json({ ServerErrorMsg: "Not logged in" });
             return
         }
+    
 
         jwt.verify(token, "jwtkey", (err, decoded) => {
 

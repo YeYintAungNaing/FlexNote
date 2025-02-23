@@ -80,6 +80,18 @@ export default function Setting() {
     setCurrentUser({...currentUser, secret : '123'})
   }
 
+  function save1() {
+    setCurrentUser({...currentUser, secret2 : 'zzzz'})
+  }
+
+  function turnoff() {
+    setCurrentUser({...currentUser, mode : 'sss'})
+  }
+  function turnOn() {
+    setCurrentUser({...currentUser, mode : 'Online'})
+  }
+
+
   console.log(currentUser)
 
 
@@ -89,7 +101,10 @@ export default function Setting() {
   return (
     <div className="setting">
       <div>
-        <button onClick={save}>Get details</button>
+        <button onClick={save}>change current user</button>
+        <button onClick={save1}>change current user_</button>
+        <button onClick={turnoff}>off</button>
+        <button onClick={turnOn}>on</button>
         <button onClick={() => { navigate('/logs')}}></button>
       </div>
         

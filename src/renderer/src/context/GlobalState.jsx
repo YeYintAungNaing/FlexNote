@@ -14,7 +14,7 @@ export default function GlobalState({children}) {
 
     const [currentUser, setCurrentUser] = useState(null)
     const [token, setToken] = useState(() => window.localStorage.getItem('sessionToken'));  // lazy initializaiton instead of straight up call, 
-    //const navigate = useNavigate()
+    const [isLoading, setIsLoading] = useState(true)
     const [profileImg, setProfileImg] = useState(null)
     //console.log("from global state",currentUser)
 
@@ -29,6 +29,7 @@ export default function GlobalState({children}) {
             
             if (response.currentUser) {
               setCurrentUser(response.currentUser)
+              setIsLoading(false)
               //console.log('verify token')
             }
             else{
@@ -41,15 +42,19 @@ export default function GlobalState({children}) {
           console.log(e)
         }
       }
+
       async function getUserDetailsOnline() {  // this first check where there is jwt token and get user details
         try{
          const response = await axios.get('http://localhost:7000/auth/verifyToken')
           setCurrentUser(response.data)
-          console.log('token comfired and get latest user data')
-          refetch()
+          //console.log('token comfired and get latest user data')
+          refetch()  
+          setIsLoading(false)
 
         }catch(e) {
           console.log(e.response.data.message)
+          setCurrentUser(null)
+          setIsLoading(false)
         }
       }
 
@@ -80,7 +85,7 @@ export default function GlobalState({children}) {
       const {data : onlineNotes, refetch} = useQuery({
         queryKey : ['notes'],
         queryFn : getNotesOnline,
-        staleTime: 10 * 60 * 1000,
+        staleTime: 5 * 60 * 1000,
         enabled: currentUser?.mode === "Online" ? true : false, 
         initialData : null
       })
@@ -113,6 +118,7 @@ export default function GlobalState({children}) {
       }
 
     useEffect(() => {
+      setIsLoading(true)
       if(token) {   // this will happen when it is offline ( sessionToken is stored inside session storage)
         getUserDetails()
       }
@@ -186,6 +192,7 @@ export default function GlobalState({children}) {
             setCurrentUser,
             token,
             clearToken,
+            isLoading,
             getUserDetails,
             getUserDetailsOnline,
             onlineNotes,

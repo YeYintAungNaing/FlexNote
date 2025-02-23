@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react"
+import { useContext, useRef, useState } from "react"
 import { Canvas, Rect, Circle, PencilBrush} from "fabric"
 //import fabric from 'fabric'
 import '../styles/drawingBoard.scss'
@@ -15,70 +15,8 @@ export default function DrawingBoard() {
 
     const [canvas, setCanvas] = useState(null)
     const [canvasSize, setCanvasSize ] = useState({ width : 500, height : 500})
-    const { alertAndLog, showAlert } = useContext(GlobalContext);
-    //const canvasInstanceRef = useRef(null);
-    //const [canvasInitialized, setCanvasInitialized] = useState(false)
-
-    // useEffect(() => {
-    //     if (canvasRef.current) {
-    //         const inintCanvas = new Canvas(canvasRef.current, {
-    //             width : canvasSize.width,
-    //             height : canvasSize.height,
-    //             isDrawingMode : false
-    //         });
-            
-    //         inintCanvas.backgroundColor = "aliceblue"
-    //         inintCanvas.freeDrawingBrush = new PencilBrush(inintCanvas)
-    //         inintCanvas.freeDrawingBrush.color = "#000000"
-    //         inintCanvas.renderAll()
-    //         setCanvas(inintCanvas)
-
-    //         return () => {
-    //             inintCanvas.dispose()
-    //         }  
-    //     }
-    // } ,[])
-
-
-    // async function initializeCanvas() {
-    //     if (!canvasRef.current) return;
-
-    //     // Dispose of existing canvas instance
-    //     if (canvasInstanceRef.current) {
-    //         canvasInstanceRef.current.dispose();
-    //         canvasInstanceRef.current = null;
-    //     }
-
-    //     // Create a new Fabric.js canvas
-    //     const inintCanvas = new Canvas(canvasRef.current, {
-    //         width: canvasSize.width,
-    //         height: canvasSize.height,
-    //         isDrawingMode: false,
-    //     });
-
-    //     inintCanvas.backgroundColor = "aliceblue";
-    //     inintCanvas.freeDrawingBrush = new PencilBrush(inintCanvas);
-    //     inintCanvas.freeDrawingBrush.color = "#000000";
-    //     inintCanvas.renderAll();
-
-    //     try {
-    //         const res = await axios.get("http://localhost:7000/drawingBoard");
-    //         if (res.data) {
-    //             console.log(res.data.drawingData)
-    //             inintCanvas.loadFromJSON(res.data.drawingData, () => {
-    //                 inintCanvas.renderAll();
-    //             });
-    //         }
-    //     } catch (e) {
-    //         console.error("Error loading drawing data:", e.response?.data?.ServerErrorMsg || e.message);
-    //     }
-
-    //     // Store Fabric.js instance in ref & mark as initialized
-    //     canvasInstanceRef.current = inintCanvas;
-    //     setCanvas(inintCanvas)
-    //     setCanvasInitialized(true);
-        
-    // }
+    const {  showAlert } = useContext(GlobalContext);
+    const [isEditing, setIsEditing] = useState(false)
 
 
     async function initializeCanvas() {
@@ -100,7 +38,8 @@ export default function DrawingBoard() {
             const res = await axios.get("http://localhost:7000/drawingBoard");
     
             if (res.data) {
-                console.log("Fetched Data:", res.data.drawingData);
+                //console.log("Fetched Data:", res.data.drawingData);
+                setIsEditing(true)
     
                 await inintCanvas.loadFromJSON(res.data.drawingData)
 
@@ -237,10 +176,17 @@ export default function DrawingBoard() {
                 click
             </button>
         
-             <canvas className="drawing-board" id="canvas" ref={canvasRef}></canvas>
+            <canvas className="drawing-board" id="canvas" ref={canvasRef}></canvas>
             
             <DrawingBoardSetting canvas={canvas}></DrawingBoardSetting>
-            <button className="board-save" onClick={editBoard}>Save</button>
+            {
+                isEditing? (
+                    <button className="board-save" onClick={editBoard}>Save data</button>
+                ) 
+                : (
+                    <button className="board-save" onClick={saveBoard}>Save</button>
+                )
+            }
             <div className="canvas-setting">
             <label>Width: </label>
                 <input

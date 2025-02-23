@@ -3,6 +3,7 @@
     align-items: center;
     height: 80vh;
     justify-content: center;
+    
     .drawing-board{
         border: 1px solid;
     }
@@ -14,8 +15,22 @@
     }
 
     .board-save {
+        
         position: fixed;
-        top: 120px;
+        right: 20px;
+        bottom: 60px;
+        border-radius: 7px;
+        font-size: 19px;
+        text-align: center;
+        padding: 10px;
+        border: 0px;
+        color: white;
+        background-color: rgb(47, 108, 223);
+
+        &:hover{
+            cursor: pointer;
+            transform: scale(1.05);
+        }
     }
 
     .tools-bar{
