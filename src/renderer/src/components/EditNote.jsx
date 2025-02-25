@@ -41,9 +41,11 @@ export default function EditNote() {
         userId : currentUser.id 
        })
        //console.log(response.message)
-       showAlert(response.message, 'success')
+       //showAlert(response.message, 'success')
+       alertAndLog(response.message, 'success')
     }catch(e) {
       console.log(e)
+      //alertAndLog(e.message, 'success')
     }  
   }
 

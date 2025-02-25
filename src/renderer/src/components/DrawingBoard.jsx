@@ -172,9 +172,11 @@ export default function DrawingBoard() {
     
     return (
         <div className="drawing-page">
-            <button onClick={initializeCanvas} >
-                click
-            </button>
+            {!canvas && 
+              <button onClick={initializeCanvas} >
+              click
+          </button>
+            }
         
             <canvas className="drawing-board" id="canvas" ref={canvasRef}></canvas>
             

@@ -1,7 +1,6 @@
 import { useContext, useEffect } from "react";
 import { GlobalContext } from "../context/GlobalState";
 import {  Link, useNavigate } from "react-router-dom";
-import Login from "./Login";
 import "./../styles/Profile.scss"
 import axios from 'axios'
 import coverImage from "../assets/cover.jpg"
@@ -14,17 +13,6 @@ export default function Profile() {
     const queryClient = useQueryClient();
 
     const {currentUser,setCurrentUser, isLoading, clearToken, fetchProfileImage, profileImg, setProfileImg } = useContext(GlobalContext);
-    // function current() {
-    //   try{
-    //     const token = window.localStorage.getItem('sessionToken');
-    //     console.log(token)
-    //   }catch(e) {
-    //       console.log(e)
-    //     }
-    //   }
-    //console.log(currentUser)
-
-    // console.log(currentUser?.profileImgPath)
 
     function logout() {
       setProfileImg(null)
@@ -61,6 +49,7 @@ export default function Profile() {
         console.log(e.response.data.message)
       } 
     }
+    //console.log(profileImg)
 
     useEffect(() => { 
       //console.log('useeffect')
@@ -71,10 +60,12 @@ export default function Profile() {
       if (profileImg || !currentUser ) {
         return
       }
+      //console.log('effect')
       fetchProfileImage()  // this set a new profileImg state  
       //console.log('profile img fetched') 
     }, [currentUser, isLoading]);   // in case currentUser is not updated in time when this useEffect takes place ( re-trigger the useeffect)
-     
+    
+   
     //console.log('outside')
     return (
       <div className="profile">

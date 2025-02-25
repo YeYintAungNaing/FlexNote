@@ -33,4 +33,24 @@ db.run(
   )`
 )
 
+db.run(
+  `CREATE TABLE IF NOT EXISTS activityLogs (
+    logId INTEGER PRIMARY KEY AUTOINCREMENT,
+    logContent,
+    userId,
+    createdAt,
+    logType
+  )`
+)
+
+db.run(
+  `CREATE TABLE IF NOT EXISTS drawingBoard (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId,
+    drawingData
+  )`
+)
+
+
+
 export default db;

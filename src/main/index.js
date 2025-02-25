@@ -285,9 +285,9 @@ ipcMain.handle('log-in', async (_, { userName, password}) => {
           return reject({ message: 'Database error'})
         }
       
-        // when there is no res data after retrieving from dv
+        // when there is no res data after retrieving from db
         else if(!row) {
-           return resolve({ message: 'User not found'})
+           return resolve({ error: 'User not found'})
         }
         // found the user data 
         else{
@@ -295,27 +295,29 @@ ipcMain.handle('log-in', async (_, { userName, password}) => {
           if (matchedPassword) {
             //resolve({ message: `Welcome ${row.userName}`});
 
-            const sessionToken = crypto.randomBytes(32).toString('hex')
+            const sessionToken_ = crypto.randomBytes(32).toString('hex')
 
             db.run(
               'UPDATE users SET sessionToken = ? WHERE id = ?',
-              [sessionToken, row.id],
+              [sessionToken_, row.id],
               (err) => {
                 if (err) {
                   return reject({message : 'failed to save session'})
                 }
                 else {
+                  // eslint-disable-next-line no-unused-vars
+                  const {password, sessionToken, ...other} = row // this row does not have updated token btw
                   return resolve({
-                    message : `Welcome ${row.userName} and your token is ${sessionToken}`,
-                    user : row,
-                    token : sessionToken,
+                    message : `Welcome ${row.userName} and your token is ${sessionToken_}`,
+                    user : other,
+                    token : sessionToken_,
                   })
                 }
               }
             )
           }
           else{
-            return resolve({ message: 'Incorrect password' });
+            return resolve({ error: 'Incorrect password' });
           }
         }
       }
@@ -409,9 +411,10 @@ ipcMain.handle('upload-img', (_, {token, userId, fileName, fileData}) => {  // r
 
 ipcMain.handle('get-userImg', async  (_, {token, userId, imagePath }) => {
   return new Promise((resolve, reject) => {
+    console.log(userId, token)
     db.get('SELECT * FROM users WHERE id = ? and sessionToken = ?',
       [userId, token ], (err, rows) => {
-        if (err) {
+        if (err) {userId, token
           console.error('db error', err);
           return reject(err);  // have to explictly return to terminate
         } 
@@ -450,7 +453,6 @@ ipcMain.handle('verify-token', async (_, token) => {
   })
 })
 
-
 ipcMain.handle('logout-user', async (_, userId) => {
   return new Promise ((resolve, reject) => {
     db.run("UPDATE users set sessionToken = null where id = ?", [userId], (err) => {
@@ -464,5 +466,64 @@ ipcMain.handle('logout-user', async (_, userId) => {
   })
 })
 
+
+ipcMain.handle('create-log', async (_, { token, userId, logContent, createdAt, logType}) => {
+  return new Promise((resolve, reject) => {
+
+    db.get('SELECT * FROM users WHERE id = ? and sessionToken = ?',
+      [userId, token ], (err, rows) => {
+        if (err) {
+          console.error('db error', err);
+          return reject(err);  // have to explictly return to terminate
+        } 
+        if(!rows) {
+          
+          return resolve(new Error('Invalid userss'))
+        }
+
+        db.run(
+          "INSERT INTO activityLogs (logContent, userId, createdAt, logType) VALUES (?, ?, ?, ?) ",
+          [logContent, userId, createdAt, logType ], (err) => {
+            if (err) {
+             console.error('Failed to create log:', err);
+              return reject(err);
+            } else {
+             //resolve({ id: this.lastID }); // Return the ID of the inserted note
+              return resolve({ message: 'log has been created' })
+            }
+          }
+        )
+      }
+    )
+  })
+});
+
+ipcMain.handle('get-log', async (_, {userId, token}) => {
+  return new Promise((resolve, reject) => {
+    
+    db.get('SELECT * FROM users WHERE id = ? and sessionToken = ?',
+     
+      [userId, token ], (err, rows) => {
+        if (err) {
+          console.error('db error', err);
+          return reject(err);  // have to explictly return to terminate
+        } 
+
+        if(!rows) {
+          return resolve({error : "Invalid user"})
+        }
+        console.log('ss')
+        db.all('SELECT * FROM activityLogs where userId = ?', 
+          [userId], (err, rows) => {
+          if (err) {
+            console.error('Failed to get logs:', err);
+            return reject(err);
+          } else {
+            return resolve(rows);
+          }
+        })
+    })
+  })
+});
 
 

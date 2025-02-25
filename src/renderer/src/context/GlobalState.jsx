@@ -7,6 +7,7 @@ import {DateTime} from 'luxon'
 import { useQuery } from '@tanstack/react-query'
 
 
+
 export const GlobalContext = createContext(null);
 
 // eslint-disable-next-line react/prop-types
@@ -52,7 +53,19 @@ export default function GlobalState({children}) {
           setIsLoading(false)
 
         }catch(e) {
-          console.log(e.response.data.message)
+          if(e.response) {   
+            if(e.response.data.ServerErrorMsg) {  
+              //console.log(e.response.data.ServerErrorMsg)
+              showAlert(e.response.data.ServerErrorMsg, "error")
+            }
+            else {
+              console.log(e.message)   
+              showAlert(e.message, "error")
+            }
+          }
+          else{  
+            console.log(e.message)
+          } 
           setCurrentUser(null)
           setIsLoading(false)
         }
@@ -78,6 +91,7 @@ export default function GlobalState({children}) {
             userId : currentUser.id
           })
           setProfileImg(base64Image);
+          console.log('offline img')
         }
       }
 
@@ -140,8 +154,6 @@ export default function GlobalState({children}) {
       message: '',
   });
 
-
-
   function showAlert(message, severity) {
       setAlert({ open: true, severity, message });
     };
@@ -151,16 +163,21 @@ export default function GlobalState({children}) {
   };
 
   function alertAndLog(message, messageType) {
-    showAlert(message, messageType)
-    saveLog(message, messageType)
-  }
-
-
-  async function saveLog(logContent, logType) {
     if (!currentUser) {
       console.log('bruh')
       return
     }
+    showAlert(message, messageType)
+    if (currentUser.mode === "Online") {
+      saveLogOnline(message, messageType)
+    }
+    else {
+      saveLog(message, messageType)
+    } 
+  }
+
+
+  async function saveLogOnline(logContent, logType) {
     try{
       const res = await axios.post(`http://localhost:7000/users/${currentUser.userId}/history`, {
         logContent, 
@@ -175,13 +192,30 @@ export default function GlobalState({children}) {
           console.log(e.response.data.ServerErrorMsg)  // have to access message via data (cause of axios)
         }
         else {
-          console.log(e.message)   // if not from server, directly get message
+          console.log(e.message)   // if not from server, directly get message ( accessing non-existenece end point for exmaple)
         }
       }
       else{  // for other errors (type error and some shit, when the axios request does not get through)
         console.log(e)
       }   
     }  
+  }
+
+  async function saveLog(logContent, logType) {
+    try {
+      const response = await window.electron.createLog({
+        token,
+        userId : currentUser.id,
+        logContent, 
+        createdAt : DateTime.now().toLocaleString(DateTime.DATETIME_FULL),
+        logType 
+      })
+      console.log(response.message)
+     
+    }
+    catch(e) {
+      console.log(e)
+    }
   }
 
 
@@ -191,6 +225,7 @@ export default function GlobalState({children}) {
             currentUser,
             setCurrentUser,
             token,
+            setToken,
             clearToken,
             isLoading,
             getUserDetails,

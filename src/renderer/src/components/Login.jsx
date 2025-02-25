@@ -9,7 +9,7 @@ export default function Login() {
 
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
-    const { setCurrentUser, showAlert, refetch, currentUser} = useContext(GlobalContext);
+    const { setCurrentUser, showAlert, refetch, currentUser, setToken} = useContext(GlobalContext);
     const [selectedMode, setSelectedMode] = useState('Online')
     const navigate = useNavigate()
 
@@ -31,18 +31,21 @@ export default function Login() {
           const response = await window.electron.loginUser({
             userName,
             password
-           })
-          if(response.token) {
+          })
+          if (response.error) {
+            showAlert(response.error, "error")
+            return
+          }
+          if(response.token || response.user) {
             window.localStorage.setItem('sessionToken', response.token)
             console.log('login success')
             setCurrentUser(response.user)
-            
-          }
-          else{
-            console.log( response.message)
+            setToken(response.token)
+            showAlert(response.message)
+            navigate('/')   
           }
         }catch(e) {
-          console.log(e)
+          showAlert("Unexpected error", "error")
         }    
       }
 
@@ -64,7 +67,7 @@ export default function Login() {
             }
             else {
               //console.log(e.message)   
-              showAlert(e.messag, "error")
+              showAlert(e.message, "error")
             }
           }
           else{  

@@ -29,6 +29,22 @@ db.run(
     password TEXT NOT NULL
   )`
 );
+db.run(
+  `CREATE TABLE IF NOT EXISTS activityLogs (
+    logId INTEGER PRIMARY KEY AUTOINCREMENT,
+    logContent,
+    userId,
+    createdAt,
+    logType
+  )`
+);
+db.run(
+  `CREATE TABLE IF NOT EXISTS drawingBoard (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId,
+    drawingData
+  )`
+);
 function createWindow() {
   const mainWindow = new electron.BrowserWindow({
     width: 900,
@@ -254,28 +270,29 @@ electron.ipcMain.handle("log-in", async (_, { userName, password }) => {
           console.error(err);
           return reject({ message: "Database error" });
         } else if (!row) {
-          return resolve({ message: "User not found" });
+          return resolve({ error: "User not found" });
         } else {
           const matchedPassword = bcrypt.compareSync(password, row.password);
           if (matchedPassword) {
-            const sessionToken = crypto.randomBytes(32).toString("hex");
+            const sessionToken_ = crypto.randomBytes(32).toString("hex");
             db.run(
               "UPDATE users SET sessionToken = ? WHERE id = ?",
-              [sessionToken, row.id],
+              [sessionToken_, row.id],
               (err2) => {
                 if (err2) {
                   return reject({ message: "failed to save session" });
                 } else {
+                  const { password: password2, sessionToken, ...other } = row;
                   return resolve({
-                    message: `Welcome ${row.userName} and your token is ${sessionToken}`,
-                    user: row,
-                    token: sessionToken
+                    message: `Welcome ${row.userName} and your token is ${sessionToken_}`,
+                    user: other,
+                    token: sessionToken_
                   });
                 }
               }
             );
           } else {
-            return resolve({ message: "Incorrect password" });
+            return resolve({ error: "Incorrect password" });
           }
         }
       }
@@ -352,6 +369,7 @@ electron.ipcMain.handle("upload-img", (_, { token, userId, fileName, fileData })
 });
 electron.ipcMain.handle("get-userImg", async (_, { token, userId, imagePath }) => {
   return new Promise((resolve, reject) => {
+    console.log(userId, token);
     db.get(
       "SELECT * FROM users WHERE id = ? and sessionToken = ?",
       [userId, token],
@@ -395,5 +413,64 @@ electron.ipcMain.handle("logout-user", async (_, userId) => {
         return resolve({ message: `logout success` });
       }
     });
+  });
+});
+electron.ipcMain.handle("create-log", async (_, { token, userId, logContent, createdAt, logType }) => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT * FROM users WHERE id = ? and sessionToken = ?",
+      [userId, token],
+      (err, rows) => {
+        if (err) {
+          console.error("db error", err);
+          return reject(err);
+        }
+        if (!rows) {
+          return resolve(new Error("Invalid userss"));
+        }
+        db.run(
+          "INSERT INTO activityLogs (logContent, userId, createdAt, logType) VALUES (?, ?, ?, ?) ",
+          [logContent, userId, createdAt, logType],
+          (err2) => {
+            if (err2) {
+              console.error("Failed to create log:", err2);
+              return reject(err2);
+            } else {
+              return resolve({ message: "log has been created" });
+            }
+          }
+        );
+      }
+    );
+  });
+});
+electron.ipcMain.handle("get-log", async (_, { userId, token }) => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT * FROM users WHERE id = ? and sessionToken = ?",
+      [userId, token],
+      (err, rows) => {
+        if (err) {
+          console.error("db error", err);
+          return reject(err);
+        }
+        if (!rows) {
+          return resolve({ error: "Invalid user" });
+        }
+        console.log("ss");
+        db.all(
+          "SELECT * FROM activityLogs where userId = ?",
+          [userId],
+          (err2, rows2) => {
+            if (err2) {
+              console.error("Failed to get logs:", err2);
+              return reject(err2);
+            } else {
+              return resolve(rows2);
+            }
+          }
+        );
+      }
+    );
   });
 });

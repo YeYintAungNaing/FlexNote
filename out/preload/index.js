@@ -14,6 +14,8 @@ electron.contextBridge.exposeInMainWorld("electron", {
   logoutUser: (userId) => electron.ipcRenderer.invoke("logout-user", userId),
   uploadImg: (data) => electron.ipcRenderer.invoke("upload-img", data),
   // {token, userId, fileName, fileData},
-  getUserImg: (data) => electron.ipcRenderer.invoke("get-userImg", data)
+  getUserImg: (data) => electron.ipcRenderer.invoke("get-userImg", data),
+  createLog: (data) => electron.ipcRenderer.invoke("create-log", data),
+  getLog: (userDetails) => electron.ipcRenderer.invoke("get-log", userDetails)
 });
 console.log("Preload script loaded");
