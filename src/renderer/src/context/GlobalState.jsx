@@ -7,7 +7,6 @@ import {DateTime} from 'luxon'
 import { useQuery } from '@tanstack/react-query'
 
 
-
 export const GlobalContext = createContext(null);
 
 // eslint-disable-next-line react/prop-types
@@ -33,14 +32,15 @@ export default function GlobalState({children}) {
               setIsLoading(false)
               //console.log('verify token')
             }
-            else{
-              console.log('invalid token')
+            else if (response.error) {
+              showAlert(response.error, "error")
               localStorage.removeItem('sessionToken') // remove the existing token if the verificaiton process failed
+              setIsLoading(false)
             }
           }
 
         }catch(e) {
-          console.log(e)
+          showAlert("Unexpected error occurs", "error")
         }
       }
 
@@ -85,13 +85,25 @@ export default function GlobalState({children}) {
           setProfileImg(imagePath)
         }
         else{
-          const base64Image = await window.electron.getUserImg({  // using filepath of db to encapsulate the image data that can be used directly on browser
-            token,
-            imagePath,
-            userId : currentUser.id
-          })
-          setProfileImg(base64Image);
-          console.log('offline img')
+          try{
+            const response = await window.electron.getUserImg({  // using filepath of db to encapsulate the image data that can be used directly on browser
+              token,
+              imagePath,
+              userId : currentUser.id
+            })
+            
+            if(response.error) {
+              alertAndLog(response.error)
+            }
+            else{
+              setProfileImg(response);
+            }
+            
+          }
+          catch(e) {
+            showAlert("Unexpected error ocuurs", "error")
+          }
+         
         }
       }
 

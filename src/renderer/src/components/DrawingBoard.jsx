@@ -15,7 +15,7 @@ export default function DrawingBoard() {
 
     const [canvas, setCanvas] = useState(null)
     const [canvasSize, setCanvasSize ] = useState({ width : 500, height : 500})
-    const {  showAlert } = useContext(GlobalContext);
+    const {  showAlert, currentUser, token, alertAndLog } = useContext(GlobalContext);
     const [isEditing, setIsEditing] = useState(false)
 
 
@@ -114,7 +114,18 @@ export default function DrawingBoard() {
         resizeCanvas(newSize.width, newSize.height);
     }
 
-    async function saveBoard(){
+    function saveBoard() {
+        if (currentUser) {
+            if (currentUser.mode === "Online") {
+                saveDrawingDataOnline()
+            }
+            else{
+                saveDrawingData()
+            }
+        }
+    }
+
+    async function saveDrawingDataOnline(){
 
         try{
             const drawingData = canvas.toJSON()
@@ -138,6 +149,28 @@ export default function DrawingBoard() {
             else{  
               console.log(e)
             } 
+        }
+    }
+
+
+    async function saveDrawingData() {
+        try {
+            const drawingData = canvas.toJSON()
+            const response = await window.electron.createDrawingData({
+                token,
+                userId : currentUser.id,
+                drawingData
+            })
+            if (response.error) {
+                alertAndLog(response.error, "error")
+              }
+            else{
+                alertAndLog(response.message, 'success')
+            }
+           
+          }
+          catch(e) {
+            showAlert("Unexpected error occurs", "error")
           }
     }
 
@@ -146,6 +179,12 @@ export default function DrawingBoard() {
 
         try{
             const drawingData = canvas.toJSON()
+            console.log(drawingData)
+            const jsonString = JSON.stringify(drawingData);
+            const sizeInBytes = new Blob([jsonString]).size; // Get size in bytes
+            const sizeInKB = sizeInBytes / 1024; // Convert to KB
+            //const sizeInMB = sizeInKB / 1024; // Convert to MB
+            console.log(sizeInKB)
             const res = await axios.put(`http://localhost:7000/drawingBoard`, {
                 drawingData
             })

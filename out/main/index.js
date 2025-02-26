@@ -99,7 +99,7 @@ electron.ipcMain.handle("save-note", async (_, { token, noteName, content, userI
           return reject(err);
         }
         if (!rows) {
-          return resolve({ message: "Invalid user" });
+          return resolve({ error: "Invalid user" });
         }
         db.get("SELECT * FROM notes where name = ?", [noteName], (err2, rows2) => {
           if (err2) {
@@ -136,7 +136,7 @@ electron.ipcMain.handle("edit-note", async (_, { token, content, noteId, userId 
           return reject(err);
         }
         if (!rows) {
-          return resolve({ message: "Invalid user" });
+          return resolve({ error: "Invalid user" });
         }
         db.run(
           "UPDATE notes SET content = ? WHERE id = ? AND userId = ?",
@@ -146,7 +146,7 @@ electron.ipcMain.handle("edit-note", async (_, { token, content, noteId, userId 
               console.error("Failed to edit note:", err2);
               return reject(err2);
             } else {
-              return resolve({ message: "note has been edited" });
+              return resolve({ message: `note with id ${noteId} has been edited` });
             }
           }
         );
@@ -166,7 +166,7 @@ electron.ipcMain.handle("edit-noteName", async (_, { token, noteName, noteId, us
           return reject(err);
         }
         if (!rows) {
-          return resolve({ message: "Invalid user" });
+          return resolve({ error: "Invalid user" });
         }
         db.get("SELECT * FROM notes where name = ?", [noteName], (err2, rows2) => {
           if (err2) {
@@ -204,7 +204,7 @@ electron.ipcMain.handle("delete-note", async (_, token, noteId, userId) => {
           return reject(err);
         }
         if (!rows) {
-          return resolve({ message: "Invalid user" });
+          return resolve({ error: "Invalid user" });
         }
         db.run(
           "DELETE FROM notes WHERE id = ? AND userId = ?",
@@ -310,20 +310,28 @@ electron.ipcMain.handle("edit-profile", async (_, { token, userName, email, loca
           return reject(err);
         }
         if (!rows) {
-          return resolve({ message: "Invalid user" });
+          return resolve({ error: "Invalid user" });
         }
-        db.run(
-          "UPDATE users SET userName = ?, email = ?, location = ?, gender = ?, dName = ? WHERE id = ?",
-          [userName, email, location, gender, dName, userId],
-          (err2) => {
-            if (err2) {
-              console.error("Failed to edit profile :", err2);
-              return reject(err2);
-            } else {
-              return resolve({ message: "profile has been edited" });
-            }
+        db.get("SELECT * FROM users where userName = ? AND id != ?", [userName], (err2, rows2) => {
+          if (err2) {
+            console.error("db error", err2);
+            return reject(err2);
+          } else if (rows2) {
+            return resolve({ error: "user name is already taken" });
           }
-        );
+          db.run(
+            "UPDATE users SET userName = ?, email = ?, location = ?, gender = ?, dName = ? WHERE id = ?",
+            [userName, email, location, gender, dName, userId],
+            (err3) => {
+              if (err3) {
+                console.error("Failed to edit profile :", err3);
+                return reject(err3);
+              } else {
+                return resolve({ message: "profile has been edited" });
+              }
+            }
+          );
+        });
       }
     );
   });
@@ -339,7 +347,7 @@ electron.ipcMain.handle("upload-img", (_, { token, userId, fileName, fileData })
           return reject(err);
         }
         if (!rows) {
-          return resolve({ message: "Invalid user" });
+          return resolve({ error: "Invalid user" });
         }
         try {
           const uploadPath = path.join(electron.app.getPath("userData"), "images/profileImg");
@@ -379,7 +387,7 @@ electron.ipcMain.handle("get-userImg", async (_, { token, userId, imagePath }) =
           return reject(err);
         }
         if (!rows) {
-          return resolve({ message: "Invalid user" });
+          return resolve({ error: "Invalid user" });
         }
         try {
           const imageBuffer = fs.readFileSync(imagePath);
@@ -397,7 +405,7 @@ electron.ipcMain.handle("verify-token", async (_, token) => {
       if (err) {
         return reject({ message: "database errr" });
       } else if (!row) {
-        return resolve({ message: "Not session" });
+        return resolve({ error: "Invalid session" });
       } else {
         return resolve({ message: "session exists", currentUser: row });
       }
@@ -426,7 +434,7 @@ electron.ipcMain.handle("create-log", async (_, { token, userId, logContent, cre
           return reject(err);
         }
         if (!rows) {
-          return resolve(new Error("Invalid userss"));
+          return resolve({ error: "Invaid user" });
         }
         db.run(
           "INSERT INTO activityLogs (logContent, userId, createdAt, logType) VALUES (?, ?, ?, ?) ",
@@ -467,6 +475,35 @@ electron.ipcMain.handle("get-log", async (_, { userId, token }) => {
               return reject(err2);
             } else {
               return resolve(rows2);
+            }
+          }
+        );
+      }
+    );
+  });
+});
+electron.ipcMain.handle("create-drawingData", async (_, { token, userId, drawingData }) => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT * FROM users WHERE id = ? and sessionToken = ?",
+      [userId, token],
+      (err, rows) => {
+        if (err) {
+          console.error("db error", err);
+          return reject(err);
+        }
+        if (!rows) {
+          return resolve({ error: "Invaid user" });
+        }
+        db.run(
+          "INSERT INTO drawingBoard (drawingData, userId) VALUES (?, ?) ",
+          [drawingData, userId],
+          (err2) => {
+            if (err2) {
+              console.error("Failed to save drawing data:", err2);
+              return reject(err2);
+            } else {
+              return resolve({ message: "drawing data has been saved" });
             }
           }
         );

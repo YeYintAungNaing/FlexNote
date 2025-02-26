@@ -51,7 +51,7 @@ export default function Logs() {
         }
         catch(e) {
             //console.log(e)
-            showAlert("Unexpected error occur", 'error')  // error from electorn backend, type error from frontend  
+            showAlert("Unexpected error occurs", 'error')  // error from electorn backend, type error from frontend  
         }
     }
         

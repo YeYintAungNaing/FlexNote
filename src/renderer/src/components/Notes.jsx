@@ -16,7 +16,7 @@ import axios from 'axios'
 
 export default function Notes() {
 
-    const {currentUser, alertAndLog, onlineNotes, refetch} = useContext(GlobalContext);
+    const {currentUser, token, alertAndLog, onlineNotes, refetch, showAlert} = useContext(GlobalContext);
     const [notes, setNotes] = useState(onlineNotes)
     const navigate = useNavigate()
     const [open, setOpen] = useState(false); // State to control modal visibility
@@ -46,46 +46,21 @@ export default function Notes() {
           //console.log(response)
           setNotes(response)
         }
-        else{
+        else if (response.error){
+          showAlert(response.error, "error")
           setNotes(null)
         }
       }
       catch(e) {
-        console.log(e)
+        setNotes(null)
+        showAlert("Unexpected error occurs", 'error')
       }
     }
-
-    // async function  getNotesOnline() {
-    //   try{
-    //       const response = await axios.get('http://localhost:7000/notes')
-          
-    //       if (response.data.length >  0) {
-    //         setNotes(response.data)
-            
-    //       }
-    //       else{
-    //         setNotes(null)
-    //       }
-
-    //   }
-    //   catch(e) {
-    //     if(e.response) {
-    //       console.log(e.response.data.message)
-    //     }
-    //     else {
-    //       console.log(e)
-    //     }
-    //   }
-    // }
 
     useEffect(()=>{
       
       if(currentUser && currentUser.mode === 'Offline') {
-        getNotes(currentUser.id)
-        
-      }
-      else{
-        return
+        getNotes(currentUser.id)   
       }
       console.log('notes effect')
 
@@ -107,7 +82,7 @@ export default function Notes() {
 
     function delete_(noteId) {
       if (currentUser.mode === "Offline") {
-        //deleteNote(noteId)
+        deleteNote(noteId)
         console.log('offline')
       }
       else{
@@ -115,8 +90,9 @@ export default function Notes() {
       }
     }
 
+    
     async function deleteNoteOnline(noteId) {
-      console.log(noteId)
+      //console.log(noteId)
       try{
         const response = await axios.delete(`http://localhost:7000/notes/${noteId}`)
         alertAndLog(response.data.message, 'success')
@@ -134,20 +110,25 @@ export default function Notes() {
       }
     }
     
-    
-    // async function deleteNote (noteId) {
-    //   //console.log()
-    //   try{
-    //     const response = await window.electron.deleteNote(token, noteId, currentUser.id);
-    //     // console.log('noteId:', noteId, 'Type:', typeof noteId);
-    //     // console.log('userId:', currentUser.id, 'Type:', typeof currentUser.id);
-    //     console.log(response.message)
-    //     getNotes(currentUser.id)
-    //   }
-    //   catch(e) {
-    //     console.log(e)
-    //   }
-    // }
+
+    async function deleteNote (noteId) {
+      try{
+        const response = await window.electron.deleteNote(token, noteId, currentUser.id);
+        // console.log('noteId:', noteId, 'Type:', typeof noteId);
+        // console.log('userId:', currentUser.id, 'Type:', typeof currentUser.id);
+        if (response.error) {
+          alertAndLog(response.error, "error")
+
+        }
+        else { 
+          getNotes(currentUser.id)
+          alertAndLog(response.message, "success")
+        }
+      }
+      catch(e) {
+        showAlert("Unexpected error occurs", 'error')
+      }
+    }
 
     return (
         <div className="notes-page">

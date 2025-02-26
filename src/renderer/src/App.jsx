@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext,  useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -37,6 +37,8 @@ import DrawingBoard from "./components/DrawingBoard";
 
 const drawerWidth = 170;
 
+// Note - this component is rendering on every global state changes 
+
 const App = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const {currentUser} = useContext(GlobalContext);
@@ -61,6 +63,8 @@ const App = () => {
     { text: "testing", icon: <SettingsIcon/>, path: "/setting" },
   ];
 
+ 
+  //console.log(currentUser)
 
   return (
     <>

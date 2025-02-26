@@ -42,7 +42,7 @@ export default function Login() {
             setCurrentUser(response.user)
             setToken(response.token)
             showAlert(response.message)
-            navigate('/')   
+            //navigate('/')   
           }
         }catch(e) {
           showAlert("Unexpected error", "error")

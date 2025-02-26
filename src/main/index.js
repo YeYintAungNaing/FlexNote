@@ -91,7 +91,7 @@ ipcMain.handle('save-note', async (_, { token, noteName, content, userId }) => {
         } 
         if(!rows) {
           
-          return resolve({ message: 'Invalid user' })
+          return resolve({ error: 'Invalid user' })
         }
 
         db.get("SELECT * FROM notes where name = ?", [noteName], (err, rows) => {
@@ -123,6 +123,7 @@ ipcMain.handle('save-note', async (_, { token, noteName, content, userId }) => {
   })
 });
 
+
 ipcMain.handle('edit-note', async (_, {  token, content, noteId,  userId }) => {
   return new Promise((resolve, reject) => {
     
@@ -133,7 +134,7 @@ ipcMain.handle('edit-note', async (_, {  token, content, noteId,  userId }) => {
           return reject(err);  // have to explictly return to terminate
         } 
         if(!rows) {
-          return resolve({ message: 'Invalid user' })
+          return resolve({ error: 'Invalid user' })
         }
 
         db.run(
@@ -143,7 +144,7 @@ ipcMain.handle('edit-note', async (_, {  token, content, noteId,  userId }) => {
               console.error('Failed to edit note:', err);
               return reject(err);
             } else {
-              return resolve({ message: 'note has been edited' })
+              return resolve({ message: `note with id ${noteId} has been edited` })
             }
           }
         )
@@ -163,7 +164,7 @@ ipcMain.handle('edit-noteName', async  (_, {token, noteName, noteId, userId}) =>
           return reject(err);  // have to explictly return to terminate
         } 
         if(!rows) {
-          return resolve({ message: 'Invalid user' })
+          return resolve({ error: 'Invalid user' })
         }
 
         db.get("SELECT * FROM notes where name = ?", [noteName], (err, rows) => {
@@ -204,7 +205,7 @@ ipcMain.handle('delete-note', async (_,  token, noteId, userId ) => {
           return reject(err);  // have to explictly return to terminate
         } 
         if(!rows) {
-          return resolve({ message: 'Invalid user' })
+          return resolve({ error: 'Invalid user' })
         }
 
         db.run(
@@ -335,20 +336,29 @@ ipcMain.handle('edit-profile', async  (_, {token, userName, email, location, gen
           return reject(err);  // have to explictly return to terminate
         } 
         if(!rows) {
-          return resolve({ message: 'Invalid user' })
+          return resolve({ error: 'Invalid user'})
         }
-
-        db.run(
-          'UPDATE users SET userName = ?, email = ?, location = ?, gender = ?, dName = ? WHERE id = ?',
-          [userName, email, location, gender, dName, userId], (err) => {
-            if (err) {
-              console.error('Failed to edit profile :', err);
-              return reject(err);
-            } else {
-              return resolve({ message: 'profile has been edited' })
-            }
+        db.get("SELECT * FROM users where userName = ? AND id != ?", [userName], (err, rows) => {
+          if (err) {
+            console.error('db error', err);
+            return reject(err)
           }
-        )
+          else if(rows){
+            return resolve({error : "user name is already taken"})
+          }
+
+          db.run(
+            'UPDATE users SET userName = ?, email = ?, location = ?, gender = ?, dName = ? WHERE id = ?',
+            [userName, email, location, gender, dName, userId], (err) => {
+              if (err) {
+                console.error('Failed to edit profile :', err);
+                return reject(err);
+              } else {
+                return resolve({ message: 'profile has been edited' })
+              }
+            }
+          )
+        })
       }
     )
   })
@@ -373,7 +383,7 @@ ipcMain.handle('upload-img', (_, {token, userId, fileName, fileData}) => {  // r
         return reject(err);  
       } 
       if(!rows) {
-        return resolve({ message: 'Invalid user' })
+        return resolve({ error: 'Invalid user' })
       } 
 
       try{
@@ -419,7 +429,7 @@ ipcMain.handle('get-userImg', async  (_, {token, userId, imagePath }) => {
           return reject(err);  // have to explictly return to terminate
         } 
         if(!rows) {
-          return resolve({ message: 'Invalid user' })
+          return resolve({ error: 'Invalid user' })
         }
 
         try{
@@ -444,7 +454,7 @@ ipcMain.handle('verify-token', async (_, token) => {
       }
       // what if there is left over token in the db for some reaosn
       else if(!row) {
-        return resolve({ message : 'Not session'})
+        return resolve({ error : 'Invalid session'})
       }
       else{
         return resolve({ message : "session exists", currentUser : row})
@@ -478,7 +488,7 @@ ipcMain.handle('create-log', async (_, { token, userId, logContent, createdAt, l
         } 
         if(!rows) {
           
-          return resolve(new Error('Invalid userss'))
+          return resolve({error : "Invaid user"})
         }
 
         db.run(
@@ -525,5 +535,38 @@ ipcMain.handle('get-log', async (_, {userId, token}) => {
     })
   })
 });
+
+ipcMain.handle('create-drawingData', async (_, { token, userId, drawingData}) => {
+  return new Promise((resolve, reject) => {
+
+    db.get('SELECT * FROM users WHERE id = ? and sessionToken = ?',
+      [userId, token ], (err, rows) => {
+        if (err) {
+          console.error('db error', err);
+          return reject(err);  // have to explictly return to terminate
+        } 
+        if(!rows) {
+          
+          return resolve({error : "Invaid user"})
+        }
+
+        db.run(
+          "INSERT INTO drawingBoard (drawingData, userId) VALUES (?, ?) ",
+          [drawingData, userId ], (err) => {
+            if (err) {
+             console.error('Failed to save drawing data:', err);
+              return reject(err);
+            } else {
+             //resolve({ id: this.lastID }); // Return the ID of the inserted note
+              return resolve({ message: 'drawing data has been saved' })
+            }
+          }
+        )
+      }
+    )
+  })
+});
+
+
 
 

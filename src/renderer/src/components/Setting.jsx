@@ -5,12 +5,13 @@ import '../styles/Setting.scss'
 
 
 
+
 export default function Setting() {
 
    const navigate = useNavigate()
   //const [data, setData] = useState("")
 
- const {alertAndLog, currentUser, setCurrentUser} = useContext(GlobalContext);
+ const {alertAndLog, showAlert, setProfileImg, currentUser, setCurrentUser} = useContext(GlobalContext);
   // function current() {
   //   try{
   //     const token = window.localStorage.getItem('sessionToken');
@@ -91,8 +92,12 @@ export default function Setting() {
     setCurrentUser({...currentUser, mode : 'Online'})
   }
 
+  function alertt() {
+    //setProfileImg('5555')
+    showAlert('dddd', "error")
+  }
 
-  console.log(currentUser)
+  console.log("setting render")
 
 
   //console.log('setting_rendered')
@@ -101,11 +106,14 @@ export default function Setting() {
   return (
     <div className="setting">
       <div>
+        <h2>this page is for testing </h2>
         <button onClick={save}>change current user</button>
         <button onClick={save1}>change current user_</button>
         <button onClick={turnoff}>off</button>
         <button onClick={turnOn}>on</button>
+        
         <button onClick={() => { navigate('/logs')}}></button>
+        <button onClick={alertt}>Alert</button>
       </div>
         
         <button onClick={() => alertAndLog('test', 'success')}></button>

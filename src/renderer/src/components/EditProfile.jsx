@@ -30,13 +30,17 @@ export default function EditProfile() {
                 userId : currentUser.id
             })
 
-            console.log(response.message)
+            if (response.error) {
+                alertAndLog(response.error, "error")
+            }
+            else {
+                getUserDetails()
+                alertAndLog(response.message, 'success')
+            }
 
         }catch(e) {
-            console.log(e)
-        }
-        await getUserDetails()
-        showAlert('successfully edited profile', 'success')   
+            showAlert("Unexpected error occur", "error")
+        } 
     }
 
     async function editProfileOnline() {
@@ -62,10 +66,10 @@ export default function EditProfile() {
                   //console.log(e.message)   
                   alertAndLog(e.message, "error")
                 }
-              }
-              else{  
+            }
+            else{  
                 console.log(e)
-              }
+            }
         }
     }
 

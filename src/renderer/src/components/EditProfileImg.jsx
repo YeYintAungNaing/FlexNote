@@ -116,15 +116,19 @@ export default function EditProfileImg() {
               userId : currentUser.id
             });
 
-            await getUserDetails()    // get updated user details
-            setProfileImg(null)
-            setFile('')
-            console.log(response.message)
-            showAlert(response.message, 'success')
+            if (response.error) {
+              alertAndLog(response.error, "error")
+            }
+            else{
+              await getUserDetails()    // get updated user details
+              setProfileImg(null)
+              setFile('')
+              alertAndLog(response.message, 'success')
+            }
           }    
         }
         catch(e) {
-          console.log(e)
+          showAlert('Unexpected error occurs', "error")
         }
     }
 

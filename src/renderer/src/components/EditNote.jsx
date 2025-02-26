@@ -21,7 +21,7 @@ export default function EditNote() {
 
   const [noteName, setNoteName] = useState(location.state.name ? location.state.name : null )
   const [content, setContent] = useState(location.state.content ? location.state.content : null )
-  const {currentUser, token, showAlert, alertAndLog} = useContext(GlobalContext);
+  const {currentUser, token, showAlert, alertAndLog, refetch} = useContext(GlobalContext);
   const [open, setOpen] = useState(false)
 
   const handleOpen = () => setOpen(true); // Open modal
@@ -39,13 +39,17 @@ export default function EditNote() {
         content : content,
         noteId : location.state.id,
         userId : currentUser.id 
-       })
-       //console.log(response.message)
-       //showAlert(response.message, 'success')
-       alertAndLog(response.message, 'success')
+      })
+
+      if (response.error) {
+        alertAndLog(response.error, "error")
+      }
+      else{
+        alertAndLog(response.message, 'success')
+      }
     }catch(e) {
-      console.log(e)
-      //alertAndLog(e.message, 'success')
+      //console.log(e)
+      showAlert('Unexpected error occurs', "error")
     }  
   }
 
@@ -57,15 +61,17 @@ export default function EditNote() {
       })
       //console.log(response.data.message)
       alertAndLog(response.data.message, "success")
+      refetch()
     }
     catch(e) {
       if(e.response) {   
         if(e.response.data.ServerErrorMsg) {  
           //console.log(e.response.data.ServerErrorMsg)
+          
           alertAndLog(e.response.data.ServerErrorMsg, "error")
         }
         else {
-          //console.log(e.message)   
+          //console.log(e.message)  
           alertAndLog(e.message, "error")
         }
       }
@@ -82,19 +88,19 @@ export default function EditNote() {
         noteName : noteName,
         noteId : location.state.id,
         userId : currentUser.id 
-       })
+      })
 
-       if (response.message) {
-        console.log(response.message)
-       }
-       else{
-        setNoteName(location.state.name)
-        console.log(response.error)
-       }
+      if (response.error) {
+        alertAndLog(response.error, "error")
+      }
+      else{
+        alertAndLog(response.message, 'success')
+      }
        
-       setOpen(false)
+      setOpen(false)
     }catch(e) {
-      console.log(e)
+      showAlert('Unexpected error occurs', "error")
+      setOpen(false)
     }
   }
 
@@ -106,6 +112,7 @@ export default function EditNote() {
         })
         //console.log(response.data.message)
         alertAndLog(response.data.message, "success")
+        refetch()
       }
       catch(e) {
         if(e.response) {   
