@@ -17,6 +17,8 @@ electron.contextBridge.exposeInMainWorld("electron", {
   getUserImg: (data) => electron.ipcRenderer.invoke("get-userImg", data),
   createLog: (data) => electron.ipcRenderer.invoke("create-log", data),
   getLog: (userDetails) => electron.ipcRenderer.invoke("get-log", userDetails),
-  createDrawingData: (data) => electron.ipcRenderer.invoke("create-drawingData", data)
+  createDrawingData: (data) => electron.ipcRenderer.invoke("create-drawingData", data),
+  getDrawingData: (data) => electron.ipcRenderer.invoke("get-drawingData", data),
+  editDrawingData: (data) => electron.ipcRenderer.invoke("edit-drawingData", data)
 });
 console.log("Preload script loaded");

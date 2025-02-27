@@ -17,7 +17,8 @@ contextBridge.exposeInMainWorld('electron', {
   createLog : (data) => ipcRenderer.invoke('create-log', data),
   getLog : (userDetails) => ipcRenderer.invoke('get-log', userDetails),
   createDrawingData : (data) => ipcRenderer.invoke('create-drawingData', data),
-
+  getDrawingData : (data) => ipcRenderer.invoke('get-drawingData', data),
+  editDrawingData : (data) => ipcRenderer.invoke('edit-drawingData', data),
  });
 
 console.log('Preload script loaded');

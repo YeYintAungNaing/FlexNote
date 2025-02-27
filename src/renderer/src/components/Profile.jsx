@@ -131,7 +131,9 @@ export default function Profile() {
               </div> 
               <div className="buttons_">
                 <Link to='/editProfile'><button>Edit profile details</button></Link> 
-                <Link to='/passwordReset'><button>Reset passoword</button></Link> 
+                {
+                  currentUser.mode === "Online" &&  <Link to='/passwordReset' ><button>Reset passoword</button></Link> 
+                }
                 <button className="logout" onClick={logout}>Logout</button>
               </div> 
             </div>

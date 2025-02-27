@@ -33,24 +33,67 @@ export default function DrawingBoard() {
         inintCanvas.freeDrawingBrush = new PencilBrush(inintCanvas);
         inintCanvas.freeDrawingBrush.color = "#000000";
         inintCanvas.renderAll();
-    
+        
+        if (currentUser.mode === "Online") {
+            getDrawingDataOnline(inintCanvas)
+            
+        }
+        else {
+            getDrawingData_(inintCanvas)
+            
+        }  
+        setCanvas(inintCanvas)
+    }
+
+    async function getDrawingData_(inintCanvas) {
+        try {
+            const response = await window.electron.getDrawingData({
+                token,
+                userId : currentUser.id,
+            })
+            if (response.error) {
+                alertAndLog(response.error, "error")
+              }
+            else if(response.drawingData) {
+                setIsEditing(true)
+                const drawingDataObj = JSON.parse(response.drawingData)
+                await inintCanvas.loadFromJSON(drawingDataObj)
+                inintCanvas.renderAll();
+            }
+
+        }
+        catch(e) {
+            console.log(e)
+            showAlert("Unexpected error occurs", "error")
+        }
+    }
+
+    async function getDrawingDataOnline(inintCanvas) {
         try {
             const res = await axios.get("http://localhost:7000/drawingBoard");
     
-            if (res.data) {
+            if (res.data.drawingData) {
                 //console.log("Fetched Data:", res.data.drawingData);
                 setIsEditing(true)
-    
                 await inintCanvas.loadFromJSON(res.data.drawingData)
-
-                inintCanvas.renderAll();
-                 
+                inintCanvas.renderAll();         
             }
+            
         } catch (e) {
-            console.error("Error loading drawing data:", e.response?.data?.ServerErrorMsg || e.message);
+            if(e.response) {   
+                if(e.response.data.ServerErrorMsg) {   // response always have data 
+                  //console.log(e.response.data.ServerErrorMsg)
+                  showAlert(e.response.data.ServerErrorMsg, "error")
+                }
+                else {
+                  //console.log(e)   
+                  showAlert(e.message, "error")
+                }
+            }
+              else{  
+                console.log(e)
+            }
         }
-    
-        setCanvas(inintCanvas);
     }
     
 
@@ -115,6 +158,10 @@ export default function DrawingBoard() {
     }
 
     function saveBoard() {
+        if (!canvas) {
+            showAlert('Plese initiate the canvas', "sucess")
+            return
+        }
         if (currentUser) {
             if (currentUser.mode === "Online") {
                 saveDrawingDataOnline()
@@ -152,10 +199,11 @@ export default function DrawingBoard() {
         }
     }
 
-
     async function saveDrawingData() {
         try {
             const drawingData = canvas.toJSON()
+            // console.log(drawingData)
+            // console.log(canvas)
             const response = await window.electron.createDrawingData({
                 token,
                 userId : currentUser.id,
@@ -168,14 +216,23 @@ export default function DrawingBoard() {
                 alertAndLog(response.message, 'success')
             }
            
-          }
-          catch(e) {
+        }
+        catch(e) {
             showAlert("Unexpected error occurs", "error")
-          }
+        }
     }
 
 
-    async function editBoard(){
+    function editBoard() {
+        if (currentUser.mode === "Online") {
+            editBoardOnline()
+        }
+        else{
+           editBoard_()
+        }
+    }
+
+    async function editBoardOnline(){
 
         try{
             const drawingData = canvas.toJSON()
@@ -205,9 +262,32 @@ export default function DrawingBoard() {
             else{  
               console.log(e)
             } 
-          }
+        }
     }
 
+
+    async function editBoard_() {
+        try {
+            const drawingData = canvas.toJSON()
+            // console.log(drawingData)
+            // console.log(canvas)
+            const response = await window.electron.editDrawingData({
+                token,
+                userId : currentUser.id,
+                drawingData
+            })
+            if (response.error) {
+                alertAndLog(response.error, "error")
+              }
+            else{
+                alertAndLog(response.message, 'success')
+            }
+           
+        }
+        catch(e) {
+            showAlert("Unexpected error occurs", "error")
+        }
+    }
     
     return (
         <div className="drawing-page">

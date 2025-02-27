@@ -284,7 +284,7 @@ electron.ipcMain.handle("log-in", async (_, { userName, password }) => {
                 } else {
                   const { password: password2, sessionToken, ...other } = row;
                   return resolve({
-                    message: `Welcome ${row.userName} and your token is ${sessionToken_}`,
+                    message: `Welcome ${row.userName}`,
                     user: other,
                     token: sessionToken_
                   });
@@ -495,15 +495,75 @@ electron.ipcMain.handle("create-drawingData", async (_, { token, userId, drawing
         if (!rows) {
           return resolve({ error: "Invaid user" });
         }
+        const drawingDataString = JSON.stringify(drawingData);
         db.run(
           "INSERT INTO drawingBoard (drawingData, userId) VALUES (?, ?) ",
-          [drawingData, userId],
+          [drawingDataString, userId],
           (err2) => {
             if (err2) {
               console.error("Failed to save drawing data:", err2);
               return reject(err2);
             } else {
               return resolve({ message: "drawing data has been saved" });
+            }
+          }
+        );
+      }
+    );
+  });
+});
+electron.ipcMain.handle("get-drawingData", async (_, { token, userId }) => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT * FROM users WHERE id = ? and sessionToken = ?",
+      [userId, token],
+      (err, rows) => {
+        if (err) {
+          console.error("db error", err);
+          return reject(err);
+        }
+        if (!rows) {
+          return resolve({ error: "Invaid user" });
+        }
+        db.get(
+          "SELECT * FROM drawingBoard where userId = ? ",
+          [userId],
+          (err2, row) => {
+            if (err2) {
+              console.error("Failed to get the drawing data:", err2);
+              return reject(err2);
+            } else {
+              return resolve(row);
+            }
+          }
+        );
+      }
+    );
+  });
+});
+electron.ipcMain.handle("edit-drawingData", async (_, { token, userId, drawingData }) => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT * FROM users WHERE id = ? and sessionToken = ?",
+      [userId, token],
+      (err, rows) => {
+        if (err) {
+          console.error("db error", err);
+          return reject(err);
+        }
+        if (!rows) {
+          return resolve({ error: "Invaid user" });
+        }
+        const drawingDataString = JSON.stringify(drawingData);
+        db.run(
+          "UPDATE drawingBoard SET drawingData = ? WHERE userId = ?",
+          [drawingDataString, userId],
+          (err2) => {
+            if (err2) {
+              console.error("Failed to edit drawing data:", err2);
+              return reject(err2);
+            } else {
+              return resolve({ message: "drawing data has been edited" });
             }
           }
         );

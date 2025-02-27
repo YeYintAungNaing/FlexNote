@@ -309,7 +309,7 @@ ipcMain.handle('log-in', async (_, { userName, password}) => {
                   // eslint-disable-next-line no-unused-vars
                   const {password, sessionToken, ...other} = row // this row does not have updated token btw
                   return resolve({
-                    message : `Welcome ${row.userName} and your token is ${sessionToken_}`,
+                    message : `Welcome ${row.userName}`,
                     user : other,
                     token : sessionToken_,
                   })
@@ -463,6 +463,7 @@ ipcMain.handle('verify-token', async (_, token) => {
   })
 })
 
+
 ipcMain.handle('logout-user', async (_, userId) => {
   return new Promise ((resolve, reject) => {
     db.run("UPDATE users set sessionToken = null where id = ?", [userId], (err) => {
@@ -508,6 +509,7 @@ ipcMain.handle('create-log', async (_, { token, userId, logContent, createdAt, l
   })
 });
 
+
 ipcMain.handle('get-log', async (_, {userId, token}) => {
   return new Promise((resolve, reject) => {
     
@@ -550,9 +552,11 @@ ipcMain.handle('create-drawingData', async (_, { token, userId, drawingData}) =>
           return resolve({error : "Invaid user"})
         }
 
+        const drawingDataString = JSON.stringify(drawingData)
+
         db.run(
           "INSERT INTO drawingBoard (drawingData, userId) VALUES (?, ?) ",
-          [drawingData, userId ], (err) => {
+          [drawingDataString, userId ], (err) => {
             if (err) {
              console.error('Failed to save drawing data:', err);
               return reject(err);
@@ -566,6 +570,73 @@ ipcMain.handle('create-drawingData', async (_, { token, userId, drawingData}) =>
     )
   })
 });
+
+
+ipcMain.handle('get-drawingData', async (_, { token, userId}) => {
+  return new Promise((resolve, reject) => {
+
+    db.get('SELECT * FROM users WHERE id = ? and sessionToken = ?',
+      [userId, token ], (err, rows) => {
+        if (err) {
+          console.error('db error', err);
+          return reject(err);  // have to explictly return to terminate
+        } 
+        if(!rows) {
+          
+          return resolve({error : "Invaid user"})
+        }
+
+        db.get(
+          "SELECT * FROM drawingBoard where userId = ? ",
+          [ userId ], (err, row) => {
+            if (err) {
+             console.error('Failed to get the drawing data:', err);
+              return reject(err);
+            } else {
+             //resolve({ id: this.lastID }); // Return the ID of the inserted note
+              return resolve(row)
+            }
+          }
+        )
+      }
+    )
+  })
+});
+
+
+ipcMain.handle('edit-drawingData', async (_, {token, userId, drawingData}) => {
+  return new Promise((resolve, reject) => {
+
+    db.get('SELECT * FROM users WHERE id = ? and sessionToken = ?',
+      [userId, token ], (err, rows) => {
+        if (err) {
+          console.error('db error', err);
+          return reject(err);  // have to explictly return to terminate
+        } 
+        if(!rows) {
+          
+          return resolve({error : "Invaid user"})
+        }
+
+        const drawingDataString = JSON.stringify(drawingData)
+
+        db.run(
+          "UPDATE drawingBoard SET drawingData = ? WHERE userId = ?",
+          [drawingDataString, userId ], (err) => {
+            if (err) {
+             console.error('Failed to edit drawing data:', err);
+              return reject(err);
+            } else {
+             //resolve({ id: this.lastID }); // Return the ID of the inserted note
+              return resolve({ message: 'drawing data has been edited' })
+            }
+          }
+        )
+      }
+    )
+  })
+});
+
 
 
 

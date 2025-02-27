@@ -122,7 +122,7 @@ export default function GlobalState({children}) {
             const response = await axios.get('http://localhost:7000/notes')
             
             if (response.data.length >  0) {
-              console.log('notes fetched')
+              //console.log('notes fetched')
               return response.data
               
             }
