@@ -15,9 +15,11 @@ import crypto from 'crypto'
 const app = express()
 app.use(express.json({ limit: "5mb" }))
 app.use(cookieParser())
+const MY_WEBSITE = process.env.MY_WEBSITE;
+const  MY_WEBSITE_2 =  process.env.MY_WEBSITE_2
 
 app.use(cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173", MY_WEBSITE, MY_WEBSITE_2],
     credentials: true
 }))
 
@@ -129,6 +131,8 @@ app.post("/auth/login", (req, res) => {
         const {password, ...other} = userData  
         res.cookie('jwt_token', token, {    // can be found inside cookie session in browser
             httpOnly:true,
+            secure: true,  // requires HTTPS
+            sameSite : "None",  // Allows the cookie to be sent in cross-site requests (different domain, subdomain or protocols)
             maxAge: 3600 * 10 * 1000 
         }).status(200).json(other)     
     }

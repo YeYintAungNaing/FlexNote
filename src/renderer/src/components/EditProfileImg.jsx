@@ -72,7 +72,7 @@ export default function EditProfileImg() {
 
         
         const res = await axios.put(`http://localhost:7000/users/${currentUser.userId}/profileImage`, {
-          image_url : resObj.url
+          image_url : resObj.secure_url
         })
         await getUserDetailsOnline()    // get updated user details
         setProfileImg(null)
