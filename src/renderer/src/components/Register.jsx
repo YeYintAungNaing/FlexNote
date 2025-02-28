@@ -13,13 +13,14 @@ export default function Register() {
     const [selectedMode, setSelectedMode] = useState('Online')
     
     
-    
     async function register() {
 
         try{
           const response = await window.electron.createUser({
             userName,
-            password
+            password,
+            mode : selectedMode,
+            timeStamp : DateTime.now().toLocaleString(DateTime.DATE_FULL)
            })
          
           if (response.error) {
@@ -27,7 +28,7 @@ export default function Register() {
             showAlert(response.error, 'error')
           }
           else{
-            console.log(response.message)
+            //console.log(response.message)
             showAlert(response.message, 'success')
           }
 
@@ -49,13 +50,18 @@ export default function Register() {
             navigate('/login')
         }
         catch(e) {
-          if(e.response.data.ServerErrorMsg) {
-            //console.log(e.response.data.ServerErrorMsg)
-            showAlert(e.response.data.ServerErrorMsg, 'error')
+          if(e.response) {   
+            if(e.response.data.ServerErrorMsg) {  
+              //console.log(e.response.data.ServerErrorMsg)
+              showAlert(e.response.data.ServerErrorMsg, "error")
+            }
+            else {
+              //console.log(e.message)   
+              showAlert(e.message, "error")
+            }
           }
-          else {
-            //console.log(e.message)
-            showAlert(e.message, 'error')
+          else{  
+            console.log(e)
           }
         }
       }

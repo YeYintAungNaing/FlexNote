@@ -57,7 +57,7 @@ app.post('/auth/register', (req, res) => {
         const duplicate = db.prepare("SELECT * FROM users where userName = ? ").get(userName);
         
         if (duplicate) {
-            res.status(409).json({ message: "Username is already taken" });
+            res.status(409).json({ ServerErrorMsg: "Username is already taken" });
             return
         }
 
@@ -69,7 +69,7 @@ app.post('/auth/register', (req, res) => {
         res.status(200).json({message : "Successfully registered"})
     }
     catch(e) {
-        res.status(500).json({ message: "Internal Server Error" })
+        res.status(500).json({ServerErrorMsg: "Internal Server Error" })
         //console.log(e)
     }
 })
@@ -80,19 +80,19 @@ app.get('/auth/verifyToken' , (req, res) => {
         const token = req.cookies?.jwt_token;
 
         if (!token){
-            res.status(401).json({ message: "Not logged in" });
+            res.status(401).json({ ServerErrorMsg: "Not logged in" });
             return
         }
 
         jwt.verify(token, "jwtkey", (err, decoded) => {
-            if (err) return res.status(403).json({ message: "Invalid token" });
+            if (err) return res.status(403).json({ ServerErrorMsg: "Invalid token" });
             // 
             //console.log(typeof(decoded.userId))
         
             const userData = db.prepare("SELECT * FROM users where userId = ?").get(decoded.userId);  //  userId when the token is first created 
             //console.log("row", userData)
             if(!userData) {
-                res.status(404).json({ message: "no valid user data" });
+                res.status(404).json({ ServerErrorMsg: "no valid user data" });
                 return
             }
             // eslint-disable-next-line no-unused-vars
@@ -102,7 +102,7 @@ app.get('/auth/verifyToken' , (req, res) => {
         });
     }
     catch(e) {
-        res.status(500).json({ message: "Internal Server Error" })
+        res.status(500).json({ ServerErrorMsg: "Internal Server Error" })
         console.log(e)
     }
 })
@@ -252,7 +252,7 @@ app.post('/users/:id/generateCode',  (req, res) => {
             }
 
             const code = crypto.randomInt(100000, 999999).toString()
-            const expirationTime = 3 * 60 * 1000; 
+            const expirationTime = 2 * 60 * 1000; 
             const expiresAt = new Date(Date.now() + expirationTime).toISOString();
             const email = req.body.email
 

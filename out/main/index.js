@@ -234,7 +234,7 @@ electron.ipcMain.handle("fetch-notes", async (_, userId) => {
     });
   });
 });
-electron.ipcMain.handle("create-user", async (_, { userName, password }) => {
+electron.ipcMain.handle("create-user", async (_, { userName, password, mode, timeStamp }) => {
   return new Promise((resolve, reject) => {
     db.get("SELECT * FROM users where userName = ?", [userName], (err, rows) => {
       if (err) {
@@ -246,8 +246,8 @@ electron.ipcMain.handle("create-user", async (_, { userName, password }) => {
       const salt = bcrypt.genSaltSync(10);
       const hashedPassword = bcrypt.hashSync(password, salt);
       db.run(
-        "INSERT INTO users (userName, password) VALUES (?, ?)",
-        [userName, hashedPassword],
+        "INSERT INTO users (userName, password, mode, createdAt) VALUES (?, ?, ?, ?)",
+        [userName, hashedPassword, mode, timeStamp],
         (err2) => {
           if (err2) {
             console.error("faled to create user account_", err2);

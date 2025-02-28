@@ -33,15 +33,20 @@ export default function DrawingBoardSetting({canvas}) {
 
     function handleObjectSelection(object) {
         if (!object) return
-        console.log('selecyed')
+        console.log('selected')
         setSelectedObject(object)
-        setColor(object.fill)
+
+        if (object.type === "path") {
+            setColor(object.stroke)
+        }
+        else{
+            setColor(object.fill)
+        }     
     }
 
    function clearSettings() {
         setColor("")  
     }
-
 
     function handleColorChange(e) {
         const value = e.target.value   

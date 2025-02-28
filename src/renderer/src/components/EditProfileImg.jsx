@@ -15,7 +15,7 @@ export default function EditProfileImg() {
             showAlert, 
             alertAndLog 
           } = useContext(GlobalContext);
-    const MAX_FILE_SIZE =  7 * 1024 * 1024
+    const MAX_FILE_SIZE =  5 * 1024 * 1024
     const allowedFileTypes = ["image/jpeg", "image/png"]
     
     //const [previewImg, setPreviewImg] = useState()
@@ -33,7 +33,7 @@ export default function EditProfileImg() {
       }
 
       if (file.size > MAX_FILE_SIZE ) {
-        console.log('Only allow file size under 7mb')
+        console.log('Only allow file size under 5mb')
         setFile("")
         return
       }

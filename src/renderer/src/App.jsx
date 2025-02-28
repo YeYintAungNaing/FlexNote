@@ -1,4 +1,4 @@
-import { useContext,  useState } from "react";
+import { useContext,  useMemo,  useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -54,14 +54,14 @@ const App = () => {
     background: 'aliceblue'
   };
 
-  const drawerContent = [
-    { text: currentUser?.dName || 'Profile', icon: <AccountCircleIcon/>,path: "/" }, 
-    { text: "Notes", icon: <StickyNote2Icon/>, path: "/notes" },
+  const drawerContent = useMemo(() => [
+    { text: currentUser?.dName || "Profile", icon: <AccountCircleIcon />, path: "/" },
+    { text: "Notes", icon: <StickyNote2Icon />, path: "/notes" },
     { text: "Create", icon: <NoteAddIcon />, path: "/createNote" },
     { text: "Board", icon: <DrawIcon />, path: "/drawingBoard" },
-    { text: "Logs", icon: <HistoryIcon/>, path: "/logs" },
-    { text: "testing", icon: <SettingsIcon/>, path: "/setting" },
-  ];
+    { text: "Logs", icon: <HistoryIcon />, path: "/logs" },
+    { text: "Settings", icon: <SettingsIcon />, path: "/setting" },
+  ], [currentUser]);
 
  
   //console.log(currentUser)

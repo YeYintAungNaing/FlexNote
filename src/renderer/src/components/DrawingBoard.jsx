@@ -19,8 +19,14 @@ export default function DrawingBoard() {
     const [isEditing, setIsEditing] = useState(false)
 
 
+    function getCanvasSize(object) {
+        const jsonString = JSON.stringify(object);
+        const sizeInBytes = new Blob([jsonString]).size; 
+        return sizeInBytes / 1024;   // return in KB
+    }
+
     async function initializeCanvas() {
-        if (!canvasRef.current) return;
+        if (!canvasRef.current || !currentUser) return;
     
         // Create Fabric.js canvas
         const inintCanvas = new Canvas(canvasRef.current, {
@@ -163,6 +169,14 @@ export default function DrawingBoard() {
             return
         }
         if (currentUser) {
+            const drawingData = canvas.toJSON()
+            const canvasSize = getCanvasSize(drawingData)
+            console.log(canvasSize, "KB")
+            if (canvasSize > 5 * 1024 * 1024 ) {
+                showAlert("Canvas file size exceeds mb", "error")
+                return
+            }
+
             if (currentUser.mode === "Online") {
                 saveDrawingDataOnline()
             }
@@ -224,6 +238,14 @@ export default function DrawingBoard() {
 
 
     function editBoard() {
+        const drawingData = canvas.toJSON()
+        const canvasSize = getCanvasSize(drawingData)
+        console.log(canvasSize, "KB")
+        if (canvasSize > 5 * 1024 * 1024 ) {  
+            showAlert("Canvas file size exceeds mb", "error")
+            return
+        }
+
         if (currentUser.mode === "Online") {
             editBoardOnline()
         }
@@ -237,11 +259,6 @@ export default function DrawingBoard() {
         try{
             const drawingData = canvas.toJSON()
             console.log(drawingData)
-            const jsonString = JSON.stringify(drawingData);
-            const sizeInBytes = new Blob([jsonString]).size; // Get size in bytes
-            const sizeInKB = sizeInBytes / 1024; // Convert to KB
-            //const sizeInMB = sizeInKB / 1024; // Convert to MB
-            console.log(sizeInKB)
             const res = await axios.put(`http://localhost:7000/drawingBoard`, {
                 drawingData
             })

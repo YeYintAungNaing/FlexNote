@@ -241,7 +241,7 @@ ipcMain.handle('fetch-notes', async (_, userId) => {
 
 
 // create user account
-ipcMain.handle('create-user', async (_, { userName, password}) => {
+ipcMain.handle('create-user', async (_, { userName, password, mode, timeStamp }) => {
   return new Promise((resolve, reject) => {
 
     db.get("SELECT * FROM users where userName = ?", [userName], (err, rows) => {
@@ -257,8 +257,8 @@ ipcMain.handle('create-user', async (_, { userName, password}) => {
       const hashedPassword = bcrypt.hashSync(password, salt);
 
       db.run(
-        'INSERT INTO users (userName, password) VALUES (?, ?)' ,
-        [userName, hashedPassword], (err) => {
+        'INSERT INTO users (userName, password, mode, createdAt) VALUES (?, ?, ?, ?)' ,
+        [userName, hashedPassword, mode, timeStamp ], (err) => {
           if (err) {
             console.error('faled to create user account_', err)
             return reject(err)

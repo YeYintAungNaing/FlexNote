@@ -30,7 +30,7 @@ export default function ResetPassword() {
                   showAlert(e.response.data.ServerErrorMsg, "error") 
                 }
                 else {
-                  console.log(e.message)   
+                  //console.log(e.message)   
                   showAlert(e.message, "error")
                 }
               }
@@ -52,37 +52,42 @@ export default function ResetPassword() {
         catch(e) {
             if(e.response) {   
                 if(e.response.data.ServerErrorMsg) {  
-                  console.log(e.response.data.ServerErrorMsg)
-                  //showAlert(e.response.data.ServerErrorMsg, "error") 
+                  //console.log(e.response.data.ServerErrorMsg)
+                  showAlert(e.response.data.ServerErrorMsg, "error") 
                 }
                 else {
-                  console.log(e.message)   
-                  //showAlert(e.messag, "error")
+                  //console.log(e.message)   
+                  showAlert(e.messag, "error")
                 }
-              }
-              else{  
+            }
+            else{  
                 console.log(e)
-              } 
+            } 
+            setToggleInput(false)
         }
     }
 
     async function resetPassword() {
+        if (password.length < 3 || password.length > 16) {
+            showAlert('password must be between 2 and 16 characters', 'error')
+            return
+        }
         try{
             const res = await axios.put(`http://localhost:7000/users/${currentUser.userId}/resetPassword`, {
                 password
             })
-            showAlert(res.data.message)
+            alertAndLog(res.data.message, "success")
             
         }   
        catch(e) {
             if(e.response) {   
                 if(e.response.data.ServerErrorMsg) {  
                     //console.log(e.response.data.ServerErrorMsg)
-                    showAlert(e.response.data.ServerErrorMsg, "error") 
+                    alertAndLog(e.response.data.ServerErrorMsg, "error") 
                 }
                 else{
                 //console.log(e.message)   
-                showAlert(e.messag, "error")
+                alertAndLog(e.messag, "error")
                 }
             }
             else{  
