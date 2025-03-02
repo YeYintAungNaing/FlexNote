@@ -42,6 +42,9 @@ export default function Profile() {
       try{
         const response =  await axios.post('http://localhost:7000/auth/logout')
         setCurrentUser(null)
+        window.localStorage.removeItem('userData')
+        window.localStorage.removeItem('tokenExpirationTime')
+        
         queryClient.removeQueries(['notes']);
         console.log(response.data.message)
       }

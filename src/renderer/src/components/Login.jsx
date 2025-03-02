@@ -9,7 +9,7 @@ export default function Login() {
 
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
-    const { setCurrentUser, showAlert, refetch, currentUser, setToken} = useContext(GlobalContext);
+    const { setCurrentUser, showAlert, currentUser, setToken} = useContext(GlobalContext);
     const [selectedMode, setSelectedMode] = useState('Online')
     const navigate = useNavigate()
 
@@ -52,12 +52,13 @@ export default function Login() {
       async function loginOnline() {
         try{
           const response = await axios.post("http://localhost:7000/auth/login", {userName, password});
-
-          setCurrentUser(response.data)
+          const { expirationTime, ...userData} = response.data
+          setCurrentUser(userData)
+          localStorage.setItem('userData', JSON.stringify(userData));
+          localStorage.setItem('tokenExpirationTime', expirationTime);
           showAlert("Login scuuess", "success")
-          refetch()
+          //refetch() 
           navigate('/')
-         
             
         }catch(e) {
           if(e.response) {   

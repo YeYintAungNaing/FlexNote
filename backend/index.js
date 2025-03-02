@@ -19,13 +19,13 @@ const MY_WEBSITE = process.env.MY_WEBSITE;
 const  MY_WEBSITE_2 =  process.env.MY_WEBSITE_2
 
 app.use(cors({
-    origin: ["http://localhost:5173", MY_WEBSITE, MY_WEBSITE_2],
+    origin: ["http://localhost:5173", MY_WEBSITE, MY_WEBSITE_2, "http://localhost:5174"],
     credentials: true
 }))
 
 const limiter = rateLimit({
     windowMs: 10 * 60 * 1000, 
-    max:100, 
+    max:5, 
     message: {message : 'Too many requests from this IP, please try again after 15 minutes'},
     headers: true, // Include rate limit info in response headers
 });
@@ -127,21 +127,23 @@ app.post("/auth/login", (req, res) => {
         }
 
         const token = jwt.sign({userId : userData.userId}, "jwtkey", { expiresIn: '10h' })
+
+        const decodedToken = jwt.decode(token);
+        const expirationTime = decodedToken.exp * 1000;
         // eslint-disable-next-line no-unused-vars
-        const {password, ...other} = userData  
+        const {password, ...userDetails} = userData  
         res.cookie('jwt_token', token, {    // can be found inside cookie session in browser
             httpOnly:true,
             secure: true,  // requires HTTPS
             sameSite : "None",  // Allows the cookie to be sent in cross-site requests (different domain, subdomain or protocols)
             maxAge: 3600 * 10 * 1000 
-        }).status(200).json(other)     
+        }).status(200).json({...userDetails, expirationTime })     
     }
     catch(e) {
         res.status(500).json({ ServerErrorMsg: "Internal Server Error" })
         console.log(e)
     }
 })
-
 
 // update user profile
 app.put('/users/:id', (req, res) => {

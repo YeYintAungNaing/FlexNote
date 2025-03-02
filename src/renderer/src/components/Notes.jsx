@@ -16,8 +16,8 @@ import axios from 'axios'
 
 export default function Notes() {
 
-    const {currentUser, token, alertAndLog, onlineNotes, refetch, showAlert} = useContext(GlobalContext);
-    const [notes, setNotes] = useState(onlineNotes)
+    const {currentUser, token, alertAndLog, showAlert, notes, setNotes, getNotesOnline} = useContext(GlobalContext);
+    //const [notes, setNotes] = useState(onlineNotes)
     const navigate = useNavigate()
     const [open, setOpen] = useState(false); // State to control modal visibility
     const [noteName, setNoteName] = useState(''); // State to store the note name
@@ -39,6 +39,7 @@ export default function Notes() {
     //console.log('rendered_')
 
     async function getNotes(userId) {
+      //console.log('sssssssssssssssssssssssssssssssss')
 
       try{
         const response = await window.electron.fetchNotes(userId);
@@ -57,14 +58,21 @@ export default function Notes() {
       }
     }
 
-    useEffect(()=>{
+    useEffect( ()=>{
       
-      if(currentUser && currentUser.mode === 'Offline') {
-        getNotes(currentUser.id)   
-      }
-      console.log('notes effect')
+      if(currentUser) {
 
-    },[])
+        if (currentUser.mode === 'Offline') {
+          getNotes(currentUser.id) 
+        }
+        else if(!notes) {
+          console.log('d')
+          //refetch()
+          getNotesOnline()
+
+        }   
+      }
+    },[currentUser])
 
     function searchNotes() {
       if (!notes) {
@@ -96,7 +104,8 @@ export default function Notes() {
       try{
         const response = await axios.delete(`http://localhost:7000/notes/${noteId}`)
         alertAndLog(response.data.message, 'success')
-        refetch()
+        //refetch()
+        getNotesOnline()
       }
       catch(e) {
         if(e.response.data.ServerErrorMsg) {
@@ -187,8 +196,7 @@ export default function Notes() {
                     You have not created any note yet!
                   </div>
                   )
-              }
-                
+              }   
             </div> 
             <Dialog open={open} onClose={handleClose}>
             <DialogTitle>Enter Note Name</DialogTitle>

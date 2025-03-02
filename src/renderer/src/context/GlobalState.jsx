@@ -4,7 +4,7 @@ import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import axios from 'axios'
 import {DateTime} from 'luxon'
-import { useQuery } from '@tanstack/react-query'
+//import { useQuery } from '@tanstack/react-query'
 
 
 export const GlobalContext = createContext(null);
@@ -16,6 +16,8 @@ export default function GlobalState({children}) {
     const [token, setToken] = useState(() => window.localStorage.getItem('sessionToken'));  // lazy initializaiton instead of straight up call, 
     const [isLoading, setIsLoading] = useState(true)
     const [profileImg, setProfileImg] = useState(null)
+    const [notes, setNotes] = useState(null)
+    
     //console.log("from global state",currentUser)
 
     axios.defaults.withCredentials = true;
@@ -46,12 +48,29 @@ export default function GlobalState({children}) {
 
       async function getUserDetailsOnline() {  // this first check where there is jwt token and get user details
         try{
+          const storedExpirationTime = localStorage.getItem('tokenExpirationTime');
+          const storedUserData = JSON.parse(localStorage.getItem('userData'));
+          if (storedExpirationTime && storedUserData) {
+            const currentTime = Date.now();
+            if (currentTime > storedExpirationTime) {
+              console.log('Token expired');
+            } 
+            else {
+              console.log('still valid');
+              setCurrentUser(storedUserData)
+              //refetch()
+              setIsLoading(false)
+              return
+            }
+          }
          const response = await axios.get('http://localhost:7000/auth/verifyToken')
+         console.log("token verify")
           setCurrentUser(response.data)
+          
           //console.log('token comfired and get latest user data')
-          refetch()  
-          setIsLoading(false)
-
+           //refetch()  
+           setIsLoading(false)
+  
         }catch(e) {
           if(e.response) {   
             if(e.response.data.ServerErrorMsg) {  
@@ -107,14 +126,13 @@ export default function GlobalState({children}) {
         }
       }
 
-
-      const {data : onlineNotes, refetch} = useQuery({
-        queryKey : ['notes'],
-        queryFn : getNotesOnline,
-        staleTime: 5 * 60 * 1000,
-        enabled: currentUser?.mode === "Online" ? true : false, 
-        initialData : null
-      })
+      // const {data : onlineNotes, refetch} = useQuery({
+      //   queryKey : ['notes'],
+      //   queryFn : getNotesOnline,
+      //   staleTime: 5 * 60 * 1000,
+      //   enabled: currentUser?.mode === "Online" ? true : false, 
+      //   initialData : null
+      // })
 
   
       async function  getNotesOnline() {
@@ -122,7 +140,8 @@ export default function GlobalState({children}) {
             const response = await axios.get('http://localhost:7000/notes')
             
             if (response.data.length >  0) {
-              //console.log('notes fetched')
+              console.log('notes fetched')
+              setNotes(response.data)
               return response.data
               
             }
@@ -242,8 +261,10 @@ export default function GlobalState({children}) {
             isLoading,
             getUserDetails,
             getUserDetailsOnline,
-            onlineNotes,
-            refetch,
+            getNotesOnline,
+            notes,
+            setNotes,
+            
             showAlert,
             fetchProfileImage,
             profileImg,

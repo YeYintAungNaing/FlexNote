@@ -21,7 +21,7 @@ export default function EditNote() {
 
   const [noteName, setNoteName] = useState(location.state.name ? location.state.name : null )
   const [content, setContent] = useState(location.state.content ? location.state.content : null )
-  const {currentUser, token, showAlert, alertAndLog, refetch} = useContext(GlobalContext);
+  const {currentUser, token, showAlert, alertAndLog, getNotesOnline} = useContext(GlobalContext);
   const [open, setOpen] = useState(false)
 
   const handleOpen = () => setOpen(true); // Open modal
@@ -61,7 +61,8 @@ export default function EditNote() {
       })
       //console.log(response.data.message)
       alertAndLog(response.data.message, "success")
-      refetch()
+      //refetch()
+      getNotesOnline()
     }
     catch(e) {
       if(e.response) {   
@@ -112,7 +113,8 @@ export default function EditNote() {
         })
         //console.log(response.data.message)
         alertAndLog(response.data.message, "success")
-        refetch()
+        //refetch()
+        getNotesOnline
       }
       catch(e) {
         if(e.response) {   
