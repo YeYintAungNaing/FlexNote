@@ -4,13 +4,13 @@ import {  Link, useNavigate } from "react-router-dom";
 import "./../styles/Profile.scss"
 import axios from 'axios'
 import coverImage from "../assets/cover.jpg"
-import { useQueryClient } from '@tanstack/react-query';
+//import { useQueryClient } from '@tanstack/react-query';
 
 
 export default function Profile() {
 
     const navigate = useNavigate()
-    const queryClient = useQueryClient();
+    //const queryClient = useQueryClient();
 
     const {currentUser,setCurrentUser, isLoading, clearToken, fetchProfileImage, profileImg, setProfileImg } = useContext(GlobalContext);
 
@@ -45,7 +45,7 @@ export default function Profile() {
         window.localStorage.removeItem('userData')
         window.localStorage.removeItem('tokenExpirationTime')
         
-        queryClient.removeQueries(['notes']);
+        //queryClient.removeQueries(['notes']);
         console.log(response.data.message)
       }
       catch(e) {
