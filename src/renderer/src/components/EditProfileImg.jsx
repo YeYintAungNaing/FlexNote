@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { GlobalContext } from "../context/GlobalState";
 import "../styles/EditProfileImg.scss"
 import axios from "axios";
+import { API_BASE_URL } from "../config";
 
 
 export default function EditProfileImg() {
@@ -52,7 +53,7 @@ export default function EditProfileImg() {
           return
       }
       try{
-        const response = await axios.get("http://localhost:7000/generateSignature");
+        const response = await axios.get(`${API_BASE_URL}/generateSignature`);
         //console.log(response.data)
         const { signature, timestamp, cloud_name, api_key } = response.data
     
@@ -71,7 +72,7 @@ export default function EditProfileImg() {
         //console.log(resObj.url)
 
         
-        const res = await axios.put(`http://localhost:7000/users/${currentUser.userId}/profileImage`, {
+        const res = await axios.put(`${API_BASE_URL}/users/${currentUser.userId}/profileImage`, {
           image_url : resObj.secure_url
         })
         await getUserDetailsOnline()    // get updated user details

@@ -5,6 +5,7 @@ import { CountryDropdown } from 'react-country-region-selector';
 import "../styles/EditProfile.scss"
 import axios from 'axios'
 import emailValidator from 'email-validator';
+import { API_BASE_URL } from "../config";
 
 export default function EditProfile() {
 
@@ -45,7 +46,7 @@ export default function EditProfile() {
 
     async function editProfileOnline() {
         try{
-            const response = await axios.put(`http://localhost:7000/users/${currentUser.userId}`, {
+            const response = await axios.put(`${API_BASE_URL}/users/${currentUser.userId}`, {
                 userName,
                 dName,
                 email,

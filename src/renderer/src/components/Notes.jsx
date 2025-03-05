@@ -11,7 +11,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { GlobalContext } from "../context/GlobalState";
 import axios from 'axios'
-
+import { API_BASE_URL } from "../config";
 
 
 export default function Notes() {
@@ -102,7 +102,7 @@ export default function Notes() {
     async function deleteNoteOnline(noteId) {
       //console.log(noteId)
       try{
-        const response = await axios.delete(`http://localhost:7000/notes/${noteId}`)
+        const response = await axios.delete(`${API_BASE_URL}/notes/${noteId}`)
         alertAndLog(response.data.message, 'success')
         //refetch()
         getNotesOnline()

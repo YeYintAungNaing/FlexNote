@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { useLocation } from 'react-router-dom'
 import axios from 'axios'
+import { API_BASE_URL } from "../config";
 
 
 export default function NoteEditor() {
@@ -59,7 +60,7 @@ export default function NoteEditor() {
 
   async function saveNoteOnline() {
     try{
-      const response = await axios.post('http://localhost:7000/notes', {
+      const response = await axios.post(`${API_BASE_URL}/notes`, {
         noteName : noteName,
         content : content,
        })

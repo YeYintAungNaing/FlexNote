@@ -2,9 +2,11 @@ import { useContext, useState } from "react";
 import { GlobalContext } from "../context/GlobalState";
 import '../styles/ResetPass.scss'
 import axios from "axios";
+import { API_BASE_URL } from "../config";
+
 export default function ResetPassword() {
 
-    const {alertAndLog, showAlert,  currentUser, setCurrentUser} = useContext(GlobalContext);
+    const {alertAndLog, showAlert,  currentUser} = useContext(GlobalContext);
     const [isAuthorized, setIsAuthorized] = useState(false)
 
     const [password, setPassword] = useState('')
@@ -15,7 +17,7 @@ export default function ResetPassword() {
     
     async function sendMail() {
         try {
-            const res = await axios.post(`http://localhost:7000/users/${currentUser.userId}/generateCode`, {
+            const res = await axios.post(`${API_BASE_URL}/users/${currentUser.userId}/generateCode`, {
                 email : currentUser.email
             })
             setToggleInput(true)
@@ -43,7 +45,7 @@ export default function ResetPassword() {
     async function verifyCode() {
         //console.log(secretCode)
         try{
-            const res = await axios.put(`http://localhost:7000/users/${currentUser.userId}/verifyCode`, {
+            const res = await axios.put(`${API_BASE_URL}/users/${currentUser.userId}/verifyCode`, {
                 code : secretCode 
             })
             showAlert(res.data.message)
@@ -73,7 +75,7 @@ export default function ResetPassword() {
             return
         }
         try{
-            const res = await axios.put(`http://localhost:7000/users/${currentUser.userId}/resetPassword`, {
+            const res = await axios.put(`${API_BASE_URL}/users/${currentUser.userId}/resetPassword`, {
                 password
             })
             alertAndLog(res.data.message, "success")

@@ -3,6 +3,7 @@ import { GlobalContext } from "../context/GlobalState"
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios'
 import "../styles/Login.scss"
+import { API_BASE_URL } from "../config";
 
 
 export default function Login() {
@@ -51,11 +52,14 @@ export default function Login() {
 
       async function loginOnline() {
         try{
-          const response = await axios.post("http://localhost:7000/auth/login", {userName, password});
-          const { expirationTime, ...userData} = response.data
-          setCurrentUser(userData)
-          localStorage.setItem('userData', JSON.stringify(userData));
-          localStorage.setItem('tokenExpirationTime', expirationTime);
+          const response = await axios.post(`${API_BASE_URL}/auth/login`, {userName, password});
+          // const { expirationTime, ...userData} = response.data
+          if (typeof response.data !== "object") {
+            throw new Error("Invalid API response. Expected JSON but received HTML.");
+          }
+          setCurrentUser(response.data)
+          // localStorage.setItem('userData', JSON.stringify(userData));
+          // localStorage.setItem('tokenExpirationTime', expirationTime);
           showAlert("Login scuuess", "success")
           //refetch() 
           navigate('/')
@@ -100,7 +104,9 @@ export default function Login() {
       <>
         {
           currentUser? (
-            <div>your have already log in</div>
+            <button className="init-btn" onClick={() => navigate('/')} >
+              You hae already logged in! Go back to profile page?
+            </button>
           ) 
           : (
           <div className="login">

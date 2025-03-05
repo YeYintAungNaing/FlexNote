@@ -3,6 +3,35 @@
     align-items: center;
     height: 80vh;
     justify-content: center;
+
+
+    .init-btn {
+        
+        width: 200px;
+        height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: auto;
+            
+        background-color: #2298d7; 
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        text-transform: uppercase;
+        border: none;
+        border-radius: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        outline: none;
+        transition: all 0.3s ease;
+        
+        
+        &:hover {
+          background-color: #00a7cc;
+          transform: translateY(-4px);
+        }
+    }
     
     .drawing-board{
         border: 1px solid;

@@ -5,7 +5,6 @@ import { useCurrentEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import '../styles/TiptapConfig.scss'
 
-
 export default function MenuBar() {
   const { editor } = useCurrentEditor()
 

@@ -14,6 +14,7 @@ import {
   TextField,
 } from '@mui/material';
 import axios from "axios"
+import { API_BASE_URL } from "../config";
 
 
 export default function EditNote() {
@@ -55,7 +56,7 @@ export default function EditNote() {
 
   async function editNoteOnline() {
     try{
-      const response =  await axios.put(`http://localhost:7000/notes/${location.state.id}`, {
+      const response =  await axios.put(`${API_BASE_URL}/notes/${location.state.id}`, {
         id : location.state.id,
         content
       })
@@ -107,7 +108,7 @@ export default function EditNote() {
 
   async function editNoteNameOnline() {
       try{
-        const response = await axios.put(`http://localhost:7000/notes/${location.state.id}/name`, {
+        const response = await axios.put(`${API_BASE_URL}/notes/${location.state.id}/name`, {
           noteName,
           id : location.state.id,
         })

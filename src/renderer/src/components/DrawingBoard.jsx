@@ -6,6 +6,7 @@ import { SquareIcon, CircleIcon,  Pencil1Icon} from "sebikostudio-icons"
 import DrawingBoardSetting from "./DrawingBoardSetting"
 import axios from "axios"
 import  { GlobalContext } from "../context/GlobalState"
+import { API_BASE_URL } from "../config";
 
 
 
@@ -17,6 +18,7 @@ export default function DrawingBoard() {
     const [canvasSize, setCanvasSize ] = useState({ width : 500, height : 500})
     const {  showAlert, currentUser, token, alertAndLog } = useContext(GlobalContext);
     const [isEditing, setIsEditing] = useState(false)
+    const [canvasLoaded, setCanvasLoaded] = useState(false)
 
 
     function getCanvasSize(object) {
@@ -49,6 +51,7 @@ export default function DrawingBoard() {
             
         }  
         setCanvas(inintCanvas)
+        setCanvasLoaded(true)
     }
 
     async function getDrawingData_(inintCanvas) {
@@ -76,7 +79,7 @@ export default function DrawingBoard() {
 
     async function getDrawingDataOnline(inintCanvas) {
         try {
-            const res = await axios.get("http://localhost:7000/drawingBoard");
+            const res = await axios.get(`${API_BASE_URL}/drawingBoard`);
     
             if (res.data.drawingData) {
                 //console.log("Fetched Data:", res.data.drawingData);
@@ -190,7 +193,7 @@ export default function DrawingBoard() {
 
         try{
             const drawingData = canvas.toJSON()
-            const res = await axios.post(`http://localhost:7000/drawingBoard`, {
+            const res = await axios.post(`${API_BASE_URL}/drawingBoard`, {
                 drawingData
             })
             showAlert(res.data.message, "success")
@@ -259,7 +262,7 @@ export default function DrawingBoard() {
         try{
             const drawingData = canvas.toJSON()
             console.log(drawingData)
-            const res = await axios.put(`http://localhost:7000/drawingBoard`, {
+            const res = await axios.put(`${API_BASE_URL}/drawingBoard`, {
                 drawingData
             })
             showAlert(res.data.message, "success")
@@ -308,25 +311,26 @@ export default function DrawingBoard() {
     
     return (
         <div className="drawing-page">
-            {!canvas && 
-              <button onClick={initializeCanvas} >
-              click
-          </button>
-            }
-        
-            <canvas className="drawing-board" id="canvas" ref={canvasRef}></canvas>
-            
-            <DrawingBoardSetting canvas={canvas}></DrawingBoardSetting>
-            {
-                isEditing? (
+        {!canvasLoaded &&
+            <button className="init-btn" onClick={initializeCanvas} >
+                Initialize drawing board
+            </button>
+        }
+        <canvas className="drawing-board" id="canvas" ref={canvasRef} style={{display : canvasLoaded? "inherit" : "none"}}></canvas>
+        {
+            canvasLoaded && 
+            <>
+                <DrawingBoardSetting canvas={canvas}></DrawingBoardSetting>
+                {
+                    isEditing? (
                     <button className="board-save" onClick={editBoard}>Save data</button>
-                ) 
-                : (
-                    <button className="board-save" onClick={saveBoard}>Save</button>
-                )
-            }
-            <div className="canvas-setting">
-            <label>Width: </label>
+                    ) 
+                    : (
+                    <button className="board-save" onClick={saveBoard}>Save data</button>
+                    )
+                 }
+                <div  className="canvas-setting">
+                <label>Width: </label>
                 <input
                     type="number"
                     name="width"
@@ -340,18 +344,20 @@ export default function DrawingBoard() {
                     value={canvasSize.height}
                     onChange={handleResizeChange}
                 />
-            </div>
-            <div className="tools-bar">
-                <button  onClick={addRectangle}>
-                    <SquareIcon></SquareIcon>
-                </button>
-                <button onClick={addCircle}>
-                    <CircleIcon></CircleIcon>
-                </button>
-                <button id="drawing" className="toggle-btn" onClick={toggleDrawingMode}>
-                    <Pencil1Icon></Pencil1Icon>
-                </button>
-            </div>
-        </div>
+                </div>
+                <div className="tools-bar">
+                    <button   onClick={addRectangle}>
+                        <SquareIcon></SquareIcon>
+                    </button>
+                    <button onClick={addCircle}>
+                        <CircleIcon></CircleIcon>
+                    </button>
+                    <button id="drawing" className="toggle-btn" onClick={toggleDrawingMode}>
+                        <Pencil1Icon></Pencil1Icon>
+                    </button>
+                </div>
+            </>
+        }
+    </div>
     )
 }

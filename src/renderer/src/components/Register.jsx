@@ -4,6 +4,7 @@ import axios from 'axios'
 import {DateTime} from 'luxon'
 import '../styles/Register.scss'
 import { Link, useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 
 export default function Register() {
     const navigate = useNavigate()
@@ -39,7 +40,7 @@ export default function Register() {
 
       async function onlineRegister() {
         try{
-            const response = await axios.post('http://localhost:7000/auth/register', {
+            const response = await axios.post(`${API_BASE_URL}/auth/register`, {
               userName,
               password,
               mode : selectedMode,

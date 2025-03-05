@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react"
 import { GlobalContext } from "../context/GlobalState";
 import axios from "axios";
 import '../styles/Log.scss'
-
+import { API_BASE_URL } from "../config";
 
 
 export default function Logs() {
@@ -15,7 +15,7 @@ export default function Logs() {
         //const test = null
 
         try{
-            const response = await axios.get(`http://localhost:7000/users/${currentUser.userId}/history`)
+            const response = await axios.get(`${API_BASE_URL}/users/${currentUser.userId}/history`)
             setMessageLogs(response.data)
             //console.log(response.data)
         }

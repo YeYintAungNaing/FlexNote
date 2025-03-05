@@ -1,9 +1,7 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { GlobalContext } from "../context/GlobalState";
 import { useNavigate } from "react-router-dom";
 import '../styles/Setting.scss'
-
-
 
 
 export default function Setting() {
@@ -11,7 +9,7 @@ export default function Setting() {
    const navigate = useNavigate()
   //const [data, setData] = useState("")
 
- const {alertAndLog, showAlert, setProfileImg, currentUser, setCurrentUser} = useContext(GlobalContext);
+ const {alertAndLog, showAlert, currentUser, setCurrentUser} = useContext(GlobalContext);
   // function current() {
   //   try{
   //     const token = window.localStorage.getItem('sessionToken');

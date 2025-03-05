@@ -20,6 +20,8 @@ const  MY_WEBSITE_2 =  process.env.MY_WEBSITE_2
 
 app.use(cors({
     origin: ["http://localhost:5173", MY_WEBSITE, MY_WEBSITE_2, "http://localhost:5174"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
+    allowedHeaders: ["Authorization", "Content-Type"],
     credentials: true
 }))
 
@@ -27,6 +29,13 @@ const limiter = rateLimit({
     windowMs: 10 * 60 * 1000, 
     max:50, 
     message: {message : 'Too many requests from this IP, please try again after 15 minutes'},
+    headers: true, // Include rate limit info in response headers
+});
+
+const strictLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, 
+    max:30, 
+    message: {message : 'Too many requests from this IP, please try again after 5 minutes'},
     headers: true, // Include rate limit info in response headers
 });
 
@@ -51,6 +60,10 @@ cloudinary.config({
 });
 
 const resend = new Resend(RESEND_API_SECRET);
+
+app.get('/test', (req, res) => {
+    res.send("hello")
+})
 
 
 app.post('/auth/register', (req, res) => {
@@ -77,7 +90,7 @@ app.post('/auth/register', (req, res) => {
 })
 
 
-app.get('/auth/verifyToken' , (req, res) => {
+app.get('/auth/verifyToken' ,strictLimiter, (req, res) => {
     try{
         const token = req.cookies?.jwt_token;
 
@@ -126,10 +139,20 @@ app.post("/auth/login", (req, res) => {
             return
         }
 
+        //const origin = req.get("origin"); // Get the requesting frontend's origin
+        // let domain;
+
+        // if (origin) {
+        //     const url = new URL(origin);
+        //     domain = url.hostname.includes("localhost") ? undefined : `${url.hostname}`; 
+        //     // Use undefined for localhost (automatically scoped), and prepend '.' for subdomains
+        // }
+        // console.log(domain)
+
         const token = jwt.sign({userId : userData.userId}, "jwtkey", { expiresIn: '10h' })
 
-        const decodedToken = jwt.decode(token);
-        const expirationTime = decodedToken.exp * 1000;
+        //const decodedToken = jwt.decode(token);
+        //const expirationTime = decodedToken.exp * 1000;
         // eslint-disable-next-line no-unused-vars
         const {password, ...userDetails} = userData  
         res.cookie('jwt_token', token, {    // can be found inside cookie session in browser
@@ -137,7 +160,7 @@ app.post("/auth/login", (req, res) => {
             secure: true,  // requires HTTPS
             sameSite : "None",  // Allows the cookie to be sent in cross-site requests (different domain, subdomain or protocols)
             maxAge: 3600 * 10 * 1000 
-        }).status(200).json({...userDetails, expirationTime })     
+        }).status(200).json(userDetails)     
     }
     catch(e) {
         res.status(500).json({ ServerErrorMsg: "Internal Server Error" })
@@ -386,7 +409,7 @@ app.put('/users/:id/resetPassword', (req, res) => {
 
 
 // getting notes
-app.get('/notes', (req, res) => {
+app.get('/notes', strictLimiter, (req, res) => {
 
     try{
         const token = req.cookies.jwt_token;
@@ -446,6 +469,7 @@ app.post('/notes', (req, res) => {
         console.log(e)
     }
 })
+
 
 // editing existing note
 app.put('/notes/:id', (req, res) => {
@@ -581,6 +605,7 @@ app.get('/drawingBoard', (req, res) => {
     }
 })
 
+
 // editing board data
 app.put('/drawingBoard', (req, res) => {
     
@@ -639,7 +664,7 @@ app.post('/users/:id/history', (req, res) => {
 
 
 // get logs
-app.get('/users/:id/history', (req, res) => {
+app.get('/users/:id/history', strictLimiter,(req, res) => {
 
     try{
         const token = req.cookies.jwt_token;
@@ -680,7 +705,7 @@ app.post('/auth/logout', (req, res) => {
 })
 
 
-app.listen(7000, () => {
+app.listen(7001, () => {
     console.log('connected to backend')
 })
 

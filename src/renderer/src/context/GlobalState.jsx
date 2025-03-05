@@ -5,7 +5,7 @@ import Snackbar from '@mui/material/Snackbar';
 import axios from 'axios'
 import {DateTime} from 'luxon'
 //import { useQuery } from '@tanstack/react-query'
-
+import { API_BASE_URL } from "../config";
 
 export const GlobalContext = createContext(null);
 
@@ -48,29 +48,32 @@ export default function GlobalState({children}) {
 
       async function getUserDetailsOnline() {  // this first check where there is jwt token and get user details
         try{
-          const storedExpirationTime = localStorage.getItem('tokenExpirationTime');
-          const storedUserData = JSON.parse(localStorage.getItem('userData'));
-          if (storedExpirationTime && storedUserData) {
-            const currentTime = Date.now();
-            if (currentTime > storedExpirationTime) {
-              console.log('Token expired');
-            } 
-            else {
-              console.log('still valid');
-              setCurrentUser(storedUserData)
-              //refetch()
-              setIsLoading(false)
-              return
-            }
+          // trying local storage caching  was a mistake zzzzzzz
+          // const storedExpirationTime = localStorage.getItem('tokenExpirationTime');
+          // const storedUserData = JSON.parse(localStorage.getItem('userData'));
+          // if (storedExpirationTime && storedUserData) {
+          //   const currentTime = Date.now();
+          //   if (currentTime > storedExpirationTime) {
+          //     console.log('Token expired');
+          //   } 
+          //   else {
+          //     console.log('still valid');
+          //     setCurrentUser(storedUserData)
+          //     //refetch()
+          //     setIsLoading(false)
+          //     return
+          //   }
+          // }
+          const response = await axios.get(`${API_BASE_URL}/auth/verifyToken`)
+          console.log("token verify")
+          if (typeof response.data !== "object") {
+            throw new Error("Invalid API response. Expected JSON but received HTML.");
           }
-         const response = await axios.get('http://localhost:7000/auth/verifyToken')
-         console.log("token verify")
-          setCurrentUser(response.data)
-          
+          setCurrentUser(response.data) 
           //console.log('token comfired and get latest user data')
-           //refetch()  
-           setIsLoading(false)
-  
+          //refetch()  
+          setIsLoading(false)
+
         }catch(e) {
           if(e.response) {   
             if(e.response.data.ServerErrorMsg) {  
@@ -137,7 +140,7 @@ export default function GlobalState({children}) {
   
       async function  getNotesOnline() {
         try{
-            const response = await axios.get('http://localhost:7000/notes')
+            const response = await axios.get(`${API_BASE_URL}/notes`)
             
             if (response.data.length >  0) {
               console.log('notes fetched')
@@ -148,7 +151,6 @@ export default function GlobalState({children}) {
             else{
               return null
             }
-  
         }
         catch(e) {
           if(e.response) {
@@ -210,7 +212,7 @@ export default function GlobalState({children}) {
 
   async function saveLogOnline(logContent, logType) {
     try{
-      const res = await axios.post(`http://localhost:7000/users/${currentUser.userId}/history`, {
+      const res = await axios.post(`${API_BASE_URL}/users/${currentUser.userId}/history`, {
         logContent, 
         createdAt : DateTime.now().toLocaleString(DateTime.DATETIME_FULL),
         logType
@@ -249,6 +251,34 @@ export default function GlobalState({children}) {
     }
   }
 
+  async function logoutOnline() {
+    try{
+      const response =  await axios.post(`${API_BASE_URL}/auth/logout`)
+      setCurrentUser(null)
+      // window.localStorage.removeItem('userData')
+      // window.localStorage.removeItem('tokenExpirationTime')
+      //await db.notes.clear();
+      setNotes(null)
+      //queryClient.removeQueries(['notes']);
+      showAlert(response.data.message, "success")
+    }
+    catch(e) {
+      console.log(e.response.data.message)
+    }    
+  }
+
+  async function logoutOffline() {
+  
+    try{
+      const response = await window.electron.logoutUser(currentUser.id)
+      console.log( response.message)
+      clearToken()
+
+    }catch(e) {
+      console.log(e)
+    } 
+  }
+
 
     return (
         <GlobalContext.Provider
@@ -264,7 +294,8 @@ export default function GlobalState({children}) {
             getNotesOnline,
             notes,
             setNotes,
-            
+            logoutOnline,
+            logoutOffline,
             showAlert,
             fetchProfileImage,
             profileImg,
