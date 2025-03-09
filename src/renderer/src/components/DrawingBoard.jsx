@@ -316,7 +316,7 @@ export default function DrawingBoard() {
                 Initialize drawing board
             </button>
         }
-        <canvas className="drawing-board" id="canvas" ref={canvasRef} style={{display : canvasLoaded? "inherit" : "none"}}></canvas>
+        <canvas className="drawing-board" id="canvas" ref={canvasRef} style={{opacity: canvasLoaded ? 1 : 0}}></canvas>
         {
             canvasLoaded && 
             <>

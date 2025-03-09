@@ -705,7 +705,7 @@ app.post('/auth/logout', (req, res) => {
 })
 
 
-app.listen(7001, () => {
+app.listen(7000, () => {
     console.log('connected to backend')
 })
 

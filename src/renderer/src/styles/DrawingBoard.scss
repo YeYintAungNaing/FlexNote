@@ -9,6 +9,8 @@
         
         width: 200px;
         height: 100px;
+        z-index: 999;
+        position: fixed;
         display: flex;
         justify-content: center;
         align-items: center;
